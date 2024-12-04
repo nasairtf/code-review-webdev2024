@@ -1,0 +1,66 @@
+# Logs and debugging files
+/logs/
+*.log
+
+# Temporary and cache files
+/.cache/
+/tmp/
+*.tmp
+
+# IDE/editor files
+.idea/
+.vscode/
+.geany/
+
+# Vendor and external libraries
+/vendor/
+jpgraph/
+jpgraph.tar.gz
+
+# Configuration, sensitive, and environment files
+.env
+*.conf
+/.config/
+/configs/
+
+# User-specific or system files
+.bash*
+.dbus/
+.esd_auth
+.htaccess
+.local/
+.mysql_history
+.ssh/
+.xauth*
+.Xauthority
+.zshrc
+
+# Utility scripts and backups
+/bin/
+/backups/
+/root-bin/
+
+# Composer-related files
+!composer.lock
+!composer.json
+!phpcs.xml
+
+# Data areas, generated graphs, etc
+data/
+public_html/ishell/graphs/
+
+# Exclude text-generated public files
+public_html/test_*.php
+
+# Exclude public_html files not in source control
+public_html/*.php
+!public_html/Login.php
+!public_html/Logout.php
+!public_html/feedback/Feedback.php
+!public_html/ishell/index.html
+!public_html/ishell/spectrograph_controller.php
+!public_html/ishell/guider_controller.php
+!public_html/ishell/monitor.php
+!public_html/proposals/UpdateApplicationDate.php
+!public_html/proposals/UploadScheduleFile.php
+

@@ -1,0 +1,259 @@
+<?php
+
+namespace App\core\htmlbuilder;
+
+/**
+ * /home/webdev2024/classes/core/htmlbuilder/FormElementsBuilder.php
+ *
+ * A utility class responsible for building HTML layout elements with optional formatting.
+ *
+ * @category Utilities
+ * @package  IRTF
+ * @author   Miranda Hawarden-Ogata
+ * @version  1.0.0
+ */
+
+class FormElementsBuilder
+{
+    /**
+     * Here are a list of element pad variables to use in each layout function to
+     * ensure flexibility and consistency of padding values for the given form.
+     * The variables are listed in alphabetical order at the very top of the methods.
+     *
+     * $buttonPad = $pad + 0;
+     * $formPad = $pad + 0;
+     * $inputPad = $pad + 0;
+     * $linePad = $pad + 0;
+     * $pulldownPad = $pad + 0;
+     * $tableCellPad = $pad + 0;
+     * $tablePad = $pad + 0;
+     * $tableRowPad = $pad + 0;
+     */
+
+    /**
+     * Whether to format the HTML output (indent and add line breaks).
+     *
+     * @var bool
+     */
+    private $formatOutput;
+
+    /**
+     * Builder object for generating HTML components.
+     *
+     * @var HtmlBuilder
+     */
+    private $htmlBuilder;
+
+    /**
+     * Constructor to set the formatting preference and HTML builder instance.
+     *
+     * @param bool        $formatOutput  If true, output will be formatted with indentation.
+     * @param HtmlBuilder $htmlBuilder   [optional] An instance of HtmlBuilder. Defaults to a new instance.
+     */
+    public function __construct(
+        bool $formatOutput = false,
+        ?HtmlBuilder $htmlBuilder = null
+    ) {
+        $this->formatOutput = $formatOutput;
+        $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder($formatOutput);
+    }
+
+    /**
+     * Generates a horizontal line inside a table cell, with specified padding and column span.
+     *
+     * @param int $colspan [optional] The number of columns to span the line. Default is 1.
+     * @param int $pad     [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the horizontal line.
+     */
+    public function buildLineTableCell(
+        int $colspan = 1,
+        int $pad = 0
+    ): string {
+        return $this->htmlBuilder->getHorizontalLine(false, '#FFFFFF', $colspan, $pad, false);
+    }
+
+    /**
+     * Generates reset and submit buttons for a form, with a customizable submit button label.
+     *
+     * @param string $button The label for the submit button.
+     * @param int    $pad    [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the reset and submit buttons.
+     */
+    public function buildSemesterChooserActionButtons(
+        string $button,
+        int $pad = 0
+    ): string {
+        $buttonPad = $pad;
+        $resetButton = $this->htmlBuilder->getResetButton('Reset', ['style' => 'width: 120px;'], $buttonPad);
+        $submitButton = $this->htmlBuilder->getSubmitButton($button, 'Generate', ['style' => 'width: 120px;'], $buttonPad);
+        return $this->htmlBuilder->formatParts([$resetButton, $submitButton], $this->formatOutput);
+    }
+
+    /**
+     * Generates a hidden input and submit button with a customizable button color.
+     *
+     * @param string $button   The label for the submit button.
+     * @param string $label    The display text on the button.
+     * @param string $id       The proposal ID for the hidden input.
+     * @param string $color    Background color for the submit button.
+     * @param int    $pad      [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the hidden input and submit button.
+     */
+    public function buildProposalActionTrigger(
+        string $button,
+        string $label,
+        string $id,
+        string $color,
+        int $pad = 0
+    ): string {
+        $buttonPad = $pad;
+        $inputPad = $pad;
+        $buttonStyle = "width: 120px; background-color: {$color};";
+        $hiddenInput = $this->htmlBuilder->getHiddenInput('i', $id, [], $inputPad);
+        $submitButton = $this->htmlBuilder->getSubmitButton($button, $label, ['style' => $buttonStyle], $buttonPad);
+        return $this->htmlBuilder->formatParts([$hiddenInput, $submitButton], $this->formatOutput);
+    }
+
+    /**
+     * Wraps a hidden input and submit button inside a form element.
+     *
+     * @param string $action The form's action URL.
+     * @param string $id     The proposal ID for the hidden input.
+     * @param string $color  Background color for the submit button.
+     * @param int    $pad    [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the form.
+     */
+    public function buildSemesterProposalListButtonForm(
+        string $action,
+        string $id,
+        string $color,
+        int $pad = 0
+    ): string {
+        $triggerPad = $pad + 2;
+        $formPad = $pad;
+        $html = trim($this->buildProposalActionTrigger('select', 'Edit', $id, $color, $triggerPad));
+        $html = $this->htmlBuilder->formatOutput($html, $this->formatOutput, false, 2);
+        return $this->htmlBuilder->getForm(
+            $action,
+            'post',
+            $html,
+            ['enctype' => 'multipart/form-data', 'target' => '_blank', 'style' => 'margin: 0px; padding: 0px;'],
+            $formPad,
+            true
+        );
+    }
+
+    /**
+     * Generates a table row for a proposal lister, including a form for editing proposals.
+     *
+     * @param string $action   The form's action URL.
+     * @param array  $proposal Array containing proposal data (id, code, program number, investigator).
+     * @param string $bgColor  Background color for the row.
+     * @param int    $pad      [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the proposal lister row.
+     */
+    public function buildSemesterProposalListFormRow(
+        string $action,
+        array $proposal,
+        string $bgColor,
+        int $pad = 0
+    ): string {
+        $cellPad = $pad + 2;
+        $formPad = $pad + 4;
+        $tableRowPad = $pad;
+        $proposalId = HtmlBuildUtility::escape($proposal['ObsApp_id'], false);
+        $proposalCode = HtmlBuildUtility::escape($proposal['code'], false);
+        $programNumber = HtmlBuildUtility::escape($proposal['semesterYear'] . $proposal['semesterCode'] . sprintf("%03d", $proposal['ProgramNumber']), false);
+        $investigator = HtmlBuildUtility::escape('(' . $proposal['InvLastName1'] . ')', false);
+        $buttonColor = $proposal['ProgramNumber'] === 0 ? 'lightblue' : 'lightgreen';
+        $editForm = $this->buildSemesterProposalListButtonForm($action, $proposalId, $buttonColor, $formPad);
+        $cells = [
+            $this->htmlBuilder->getTableCell('&nbsp;', false, true, ['style' => 'width: 75px;'], $cellPad, true),
+            $this->htmlBuilder->getTableCell($editForm, false, false, ['align' => 'right', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $cellPad, true),
+            $this->htmlBuilder->getTableCell($proposalCode, false, true, ['align' => 'center', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $cellPad, true),
+            $this->htmlBuilder->getTableCell($programNumber, false, true, ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $cellPad, true),
+            $this->htmlBuilder->getTableCell($investigator, false, true, ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $cellPad, true),
+            $this->htmlBuilder->getTableCell('&nbsp;', false, true, ['style' => 'width: 75px;'], $cellPad, true),
+        ];
+        return $this->htmlBuilder->getTableRowFromCells($cells, ['style' => 'height: 32px; background-color: ' . $bgColor], $tableRowPad);
+    }
+
+    /**
+     * Creates a set of pulldown menus for selecting a date (year, month, and day).
+     *
+     * @param array $names     Associative array with 'year', 'month', and 'day' keys for pulldown name attributes.
+     * @param array $options   [optional] Array with 'year', 'month', and 'day' keys for default selections.
+     * @param int   $startYear [optional] Start year for year pulldown. Defaults to current year - 5.
+     * @param int   $endYear   [optional] End year for year pulldown. Defaults to current year + 3.
+     * @param int   $pad       [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the date pulldown set.
+     */
+    public function buildDatePulldowns(
+        array $names,
+        array $options = [],
+        int $startYear = null,
+        int $endYear = null,
+        int $pad = 0
+    ): string {
+        $currentYear = date('Y');
+        $startYear = $startYear ?? $currentYear - 5;
+        $endYear = $endYear ?? 0;
+        $selectedYear = $options['year'] ?? date('Y');
+        $selectedMonth = $options['month'] ?? date('n');
+        $selectedDay = $options['day'] ?? date('j');
+
+        $yearPulldown = $this->htmlBuilder->getYearsPulldown($names['year'], $selectedYear, $startYear, $endYear, [], $pad, false);
+        $monthPulldown = $this->htmlBuilder->getShortMonthNamesPulldown($names['month'], $selectedMonth, [], $pad, false);
+        $dayPulldown = $this->htmlBuilder->getDaysOfMonthPulldown($names['day'], $selectedDay, false, [], $pad, false);
+        return $this->htmlBuilder->formatParts([$monthPulldown, $dayPulldown, $yearPulldown], $this->formatOutput);
+    }
+
+    /**
+     * Generates three pulldown menus for selecting single-digit numbers (0 to 9).
+     *
+     * @param array $names     Array specifying names for each pulldown with keys [1], [2], and [3].
+     * @param array $options   [optional] Array with default selected values for each pulldown.
+     * @param int   $pad       [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the three-number pulldown set.
+     */
+    public function buildThreeNumberPulldowns(
+        array $names,
+        array $options = [],
+        int $pad = 0
+    ): string {
+        $selectedFirst = $options[1] ?? 0;
+        $selectedSecond = $options[2] ?? 0;
+        $selectedThird = $options[3] ?? 0;
+        $firstPulldown = $this->htmlBuilder->getNumbersPulldown($names[1], $selectedFirst, 0, 9, false, [], $pad, false);
+        $secondPulldown = $this->htmlBuilder->getNumbersPulldown($names[2], $selectedSecond, 0, 9, false, [], $pad, false);
+        $thirdPulldown = $this->htmlBuilder->getNumbersPulldown($names[3], $selectedThird, 0, 9, false, [], $pad, false);
+        return $this->htmlBuilder->formatParts([$firstPulldown, $secondPulldown, $thirdPulldown], $this->formatOutput);
+    }
+
+    /**
+     * Generates a pulldown menu for selecting a semester program.
+     *
+     * @param string $name           The name attribute for the dropdown.
+     * @param string $selectedOption The option to pre-select in the dropdown.
+     * @param array  $options        Associative array of options (label => program ID).
+     * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the semester program pulldown.
+     */
+    public function buildSemesterProgramsPulldown(
+        string $name,
+        string $selectedOption,
+        array $options,
+        int $pad = 0
+    ): string {
+        $pulldown = $this->htmlBuilder->getPulldown($name, $selectedOption, $options, [], $pad, false);
+        return $this->htmlBuilder->formatParts([$pulldown], $this->formatOutput);
+    }
+}

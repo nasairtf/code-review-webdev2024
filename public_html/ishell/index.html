@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iSHELL Temperature Monitoring</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Layout: Two equal columns side by side */
+        .container {
+            display: flex;
+            flex: 1;
+            height: 100vh;
+        }
+
+        .left-column,
+        .right-column {
+            width: 50%;
+            overflow: hidden; /* Prevents scrollbars in columns */
+            border: 1px solid #ccc;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Nested flex layout for the left column */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .frame {
+            flex: 1; /* Makes each frame take up 50% of the column height */
+            overflow: hidden; /* Prevents scrollbars inside each frame */
+            border: 1px solid #ddd;
+        }
+
+        /* Styling the sections */
+        h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            overflow-y: auto; /* allow scrolling inside the iframe only */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Left column with two frames -->
+    <div class="left-column">
+        <div class="frame">
+            <!-- Spectrograph Controller -->
+            <iframe src="spectrograph_controller.php" title="Spectrograph Controller"></iframe>
+        </div>
+        <div class="frame">
+            <!-- Guider Controller -->
+            <iframe src="guider_controller.php" title="Guider"></iframe>
+        </div>
+    </div>
+
+    <!-- Right column with a single frame -->
+    <div class="right-column">
+        <!-- Monitor -->
+        <iframe src="monitor.php" title="Monitor"></iframe>
+    </div>
+</div>
+
+</body>
+</html>

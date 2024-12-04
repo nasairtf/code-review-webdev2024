@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<ruleset name="CustomRules">
+    <description>Custom coding standards for WebDev2024 project.</description>
+
+    <!-- Base coding standard -->
+    <rule ref="PSR12" />
+
+    <!-- Paths to scan -->
+    <file>classes/</file>
+    <!--
+    <file>classes/controllers</file>
+    <file>classes/core/common</file>
+    <file>classes/core/htmlbuilder</file>
+    <file>classes/core/irtf</file>
+    <file>classes/exceptions</file>
+    <file>classes/models</file>
+    <file>classes/services/database</file>
+    <file>classes/services/email</file>
+    <file>classes/services/graphs</file>
+    <file>classes/validators</file>
+    <file>classes/views</file>
+    -->
+    <file>configs/</file>
+    <file>public_html/</file>
+
+    <!-- Exclude legacy code -->
+    <exclude-pattern>*/legacy/*</exclude-pattern>
+
+    <!-- Exclude vendor code -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <!-- Exclude graph libraries code -->
+    <exclude-pattern>*/graphs/lib/*</exclude-pattern>
+
+    <!-- Exclude specific files if needed -->
+    <!--
+    <exclude-pattern>*/public_html/test_*.php</exclude-pattern>
+    -->
+</ruleset>

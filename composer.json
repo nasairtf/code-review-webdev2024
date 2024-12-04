@@ -1,0 +1,21 @@
+{
+    "name": "webdev2024/webdev2024",
+    "description": "Webpage refactor to class-based code",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "classes/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Miranda Hawarden-Ogata"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.11"
+    }
+}
