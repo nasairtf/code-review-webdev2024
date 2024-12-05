@@ -40,6 +40,7 @@ This document serves as a guide for SE team members working on the IRTF website 
     - Use `snake_case` for configuration and script files (e.g., `my_config.php`).
     - Follow existing directory and namespace structures (e.g., `classes/services/files/FileParser.php`).
     - Use namespaces that correspond to the directory structure (e.g., `App\services\files`).
+    - See [STRUCTURE.md](https://github.com/ifauh/webdev2024/blob/main/STRUCTURE.md) for more details.
 
 4. **Coding Practices**:
     - Functions and methods should have clear, descriptive names.

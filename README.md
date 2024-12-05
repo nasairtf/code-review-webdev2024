@@ -104,6 +104,8 @@ The project follows a standard MVC pattern. Key directories include:
 - `tests/`: PHPUnit test cases.
 - `classes/legacy/`: Wrapper classes providing a unified API for interacting with old procedural code. This area facilitates smooth integration between refactored and legacy components during the transition.
 
+Please see [STRUCTURE.md](https://github.com/ifauh/webdev2024/blob/main/STRUCTURE.md) for more details.
+
 ---
 
 ## License
