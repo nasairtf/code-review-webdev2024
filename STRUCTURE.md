@@ -49,7 +49,7 @@ The project is organized around the MVC pattern with SRP and DRY principles. Leg
 - **Deprecation of `legacy/`**: Once all functionality has been refactored, this directory will be removed.
 
 ## Generated Directory Tree
-
+```
 /home/webdev2024/
 ├── classes
 │   ├── controllers
@@ -211,7 +211,7 @@ The project is organized around the MVC pattern with SRP and DRY principles. Leg
 ├── phpcs.xml
 ├── README.md
 └── STRUCTURE.md
-
+```
 ---
 
 ### Revision History
