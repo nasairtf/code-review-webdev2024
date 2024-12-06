@@ -6,6 +6,8 @@
 /.cache/
 /tmp/
 *.tmp
+.doctum-cache/
+.phpunit.result.cache
 
 # IDE/editor files
 .idea/
@@ -49,11 +51,16 @@ jpgraph.tar.gz
 data/
 public_html/ishell/graphs/
 
-# Exclude text-generated public files
+# Exclude generated documentation
+docs/
+
+# Exclude test-generated public files
 public_html/test_*.php
 
 # Exclude public_html files not in source control
 public_html/*.php
+
+# Include specific entry points in public_html
 !public_html/Login.php
 !public_html/Logout.php
 !public_html/feedback/Feedback.php
@@ -63,4 +70,3 @@ public_html/*.php
 !public_html/ishell/monitor.php
 !public_html/proposals/UpdateApplicationDate.php
 !public_html/proposals/UploadScheduleFile.php
-
