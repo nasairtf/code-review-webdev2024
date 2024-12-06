@@ -5,6 +5,9 @@
     <!-- Base coding standard -->
     <rule ref="PSR12" />
 
+    <!-- PHP version compatibility -->
+    <config name="testVersion" value="7.2" />
+
     <!-- Paths to scan -->
     <file>classes/</file>
     <!--
