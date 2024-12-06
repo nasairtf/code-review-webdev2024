@@ -21,6 +21,7 @@ define('VENDOR_PATH', BASE_PATH . 'vendor/');
 define('CONFIG_PATH', BASE_PATH . 'configs/');
 define('CLASS_PATH', BASE_PATH . 'classes/');
 define('LOGS_PATH', BASE_PATH . 'logs/');
+define('DATA_PATH', BASE_PATH . 'data/');
 
 // Load Composer autoloader
 require_once VENDOR_PATH . 'autoload.php';
@@ -54,6 +55,7 @@ define('VENDOR_PATH', BASE_PATH . 'vendor/');
 define('CONFIG_PATH', BASE_PATH . 'configs/');
 define('CLASS_PATH', BASE_PATH . 'classes/');
 define('LOGS_PATH', BASE_PATH . 'logs/');
+define('DATA_PATH', BASE_PATH . 'data/');
 
 // Load Composer autoloader
 require_once VENDOR_PATH . 'autoload.php';
