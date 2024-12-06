@@ -54,14 +54,9 @@ The project is organized around the MVC pattern with SRP and DRY principles. Leg
 ├── classes
 │   ├── controllers
 │   │   ├── feedback
-│   │   │   └── FeedbackController.php
 │   │   ├── ishell
-│   │   │   └── TemperaturesController.php
 │   │   ├── login
-│   │   │   └── LoginController.php
 │   │   └── proposals
-│   │       ├── UpdateApplicationDateController.php
-│   │       └── UploadScheduleFileController.php
 │   ├── core
 │   │   ├── common
 │   │   │   ├── Config.php
@@ -94,62 +89,24 @@ The project is organized around the MVC pattern with SRP and DRY principles. Leg
 │   │   └── Proposals.php
 │   ├── models
 │   │   ├── feedback
-│   │   │   └── FeedbackModel.php
 │   │   ├── ishell
-│   │   │   └── TemperaturesModel.php
 │   │   ├── login
-│   │   │   └── LoginModel.php
 │   │   └── proposals
-│   │       └── UpdateApplicationDateModel.php
 │   ├── schedule
 │   │   ├── build
-│   │   │   └── ScheduleBuildManager.php
 │   │   ├── common
-│   │   │   └── ScheduleUtility.php
 │   │   ├── upload
-│   │   │   ├── ScheduleIngester.php
-│   │   │   ├── ScheduleProcessor.php
-│   │   │   ├── ScheduleUploadManager.php
-│   │   │   └── ScheduleUploadModel.php
 │   │   └── ScheduleManager.php
 │   ├── services
 │   │   ├── database
 │   │   │   ├── feedback
-│   │   │   │   ├── read
-│   │   │   │   │   └── FeedbackService.php
-│   │   │   │   ├── write
-│   │   │   │   │   ├── FeedbackService.php
-│   │   │   │   │   ├── InstrumentService.php
-│   │   │   │   │   ├── OperatorService.php
-│   │   │   │   │   └── SupportService.php
-│   │   │   │   └── FeedbackService.php
 │   │   │   ├── ishell
-│   │   │   │   ├── read
-│   │   │   │   │   └── TemperaturesService.php
-│   │   │   │   └── IshellService.php
 │   │   │   ├── troublelog
-│   │   │   │   ├── read
-│   │   │   │   │   ├── EngProgramService.php
-│   │   │   │   │   ├── GuestAcctsService.php
-│   │   │   │   │   ├── HardwareService.php
-│   │   │   │   │   ├── ObsAppService.php
-│   │   │   │   │   ├── OperatorService.php
-│   │   │   │   │   ├── ProgramService.php
-│   │   │   │   │   ├── SciCategoryService.php
-│   │   │   │   │   └── SupportAstronomerService.php
-│   │   │   │   ├── write
-│   │   │   │   │   ├── DailyInstrumentService.php
-│   │   │   │   │   ├── DailyOperatorService.php
-│   │   │   │   │   ├── ObsAppService.php
-│   │   │   │   │   ├── ProgramService.php
-│   │   │   │   │   └── ScheduleObsService.php
-│   │   │   │   └── TroublelogService.php
 │   │   │   ├── DatabaseService.php
 │   │   │   ├── DB.php
 │   │   │   └── DbQueryUtility.php
 │   │   ├── email
 │   │   │   ├── feedback
-│   │   │   │   └── FeedbackService.php
 │   │   │   └── EmailService.php
 │   │   ├── files
 │   │   │   ├── FileParser.php
@@ -159,28 +116,17 @@ The project is organized around the MVC pattern with SRP and DRY principles. Leg
 │   ├── validators
 │   │   ├── forms
 │   │   │   ├── feedback
-│   │   │   │   └── FeedbackValidator.php
 │   │   │   ├── login
-│   │   │   │   └── LoginValidator.php
 │   │   │   ├── proposals
-│   │   │   │   ├── UpdateApplicationDateValidator.php
-│   │   │   │   └── UploadScheduleFileValidator.php
 │   │   │   └── BaseFormValidator.php
 │   │   └── ishell
-│   │       └── TemperaturesValidator.php
 │   └── views
 │       ├── forms
 │       │   ├── feedback
-│       │   │   └── FeedbackView.php
 │       │   ├── login
-│       │   │   └── LoginView.php
 │       │   ├── proposals
-│       │   │   ├── UpdateApplicationDateView.php
-│       │   │   └── UploadScheduleFileView.php
 │       │   └── BaseFormView.php
 │       └── ishell
-│           ├── TemperaturesView.php
-│           └── temperature_template.php
 ├── configs
 │   ├── contact_config.php
 │   ├── db_config.php
@@ -191,16 +137,8 @@ The project is organized around the MVC pattern with SRP and DRY principles. Leg
 │   └── smtp_config.php
 ├── public_html
 │   ├── feedback
-│   │   └── Feedback.php
 │   ├── ishell
-│   │   ├── guider_controller.php
-│   │   ├── index.html
-│   │   ├── monitor.php
-│   │   └── spectrograph_controller.php
 │   ├── proposals
-│   │   ├── LoadFastTrack_proc.php
-│   │   ├── UpdateApplicationDate.php
-│   │   └── UploadScheduleFile.php
 │   ├── Login.php
 │   └── Logout.php
 ├── bootstrap.php
@@ -222,6 +160,6 @@ The project is organized around the MVC pattern with SRP and DRY principles. Leg
 
 ---
 
-### **Next Steps**
-- Use the current `tree` command to populate the "Generated Directory Tree" section.
-- As the project grows, you can reassess whether additional tools or scripts are needed.
+**Note**: This document should be updated whenever:
+- A new top-level directory is added.
+- The purpose or structure of an existing directory changes significantly.
