@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         stopOnFailure="true">
+    <testsuites>
+        <testsuite name="WebDev2024 Project Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <!-- Include your class directories for coverage analysis -->
+        <whitelist>
+            <directory suffix=".php">classes</directory>
+            <directory suffix=".php">public_html</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <!-- Generate coverage reports -->
+        <log type="coverage-html" target="logs/phpunit/coverage-html" />
+    </logging>
+</phpunit>
