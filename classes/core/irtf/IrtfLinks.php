@@ -2771,7 +2771,9 @@ class IrtfLinks
      */
     public static function getGalleryTour(): string
     {
-        return 'javascript:CreateWnd("http://www.panaviz.com/scenic-hawaii/mauna-kea/nasa-irtf/bwdetect.html",540,550,scrollbars=false);';
+        $url = '"http://www.panaviz.com/scenic-hawaii/mauna-kea/nasa-irtf/bwdetect.html"';
+        $javascript = "javascript:CreateWnd({$url},540,550,scrollbars=false);";
+        return $javascript;
     }
 
     /**
