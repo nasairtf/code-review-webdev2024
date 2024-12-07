@@ -10,9 +10,15 @@ use App\legacy\IRTFLayout as IrtfBuilder;
 /**
  * Base class for rendering form views.
  *
- * This abstract class provides standard functionality for generating
- * HTML forms and results/error pages. Child classes are expected to
- * implement specific methods for custom rendering.
+ * This abstract class provides standard functionality for generating HTML forms
+ * and results/error pages, with integrated debugging and layout building tools.
+ * Child classes are expected to implement specific methods to define the form
+ * structure and field labels.
+ *
+ * Key Features:
+ * - Support for formatted (readable) HTML output.
+ * - Debugging utilities for tracking rendering and form processing logic.
+ * - Integration with multiple HTML builders for modular page construction.
  *
  * @category Views
  * @package  IRTF
@@ -22,38 +28,70 @@ use App\legacy\IRTFLayout as IrtfBuilder;
 abstract class BaseFormView
 {
     /**
-     * @var bool $formatHtml Whether to produce formatted (readable) HTML output.
+     * Whether to produce formatted (readable) HTML output.
+     *
+     * Determines if the HTML builders should include line breaks and indentation
+     * in the generated HTML for better readability during development.
+     * Defaults to `false` if not explicitly set.
+     *
+     * @var bool
      */
     protected $formatHtml;
 
     /**
-     * @var Debug $debug Debug instance for logging and debugging output.
+     * Debug instance for logging and debugging output.
+     *
+     * Provides methods for structured debug messages and error tracking. If no
+     * instance is provided, a default instance is initialized with debug mode
+     * disabled.
+     *
+     * @var Debug
      */
     protected $debug;
 
     /**
-     * @var HtmlBuilder $htmlBuilder Instance for constructing HTML elements.
+     * Instance for constructing individual HTML elements.
+     *
+     * This builder is used to create basic HTML components such as tables,
+     * paragraphs, and forms. It supports formatting based on the `$formatHtml` setting.
+     *
+     * @var HtmlBuilder
      */
     protected $htmlBuilder;
 
     /**
-     * @var CompBuilder $compBuilder Instance for building composite HTML components.
+     * Instance for building composite HTML components.
+     *
+     * Used to generate higher-level HTML constructs like forms with validation errors
+     * or results tables, combining multiple basic elements. Inherits formatting preferences
+     * from the `$htmlBuilder`.
+     *
+     * @var CompBuilder
      */
     protected $compBuilder;
 
     /**
-     * @var IrtfBuilder $irtfBuilder Legacy layout builder for header/footer content.
+     * Legacy layout builder for header/footer content.
+     *
+     * Handles specific layout components, such as the page header and footer, based on
+     * legacy IRTF requirements. This is primarily used for wrapping form content in
+     * site-wide templates.
+     *
+     * @var IrtfBuilder
      */
     protected $irtfBuilder;
 
     /**
      * Constructor for the BaseFormView class.
      *
-     * @param bool|null        $formatHtml  Enable formatted HTML output.
-     * @param Debug|null       $debug       Debug instance for logging and debugging.
-     * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements.
-     * @param CompBuilder|null $compBuilder Instance for composite HTML elements.
-     * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for header/footer content.
+     * Initializes debugging, formatting preferences, and the necessary builder instances. Defaults are provided
+     * if no specific instances or configurations are passed.
+     *
+     * @param bool|null        $formatHtml  Enable formatted HTML output. Defaults to false if not provided.
+     * @param Debug|null       $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
+     * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new HtmlBuilder.
+     * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new CompBuilder.
+     * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for site meta. Defaults to a new IrtfBuilder.
      */
     public function __construct(
         ?bool $formatHtml = null,
@@ -62,30 +100,32 @@ abstract class BaseFormView
         ?CompBuilder $compBuilder = null,
         ?IrtfBuilder $irtfBuilder = null
     ) {
-        // Debug output
+        // Initialize debugging
         $this->debug = $debug ?? new Debug('default', false, 0);
         $debugHeading = $this->debug->debugHeading("View", "__construct");
         $this->debug->debug($debugHeading);
 
-        // Set the global html formatting
+        // Set global HTML formatting preference
         $this->formatHtml = $formatHtml ?? false;
         $this->debug->debugVariable($this->formatHtml, "{$debugHeading} -- this->formatHtml");
 
-        // Set up the builder instances
+        // Initialize builder instances
         $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder($this->formatHtml);
         $this->compBuilder = $compBuilder ?? new CompBuilder($this->formatHtml, $this->htmlBuilder);
         $this->irtfBuilder = $irtfBuilder ?? new IrtfBuilder();
-        $this->debug->log("{$debugHeading} -- HtmlBuilder, CompBuilder, IrtfBuilder classes are successfully initialised.");
+        $this->debug->log("{$debugHeading} -- HtmlBuilder, CompBuilder, IrtfBuilder successfully initialised.");
 
-        // Class initialisation complete
+        // Constructor completed
         $this->debug->log("{$debugHeading} -- Parent View initialisation complete.");
     }
 
     /**
      * Abstract method to provide field labels for the form.
      *
-     * This method maps internal field names to user-friendly labels. It is
-     * required for all form views. Non-form views can implement a stub.
+     * Child classes must implement this method to map internal field names
+     * to user-friendly labels for display in forms and error messages. For
+     * non-form views, this method can be implemented as a stub returning an
+     * empty array or a default mapping.
      *
      * @return array An associative array mapping field names to labels.
      */
@@ -95,11 +135,12 @@ abstract class BaseFormView
      * Abstract method to generate the main page content for a form.
      *
      * Each child class must implement this method to define the specific
-     * content structure for its form.
+     * content structure for its form. By default, data arrays are empty
+     * and padding is set to 0.
      *
-     * @param array $dbData   Data arrays required to populate form options.
-     * @param array $formData Default data for form fields.
-     * @param int   $pad      Optional padding level for formatted output.
+     * @param array $dbData   Data arrays required to populate form options. Defaults to an empty array.
+     * @param array $formData Default data for form fields. Defaults to an empty array.
+     * @param int   $pad      Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The HTML content for the form page.
      */
@@ -110,32 +151,17 @@ abstract class BaseFormView
     ): string;
 
     /**
-     * Renders a complete HTML page with a title and content.
+     * Retrieves the HTML formatting preference.
      *
-     * This method wraps the provided content in the site's standard header
-     * and footer layout.
+     * This method returns the value of the `$formatHtml` property, 
+     * which indicates whether the HTML output should be formatted 
+     * with indentation and line breaks for readability.
      *
-     * @param string $title   The title of the page.
-     * @param string $content The HTML content of the page.
-     *
-     * @return string The complete HTML of the page.
+     * @return bool True if HTML formatting is enabled; false otherwise.
      */
-    protected function renderPage(
-        string $title = '',
-        string $content = ''
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "renderPage");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($title, "{$debugHeading} -- title");
-        //$this->debug->debugVariable($content, "{$debugHeading} -- content");
-        // wrap the page contents in the site meta
-        $htmlParts = [
-            $this->irtfBuilder->myHeader(false, $title, false),
-            $content,
-            $this->irtfBuilder->myFooter(__FILE__, false),
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
+    public function getFormatHtml(): bool
+    {
+        return $this->formatHtml;
     }
 
     /**
@@ -158,6 +184,7 @@ abstract class BaseFormView
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($title, "{$debugHeading} -- title");
         $this->debug->debugVariable($message, "{$debugHeading} -- message");
+
         // Generate the results page contents
         $content = $this->compBuilder->buildResultsPage($message, [], 0);
         return $this->renderPage($title, $content);
@@ -183,6 +210,7 @@ abstract class BaseFormView
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($title, "{$debugHeading} -- title");
         $this->debug->debugVariable($message, "{$debugHeading} -- message");
+
         // Generate the error page contents
         $content = $this->compBuilder->buildErrorPage($message, [], 0);
         return $this->renderPage($title, $content);
@@ -217,6 +245,7 @@ abstract class BaseFormView
         $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
+
         // Wrap form tags around the body content
         $content = $this->getContentsForm($action, $dbData, $formData, $pad);
         return $this->renderPage($title, $content);
@@ -258,6 +287,7 @@ abstract class BaseFormView
         $this->debug->debugVariable($dataErrors, "{$debugHeading} -- dataErrors");
         $this->debug->debugVariable($fieldLabels, "{$debugHeading} -- fieldLabels");
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
+
         // Render the errors section and the form
         return $this->renderPage(
             $title,
@@ -269,6 +299,68 @@ abstract class BaseFormView
                 $this->formatHtml
             )
         );
+    }
+
+    /**
+     * Renders the results page after form submission.
+     *
+     * This method generates a standardized results page using a message
+     * and wraps it with the site's standard layout.
+     *
+     * @param string $title   The title of the results page.
+     * @param string $message The message to display on the results page.
+     *
+     * @return string The complete HTML of the results page.
+     */
+    public function renderPageWithResults(
+        string $title = '',
+        array $messages = []
+    ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "renderPageWithResults");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($title, "{$debugHeading} -- title");
+        $this->debug->debugVariable($messages, "{$debugHeading} -- messages");
+
+        // Generate the results block
+        $resultBlock = $this->getResultsBlock($messages, 0);
+
+        // Generate the results page contents
+        $content = $this->compBuilder->buildResultsBlockPage($resultBlock, [], 0);
+        return $this->renderPage($title, $content);
+    }
+
+    /**
+     * Renders a complete HTML page with a title and content.
+     *
+     * This method wraps the provided content in the site's standard header
+     * and footer layout.
+     *
+     * @param string $title   The title of the page.
+     * @param string $content The HTML content of the page.
+     *
+     * @return string The complete HTML of the page.
+     */
+    protected function renderPage(
+        string $title = '',
+        string $content = ''
+    ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "renderPage");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($title, "{$debugHeading} -- title");
+        //$this->debug->debugVariable($content, "{$debugHeading} -- content");
+
+        // REMOVE ONCE IRTFLayout HAS BEEN REFACTORED!
+        define('CONTACT', '');
+
+        // wrap the page contents in the site meta
+        $htmlParts = [
+            $this->irtfBuilder->myHeader(false, $title, false),
+            $content,
+            $this->irtfBuilder->myFooter(__FILE__, false),
+        ];
+        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
     }
 
     /**
@@ -346,33 +438,6 @@ abstract class BaseFormView
     }
 
     /**
-     * Renders the results page after form submission.
-     *
-     * This method generates a standardized results page using a message
-     * and wraps it with the site's standard layout.
-     *
-     * @param string $title   The title of the results page.
-     * @param string $message The message to display on the results page.
-     *
-     * @return string The complete HTML of the results page.
-     */
-    public function renderPageWithResults(
-        string $title = '',
-        array $messages = []
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "renderPageWithResults");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($title, "{$debugHeading} -- title");
-        $this->debug->debugVariable($messages, "{$debugHeading} -- messages");
-        // Generate the results block
-        $resultBlock = $this->getResultsBlock($messages, 0);
-        // Generate the results page contents
-        $content = $this->compBuilder->buildResultsBlockPage($resultBlock, [], 0);
-        return $this->renderPage($title, $content);
-    }
-
-    /**
      * Generates the HTML block for displaying results messages.
      *
      * This method creates a table of results messages formatted as paragraphs.
@@ -400,6 +465,7 @@ abstract class BaseFormView
         $rowAttr = [];
         $tableAttr = ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'];
 
+        // Generate the results block
         $rows = [];
         foreach ($dataResults as $message) {
             $escapedMessage = $this->htmlBuilder->escape(
@@ -465,6 +531,7 @@ abstract class BaseFormView
         $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
+
         // Wrap form tags around the body content
         $htmlParts = [
             $this->htmlBuilder->getForm(
