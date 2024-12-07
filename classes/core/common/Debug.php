@@ -3,71 +3,86 @@
 namespace App\core\common;
 
 use Exception;
-
 use App\exceptions\DatabaseException as Database;
 use App\exceptions\EmailException as Email;
 use App\exceptions\ValidationException as Validation;
-
 use App\core\common\Config;
 
 /**
  * /home/webdev2024/classes/core/common/Debug.php
  *
- * Handles debug output and error logging.
+ * Provides utilities for debugging, error logging, and structured debug output.
  *
- * Created:
- *  2024/10/15 - Miranda Hawarden-Ogata
+ * This class supports configurable debug modes, levels, and message coloring for
+ * improved debugging workflows. It integrates with custom exception types for
+ * more specific error handling.
  *
- * Modified:
- *  2024/10/20 - Miranda Hawarden-Ogata
- *      - Refactored class from static methods/properties to instance methods/properties.
- *      - Renamed class from DebugUtility to Debug, given it is not a utility class.
- *  2024/10/21 - Miranda Hawarden-Ogata
- *      - Set up composer and autoloading.
- *  2024/12/02 - Miranda Hawarden-Ogata
- *      - Add Debug colour config.
+ * Example usage:
+ * ```php
+ * $debug = new Debug('database', true, 1);
+ * $debug->log('Database connection failed.');
+ * ```
  *
  * @category Utilities
  * @package  IRTF
- * @author   Miranda Hawarden-Ogata
  * @version  1.0.3
  */
 
 class Debug
 {
+    /**
+     * Whether debugging is enabled.
+     *
+     * This flag determines if debug output is allowed. If set to `true`,
+     * messages will be displayed as specified in the `debug()` method.
+     *
+     * @var bool
+     */
     private $debugMode;
+
+    /**
+     * The verbosity level for logging.
+     *
+     * Reserved for future use to control the level of detail in log output.
+     * Currently operates as a toggle to turn log output on (1) or off (0).
+     *
+     * @var int
+     */
     private $debugLevel;
+
+    /**
+     * The default color for debug messages.
+     *
+     * This is determined by the context passed during initialization or defaults to "green".
+     *
+     * @var string
+     */
     private $defaultColor;
 
     /**
-     * Constructor to set the default debug mode, level, and colour.
+     * Initializes the debug settings and assigns a default message color.
      *
-     * @param bool   $debugMode  Enable or disable debug mode.
-     * @param int    $debugLevel Set the debugging level (in future).
-     * @param string $color      The default color for debug messages.
-     */
-    //public function __construct(
-    //    bool $debugMode = false,
-    //    int $debugLevel = 0,
-    //    string $color = 'green'
-    /**
-     * Constructor to initialize debug settings, optionally using Config for colors.
+     * The constructor configures debugging behavior based on the provided parameters.
+     * If a context is specified, it determines the default color for debug messages
+     * by fetching configuration settings from `Config::get('debug_config', 'colors')`.
+     * If no color is found for the context, it defaults to "green".
      *
-     * @param string $context    The context or service type for debugging (e.g., 'schedule', 'database').
-     * @param bool   $debugMode  Enable or disable debug mode.
-     * @param int    $debugLevel Set the debugging level (in future).
+     * @param string|null $context    [optional] The context or service type for debugging (e.g., 'schedule',
+     *                                'database'). Defaults to null.
+     * @param bool|null   $debugMode  [optional] Enable or disable debug mode. Defaults to false if not provided.
+     * @param int|null    $debugLevel [optional] Debug verbosity level (reserved for future use). Defaults to 0 if not
+     *                                provided.
      */
     public function __construct(
-        string $context = '',
-        bool $debugMode = false,
-        int $debugLevel = 0
+        ?string $context = null,
+        ?bool $debugMode = null,
+        ?int $debugLevel = null
     ) {
         // Fetch color from Config or use a default
         $colorConfig = Config::get('debug_config', 'colors');
         $this->defaultColor = $colorConfig[$context] ?? 'green';
-        //$this->defaultColor = $color;
-        $this->debugMode = $debugMode;
-        $this->debugLevel = $debugLevel;
+        $this->debugMode = $debugMode ?? false;
+        $this->debugLevel = $debugLevel ?? 0;
     }
 
     /**
@@ -81,7 +96,10 @@ class Debug
     }
 
     /**
-     * Set the debug level.
+     * Retrieves the current debug level.
+     *
+     * The debug level determines the verbosity of debug messages. Currently, this is
+     * reserved for future enhancements.
      *
      * @return int The current debug level.
      */
@@ -91,9 +109,9 @@ class Debug
     }
 
     /**
-     * Set the default color for all debug messages.
+     * Retrieves the default color for debug messages.
      *
-     * @return string The current debug message colour.
+     * @return string The default color for debug messages.
      */
     public function getDefaultColor(): string
     {
@@ -101,13 +119,16 @@ class Debug
     }
 
     /**
-     * Handles the logging and debugging output for fail methods.
+     * Logs a message and prepares the exception message for fail methods.
      *
-     * @param string      $message   The message to log.
-     * @param string      $throwMsg  The exception message to throw.
-     * @param string|null $color     Optional color for the message, defaults to class color.
+     * This method logs the provided message and returns the exception message.
+     * It uses the specified color for logging, or falls back to the default color.
      *
-     * @return string The message to use in the exception.
+     * @param string      $message   The debug message to log.
+     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
+     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
+     *
+     * @return string The exception message to throw.
      */
     private function handleFail(string $message, string $throwMsg = '', ?string $color = null): string
     {
@@ -118,13 +139,17 @@ class Debug
     }
 
     /**
-     * Logs the message and throws an exception.
+     * Logs a debug message and throws a general exception.
      *
-     * @param string      $message   The message to log.
-     * @param string      $throwMsg  Optional exception message to throw. Defaults to $message if not provided.
-     * @param string|null $color     Optional custom color for this message. Defaults to the class default.
+     * This method logs the provided message and throws an `Exception` with the
+     * specified message. It uses the specified color for logging, or defaults
+     * to the class-defined color.
      *
-     * @throws Exception
+     * @param string      $message   The debug message to log.
+     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
+     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
+     *
+     * @throws \Exception Always throws an exception with the specified message.
      */
     public function fail(string $message, string $throwMsg = '', ?string $color = null): void
     {
@@ -132,18 +157,57 @@ class Debug
         throw new \Exception($throw);
     }
 
+    /**
+     * Logs a debug message and throws a validation exception.
+     *
+     * This method logs the provided message and throws a `ValidationException`
+     * with the specified message. It uses the specified color for logging,
+     * or defaults to the class-defined color.
+     *
+     * @param string      $message   The debug message to log.
+     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
+     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
+     *
+     * @throws \App\exceptions\ValidationException Always throws a validation exception.
+     */
     public function failValidation(string $message, string $throwMsg = '', ?string $color = null): void
     {
         $throw = $this->handleFail($message, $throwMsg, $color);
         throw new Validation($throw);
     }
 
+    /**
+     * Logs a debug message and throws a database exception.
+     *
+     * This method logs the provided message and throws a `DatabaseException`
+     * with the specified message. It uses the specified color for logging,
+     * or defaults to the class-defined color.
+     *
+     * @param string      $message   The debug message to log.
+     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
+     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
+     *
+     * @throws \App\exceptions\DatabaseException Always throws a database exception.
+     */
     public function failDatabase(string $message, string $throwMsg = '', ?string $color = null): void
     {
         $throw = $this->handleFail($message, $throwMsg, $color);
         throw new Database($throw);
     }
 
+    /**
+     * Logs a debug message and throws an email exception.
+     *
+     * This method logs the provided message and throws a `EmailException`
+     * with the specified message. It uses the specified color for logging,
+     * or defaults to the class-defined color.
+     *
+     * @param string      $message   The debug message to log.
+     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
+     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
+     *
+     * @throws \App\exceptions\EmailException Always throws a email exception.
+     */
     public function failEmail(string $message, string $throwMsg = '', ?string $color = null): void
     {
         $throw = $this->handleFail($message, $throwMsg, $color);
@@ -181,10 +245,14 @@ class Debug
     }
 
     /**
-     * Generate a debug heading in the format "ClassLabel Label: methodName()".
+     * Generates a debug heading with the calling class, label, and method name.
      *
-     * @param string $classLabel The type of class (e.g., View, Controller, Validator).
+     * This method uses the debug backtrace to identify the calling class,
+     * and formats the output as "ClassLabel Label: methodName()".
+     *
+     * @param string $classLabel The label for the class (e.g., View, Controller, Validator).
      * @param string $methodName The name of the method (e.g., __construct).
+     *
      * @return string The formatted debug heading.
      */
     public function debugHeading(string $classLabel, string $methodName): string
