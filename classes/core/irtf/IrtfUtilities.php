@@ -3,9 +3,10 @@
 namespace App\core\irtf;
 
 /**
- * /home/webdev2024/classes/core/irtf/IrtfUtilities.php
+ * This class provides static utility methods to handle IRTF-specific tasks.
  *
- * This class provides static methods to handle IRTF-specific tasks.
+ * These tasks include date calculations, string sanitization for HTML output,
+ * and semester determination based on the IRTF's semester system.
  *
  * @category Utilities
  * @package  IRTF
@@ -18,7 +19,15 @@ class IrtfUtilities
     // Dates
 
     /**
-     * Calculates the Unix timestamp from a given date.
+     * Calculates the Unix timestamp for a given date at midnight.
+     *
+     * This method sets the time to 00:00:00 and computes the Unix timestamp
+     * for the specified month, day, and year.
+     *
+     * Example:
+     * ```php
+     * $timestamp = IrtfUtilities::returnUnixDate(10, 25, 2024); // Unix timestamp for "2024-10-25 00:00:00"
+     * ```
      *
      * @param int $month The month (1-12).
      * @param int $day   The day (1-31).
@@ -37,9 +46,16 @@ class IrtfUtilities
     /**
      * Formats a Unix timestamp as a human-readable date string.
      *
-     * Converts a Unix timestamp to a string format, e.g., "Oct 25, 2024".
+     * Converts a Unix timestamp into a string representation using the specified
+     * format. The default format is "M d, Y" (e.g., "Oct 25, 2024").
      *
-     * @param int $timestamp The Unix timestamp.
+     * Example:
+     * ```php
+     * $formattedDate = IrtfUtilities::returnTextDate(1727846400); // "Oct 25, 2024"
+     * ```
+     *
+     * @param int    $timestamp The Unix timestamp to format.
+     * @param string $format    [optional] The date format. Default is 'M d, Y'.
      *
      * @return string The formatted date string.
      */
@@ -48,7 +64,6 @@ class IrtfUtilities
         string $format = 'M d, Y'
     ): string {
         return date($format, $timestamp);
-        //return date("M d, Y", $timestamp);
     }
 
     // Strings
@@ -74,10 +89,18 @@ class IrtfUtilities
     /**
      * Determines the semester based on the given date.
      *
-     * The year is divided into two semesters: "A" (February 1 to July 31) and
-     * "B" (August 1 to January 31 of the following year). Note that the
-     * date values are constructed to ensure appropriate fall-through of the
-     * conditionals. Yes, Jan 1 is NOT a typo.
+     * The year is divided into two semesters:
+     * - "A" (February 1 to July 31)
+     * - "B" (August 1 to January 31 of the following year)
+     *
+     * For dates before February 1, the method assigns the "B" semester of the previous year.
+     * This logic ensures seamless fall-through of conditional checks.
+     *
+     * Example:
+     * ```php
+     * $semester = IrtfUtilities::returnSemester(3, 15, 2024); // "2024A"
+     * $semester = IrtfUtilities::returnSemester(1, 15, 2024); // "2023B"
+     * ```
      *
      * @param int $month The month of the date.
      * @param int $day   The day of the date.
