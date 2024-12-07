@@ -5,6 +5,7 @@
 # Temporary and cache files
 /.cache/
 /tmp/
+/home/webdev2024/tmp/
 *.tmp
 .doctum-cache/
 .phpunit.result.cache
