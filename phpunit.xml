@@ -23,6 +23,7 @@
     </filter>
     <logging>
         <!-- Generate coverage reports -->
-        <log type="coverage-html" target="logs/phpunit/coverage-html" />
+        <log type="coverage-html" target="docs/phpunit/coverage-html" />
+        <log type="coverage-xml" target="docs/phpunit/coverage-xml" />
     </logging>
 </phpunit>

@@ -31,7 +31,7 @@ $finder = Finder::create()
 
 return new Doctum($finder, [
     'title'                => 'WebDev2024 Documentation',
-    'build_dir'            => __DIR__ . '/docs',
+    'build_dir'            => __DIR__ . '/docs/doctum',
     'cache_dir'            => __DIR__ . '/.doctum-cache',
     'default_opened_level' => 2,
 //    'versions'             => $versions, // Optional

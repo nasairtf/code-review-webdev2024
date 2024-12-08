@@ -41,6 +41,7 @@ jpgraph.tar.gz
 # Utility scripts and backups
 /bin/
 /backups/
+/old/
 /root-bin/
 
 # Composer-related files
