@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Determine environment based on the path of the entry script
 $entryScript = $_SERVER['SCRIPT_FILENAME'];
 
