@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\classes\core\irtf;
 
 use PHPUnit\Framework\TestCase;

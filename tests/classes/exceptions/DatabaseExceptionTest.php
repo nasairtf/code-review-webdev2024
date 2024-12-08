@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\classes\exceptions;
 
 use PHPUnit\Framework\TestCase;
