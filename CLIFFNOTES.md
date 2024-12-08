@@ -10,7 +10,64 @@
         5. Protected Methods
         6. Private Methods
 
-2. **Naming Conventions**
+2. **Use Statement Ordering**:
+    1. Class files:
+        1. Built-in PHP classes
+            - Exception
+            - DateTime
+        2. External dependencies (libraries or vendor classes)
+        3. Application-specific dependencies
+            - Debug
+            - DatabaseService
+            - other dependencies
+    2. Unit test files:
+        1. Built-in PHP classes
+        2. External dependencies (libraries or vendor classes)
+            - PHPUnit
+            - Mockery
+            - other libraries
+        3. The class being tested
+        4. Other application-specific dependencies required for the test
+            - ValidationException
+            - other dependencies
+
+#### Standard Class Example:
+```php
+declare(strict_types=1);
+
+namespace App\services\email;
+
+use Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
+use App\core\common\Debug;
+
+class EmailService
+{
+    // service class implementation
+}
+```
+
+#### Unit Test Class Example:
+```php
+declare(strict_types=1);
+
+namespace Tests\classes\core\common;
+
+use PHPUnit\Framework\TestCase;
+use Mockery as Mockery;
+use App\core\common\Debug;
+use App\exceptions\DatabaseException;
+use App\exceptions\EmailException;
+use App\exceptions\ValidationException;
+
+class DebugTest extends TestCase
+{
+    // unit test implementation
+}
+```
+
+3. **Naming Conventions**
     - Class names: `PascalCase` (e.g., `ScheduleManager`).
     - Properties and methods: `camelCase` (e.g., `$this->debugMode`).
     - Constants: `UPPER_SNAKE_CASE` (e.g., `MAX_RESULTS`).
@@ -20,7 +77,7 @@
     - Use names: `App\lower\case\dir\ClassName;` (e.g., `App\views\forms;`).
     - Use aliases for parent classes, service classes, and standard model, view, validator classes (e.g., `use App\views\forms\BaseFormView as BaseView;`, class UploadScheduleFileView extends BaseView).
 
-3. **Git**
+4. **Git**
     ```bash
     git status
     git add CONTRIBUTING.md
