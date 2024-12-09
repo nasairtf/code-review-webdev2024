@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\validators\forms\login;
 
 use App\core\common\Debug;
@@ -59,7 +61,9 @@ class LoginValidator
         $pattern = '/^\d{4}[AB]\d{3}$/'; // Matches YYYY[A|B]NNN format
 
         if (!preg_match($pattern, $program)) {
-            $this->debug->fail("Invalid program format: '{$program}'. Expected format: YYYY[A|B]NNN.");
+            $this->debug->fail(
+                "Invalid program format: '{$program}'. Expected format: YYYY[A|B]NNN."
+            );
         }
 
         $year = intval(substr($program, 0, 4));
@@ -67,15 +71,21 @@ class LoginValidator
         $number = intval(substr($program, 5, 3));
 
         if ($year < 2000 || $year > intval(date('Y')) + 1) {
-            $this->debug->fail("Invalid year in program number '{$program}'. Year must be between 2000 and next calendar year.");
+            $this->debug->fail(
+                "Invalid year in program number '{$program}'. Year must be between 2000 and next calendar year."
+            );
         }
 
         if (!in_array($semester, ['A', 'B'])) {
-            $this->debug->fail("Invalid semester in program number '{$program}'. Semester must be 'A' or 'B'.");
+            $this->debug->fail(
+                "Invalid semester in program number '{$program}'. Semester must be 'A' or 'B'."
+            );
         }
 
         if ($number < 1 || $number > 999) {
-            $this->debug->fail("Invalid program number in '{$program}'. Number must be between 001 and 999.");
+            $this->debug->fail(
+                "Invalid program number in '{$program}'. Number must be between 001 and 999."
+            );
         }
 
         return $program;

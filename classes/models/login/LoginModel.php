@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\models\login;
 
 use App\core\common\Debug;
-
 use App\services\database\troublelog\read\GuestAcctsService as DbRead;
 
 /**

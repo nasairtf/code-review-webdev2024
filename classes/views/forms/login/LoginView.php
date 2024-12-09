@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\views\forms\login;
 
 use App\core\common\Debug;
-
 use App\core\htmlbuilder\HtmlBuilder as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
 use App\legacy\IRTFLayout as IrtfBuilder;

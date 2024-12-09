@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\controllers\login;
 
 use Exception;
-
 use App\core\common\Config;
 use App\core\common\Debug;
-
 use App\models\login\LoginModel as Model;
 use App\views\forms\login\LoginView as View;
 use App\validators\forms\login\LoginValidator as Validator;
@@ -215,7 +215,8 @@ class LoginController
      * Prepares an embeddable login form with optional customizations for
      * action URL, form data, and instructions.
      *
-     * @param string $action       [optional] The URL where the form should be submitted. Defaults to the current script.
+     * @param string $action       [optional] The URL where the form should be submitted.
+     *                              Defaults to the current script.
      * @param array  $data         [optional] Initial data for form fields. Defaults to empty fields.
      * @param string $instructions [optional] Custom instructions displayed above the form. Empty by default.
      *
