@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\troublelog\read;
 
 use App\services\database\troublelog\TroublelogService as BaseService;
@@ -40,6 +42,9 @@ class ProgramService extends BaseService
     private function getProgramInfoListQuery(bool $sortAsc = true): string
     {
         // Filter: 'programID' < 900 indicates non-engineering programs
-        return "SELECT programID, projectPI FROM Program WHERE semesterID = ? AND programID > 000 AND programID < 900 ORDER BY programID " . $this->getSortString($sortAsc) . ";";
+        return "SELECT programID, projectPI "
+            . "FROM Program "
+            . "WHERE semesterID = ? AND programID > 000 AND programID < 900 "
+            . "ORDER BY programID " . $this->getSortString($sortAsc) . ";";
     }
 }

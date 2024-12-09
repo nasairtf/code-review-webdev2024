@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\troublelog\read;
 
 use App\services\database\troublelog\TroublelogService as BaseService;
@@ -64,18 +66,24 @@ class SciCategoryService extends BaseService
     private function getScientificCategoryListQuery(bool $sortAsc = true): string
     {
         /** NOTE: fix field names once table is refactored */
-        return "SELECT SciCategory, SciCategoryText FROM SciCategory ORDER BY SciCategory " . $this->getSortString($sortAsc) . ";";
+        return "SELECT SciCategory, SciCategoryText "
+            . "FROM SciCategory "
+            . "ORDER BY SciCategory " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getScientificCategoryIdQuery(): string
     {
         /** NOTE: fix field names once table is refactored */
-        return "SELECT SciCategory FROM SciCategory WHERE SciCategoryText = ?";
+        return "SELECT SciCategory "
+            . "FROM SciCategory "
+            . "WHERE SciCategoryText = ?";
     }
 
     private function getScientificCategoryNameQuery(): string
     {
         /** NOTE: fix field names once table is refactored */
-        return "SELECT SciCategoryText FROM SciCategory WHERE SciCategory = ?";
+        return "SELECT SciCategoryText "
+            . "FROM SciCategory "
+            . "WHERE SciCategory = ?";
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\feedback\read;
 
 use App\services\database\feedback\FeedbackService as BaseService;

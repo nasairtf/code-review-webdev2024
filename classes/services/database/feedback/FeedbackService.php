@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\feedback;
 
 use Exception;
-
 use App\services\database\DatabaseService as BaseService;
-
 use App\services\database\feedback\write\FeedbackService as   FeedbackServiceWrite;
 use App\services\database\feedback\write\InstrumentService as InstrumentServiceWrite;
 use App\services\database\feedback\write\OperatorService as   OperatorServiceWrite;

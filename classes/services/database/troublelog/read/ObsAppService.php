@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\troublelog\read;
 
 use App\services\database\troublelog\TroublelogService as BaseService;
@@ -131,6 +133,8 @@ class ObsAppService extends BaseService
     private function getProposalProgramDataQuery(): string
     {
         $fields = 'ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate';
-        return "SELECT {$fields} FROM ObsApp WHERE semesterYear = ? AND semesterCode = ? AND ProgramNumber = ?;";
+        return "SELECT {$fields} "
+            . "FROM ObsApp "
+            . "WHERE semesterYear = ? AND semesterCode = ? AND ProgramNumber = ?;";
     }
 }

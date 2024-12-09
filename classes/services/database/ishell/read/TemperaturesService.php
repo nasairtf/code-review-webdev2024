@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\ishell\read;
 
 use App\services\database\ishell\IshellService as BaseService;

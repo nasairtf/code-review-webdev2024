@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\troublelog\read;
 
 use App\services\database\troublelog\TroublelogService as BaseService;
@@ -104,59 +106,84 @@ class HardwareService extends BaseService
         #-- from irtfhelper.inc:
         #-- mode = "all" returns the instrument list with all the entries in the Hardware table;
         // Filter: 'notes' = 'obsolete' indicates retired instrument
-        return "SELECT * FROM Hardware ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM Hardware "
+            . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getActiveSecondaryInstrumentsListQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
-        #-- mode = "secon" returns the instrument list with all the active secondary entries in the Hardware table;
+        #-- mode = "secon" returns the instrument list with all the active secondary entries
+        #--     in the Hardware table;
         // Filter: 'notes' = 'active' indicates active facility instrument
         // Filter: 'type' = 'secon' indicates secondary
-        return "SELECT * FROM Hardware WHERE notes = 'active' AND type = 'secon' AND hardwareID <> 'unk' AND hardwareID <> 'ic' ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM Hardware "
+            . "WHERE notes = 'active' AND type = 'secon' AND hardwareID <> 'unk' AND hardwareID <> 'ic' "
+            . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getAllActiveFacilityInstrumentsListByIndexQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
-        #-- mode = "instru+vis" returns the instrument list with all the active instrument entries in the Hardware table;
-        #-- mode = "instru" returns the instrument list with all the active instrument entries in the Hardware table;
+        #-- mode = "instru+vis" returns the instrument list with all the active instrument entries
+        #--     in the Hardware table;
+        #-- mode = "instru" returns the instrument list with all the active instrument entries
+        #--     in the Hardware table;
         // Filter: 'notes' = 'visitor' indicates active visitor instrument
         // Filter: 'notes' = 'active' indicates active facility instrument
         // Filter: 'type' = 'instr' indicates instrument
-        return "SELECT * FROM Hardware WHERE notes = 'active' AND type = 'instr' AND hardwareID <> 'unk' AND hardwareID <> 'ic' ORDER BY pulldownIndex " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM Hardware "
+            . "WHERE notes = 'active' AND type = 'instr' AND hardwareID <> 'unk' AND hardwareID <> 'ic' "
+            . "ORDER BY pulldownIndex " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getAllActiveInstrumentsListByIndexQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
-        #-- mode = "active-instru" returns the instrument list with all the active instruments entries in the Hardware table;
+        #-- mode = "active-instru" returns the instrument list with all the active instruments entries
+        #--     in the Hardware table;
         // Filter: 'notes' = 'visitor' indicates active visitor instrument
         // Filter: 'notes' = 'active' indicates active facility instrument
         // Filter: 'type' = 'instr' indicates instrument
-        return "SELECT * FROM Hardware WHERE notes IN ('active','visitor') AND type = 'instr' AND hardwareID <> 'unk' AND hardwareID <> 'ic' ORDER BY pulldownIndex " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM Hardware "
+            . "WHERE notes IN ('active','visitor') AND type = 'instr' AND hardwareID <> 'unk' AND hardwareID <> 'ic' "
+            . "ORDER BY pulldownIndex " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getAllActiveInstrumentsListByNameQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
-        #-- mode = "trouble" returns the instrument list with all the active instruments entries in the Hardware table;
+        #-- mode = "trouble" returns the instrument list with all the active instruments entries
+        #--     in the Hardware table;
         // Filter: 'notes' = 'visitor' indicates active visitor instrument
         // Filter: 'notes' = 'active' indicates active facility instrument
         // Filter: 'type' = 'instr' indicates instrument
-        return "SELECT * FROM Hardware WHERE notes IN ('active','visitor') AND type = 'instr' AND hardwareID <> 'unk' AND hardwareID <> 'ic' ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM Hardware "
+            . "WHERE notes IN ('active','visitor') AND type = 'instr' AND hardwareID <> 'unk' AND hardwareID <> 'ic' "
+            . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getAllNotObsoleteInstrumentsListByNameQuery(bool $sortAsc = true): string
     {
         // Filter: 'notes' <> 'obsolete' indicates active instrument, including 'ic', 'unk', etc
-        return "SELECT * FROM Hardware WHERE notes <> 'obsolete' ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM Hardware "
+            . "WHERE notes <> 'obsolete' "
+            . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getAllActiveVisitorInstrumentListQuery(bool $sortAsc = true): string
     {
         // Filter: 'notes' = 'visitor' indicates active visitor instrument
         // Filter: 'type' = 'instr' indicates instrument
-        return "SELECT hardwareID, itemName FROM Hardware WHERE notes = 'visitor' AND type = 'instr' ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT hardwareID, itemName "
+            . "FROM Hardware "
+            . "WHERE notes = 'visitor' AND type = 'instr' "
+            . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 }

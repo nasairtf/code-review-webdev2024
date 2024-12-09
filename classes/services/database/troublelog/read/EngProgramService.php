@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\troublelog\read;
 
 use App\services\database\troublelog\TroublelogService as BaseService;
@@ -50,6 +52,8 @@ class EngProgramService extends BaseService
     private function getProposalEngProgramDataQuery(): string
     {
         $fields = 'semesterID, programID, projectPI';
-        return "SELECT {$fields} FROM EngProgram WHERE semesterID = ? AND programID = ?;";
+        return "SELECT {$fields} "
+            . "FROM EngProgram "
+            . "WHERE semesterID = ? AND programID = ?;";
     }
 }

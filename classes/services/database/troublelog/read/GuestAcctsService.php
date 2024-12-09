@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\troublelog\read;
 
 use App\services\database\troublelog\TroublelogService as BaseService;
@@ -58,13 +60,15 @@ class GuestAcctsService extends BaseService
 
     private function getSingleProgramSessionQuery(): string
     {
-        //return "SELECT username as program, defaultpwd as session FROM GuestAccts WHERE username = ? AND defaultpwd = ?;";
-        return "SELECT username as program, defaultpwd as session FROM GuestAccts WHERE username = ? AND defaultpwd LIKE BINARY ?;";
+        return "SELECT username as program, defaultpwd as session "
+            . "FROM GuestAccts "
+            . "WHERE username = ? AND defaultpwd LIKE BINARY ?;";
     }
 
     private function getValidateProgramQuery(): string
     {
-        //return "SELECT COUNT(*) AS count FROM GuestAccts WHERE username = ? AND defaultpwd = ?;";
-        return "SELECT COUNT(*) AS count FROM GuestAccts WHERE username = ? AND defaultpwd LIKE BINARY ?;";
+        return "SELECT COUNT(*) AS count "
+            . "FROM GuestAccts "
+            . "WHERE username = ? AND defaultpwd LIKE BINARY ?;";
     }
 }

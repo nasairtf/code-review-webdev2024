@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database;
 
 use Exception;
-
 use App\core\common\Debug;
 
 /**

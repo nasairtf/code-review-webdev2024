@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\troublelog\read;
 
 use App\services\database\troublelog\TroublelogService as BaseService;
@@ -52,12 +54,17 @@ class SupportAstronomerService extends BaseService
     private function getAllSupportAstronomersListQuery(bool $sortAsc = true): string
     {
         // Filter: 'status' = 0 indicates non-active support astronomers
-        return "SELECT * FROM SupportAstronomer ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM SupportAstronomer "
+            . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getSupportAstronomerListQuery(bool $sortAsc = true): string
     {
         // Filter: 'status' = 1 indicates active support astronomers
-        return "SELECT * FROM SupportAstronomer WHERE status = '1' ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM SupportAstronomer "
+            . "WHERE status = '1' "
+            . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 }

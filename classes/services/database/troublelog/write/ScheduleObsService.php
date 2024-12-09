@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\troublelog\write;
 
 use App\services\database\troublelog\TroublelogService as BaseService;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\database\troublelog\read;
 
 use App\services\database\troublelog\TroublelogService as BaseService;
@@ -64,18 +66,26 @@ class OperatorService extends BaseService
     private function getAllOperatorsListQuery(bool $sortAsc = true): string
     {
         // Filter: 'nightAttend' = -1 indicates non-active operators
-        return "SELECT * FROM Operator ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM Operator "
+            . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getTelescopeOperatorsListQuery(bool $sortAsc = true): string
     {
         // Filter: 'nightAttend' = 0 indicates active operators
-        return "SELECT * FROM Operator WHERE nightAttend = '0' ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM Operator "
+            . "WHERE nightAttend = '0' "
+            . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 
     private function getObservatoryAssistantsListQuery(bool $sortAsc = true): string
     {
         // Filter: 'nightAttend' = 1 indicates active assistants
-        return "SELECT * FROM Operator WHERE nightAttend = '1' ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
+        return "SELECT * "
+            . "FROM Operator "
+            . "WHERE nightAttend = '1' "
+            . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 }
