@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\views\forms\proposals;
 
 use App\core\common\Debug;
 use App\core\irtf\IrtfLinks;
-
 use App\views\forms\BaseFormView as BaseView;
 
 /**
@@ -71,12 +72,12 @@ class UploadScheduleFileView extends BaseView
         $color = "";
 
         $code .= "<table width='100%' border='0' cellspacing='0' cellpadding='6'>\n";
-        $code .= getHorizontalLine( 0, 0, "FFFFFF" );
+        $code .= getHorizontalLine(0, 0, "FFFFFF");
 
         $height = 45;
         $width = 75;
         $bwid = 120;
-        $color = getGrayShading( $color );
+        $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' >\n";
         $code .= "    <td align='center'>\n";
         $code .= "      Select the FastTrack time allocation file for upload\n";
@@ -87,7 +88,7 @@ class UploadScheduleFileView extends BaseView
         $code .= "    <td align='center'><input type='file' name='file' /></td>\n";
         $code .= "  </tr>\n";
 
-        $color = getGrayShading( $color );
+        $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' >\n";
         $code .= "     <td colspan='3' align='center'>If a full schedule load is needed, select 'Yes' below.</td>\n";
         $code .= "  </tr>\n";
@@ -99,7 +100,7 @@ class UploadScheduleFileView extends BaseView
         $code .= "     </td>\n";
         $code .= "  </tr>\n";
 
-        $color = getGrayShading( $color );
+        $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' >\n";
         $code .= "     <td colspan='3' align='center'>For only private txt/pdf files (no public access), click 'Private' below.</td>\n";
         $code .= "  </tr>\n";
@@ -113,17 +114,17 @@ class UploadScheduleFileView extends BaseView
 
         $ack = $this->htmlBuilder->getLink($this->irtfLinks->getEditInstruments(), 'acknowledgement page', [], 0, true);
         $ack = $this->htmlBuilder->getLink($this->irtfLinks->getEditOperators(), 'acknowledgement page', [], 0, true);
-        $color = getGrayShading( $color );
+        $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' >\n";
         $code .= "     <td>\n";
         $code .= "       <p>A full schedule load will remove all of the entries for the current semester from the database and then load all entries in the schedule file uploaded here.</p>\n";
-        $code .= "       <p>A partial schedule load will remove only entries in the future (data from ".date("m/d/Y")." and later) and will leave all historical data in the database.</p>\n";
+        $code .= "       <p>A partial schedule load will remove only entries in the future (data from " . date("m/d/Y") . " and later) and will leave all historical data in the database.</p>\n";
         $code .= "       <p>Generally a full schedule load should occur at the beginning of the semester and updates done over the course of the semester can use the partial schedule load. Partial schedule loading is the default behavior.</p>\n";
         $code .= "       <p><strong>Pease note</strong>: check the instrument and operator/night attendant listing <a href='EditDatabase.php'>here</a> and add any instruments or personnel not already listed on the page.</p>\n";
         $code .= "     </td>\n";
         $code .= "  </tr>\n";
 
-        $color = getGrayShading( $color );
+        $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
         $code .= "    <td align='center'>\n";
         $code .= "      <input type='submit' name='clear' value='Clear' style='width: {$bwid}px;'/>\n";
@@ -131,10 +132,9 @@ class UploadScheduleFileView extends BaseView
         $code .= "    </td>\n";
         $code .= "  </tr>\n";
 
-        $code .= getHorizontalLine( 0, 0, "FFFFFF" );
+        $code .= getHorizontalLine(0, 0, "FFFFFF");
         $code .= "</table>\n";
 
         return $code;
     }
-
 }

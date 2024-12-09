@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\validators\forms\proposals;
 
 use Exception;
-
 use App\exceptions\ValidationException;
-
 use App\core\common\Debug;
 use App\core\irtf\IrtfUtilities;
-
 use App\validators\forms\BaseFormValidator as BaseValidator;
 
 /**
