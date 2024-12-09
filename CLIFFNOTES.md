@@ -3,12 +3,12 @@
 ---
 
 1. **Class layout**:
-        1. Properties
-        2. Constructor
-        3. Abstract Methods
-        4. Public Methods
-        5. Protected Methods
-        6. Private Methods
+    1. Properties
+    2. Constructor
+    3. Abstract Methods
+    4. Public Methods
+    5. Protected Methods
+    6. Private Methods
 
 2. **Use Statement Ordering**:
     1. Class files:
