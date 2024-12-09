@@ -1,16 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\controllers\ishell;
 
 use Exception;
-
 use App\exceptions\ValidationException;
-
 use App\core\common\Config;
 use App\core\common\Debug;
-
 use App\services\graphs\GraphService as Graph;
-
 use App\models\ishell\TemperaturesModel as Model;
 use App\views\ishell\TemperaturesView as View;
 use App\validators\ishell\TemperaturesValidator as Validator;

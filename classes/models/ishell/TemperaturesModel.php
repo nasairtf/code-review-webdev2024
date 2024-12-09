@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\models\ishell;
 
 use App\core\common\Debug;
 use App\core\irtf\IrtfUtilities;
-
 use App\services\database\ishell\read\TemperaturesService as DbRead;
 
 /**
@@ -92,9 +93,16 @@ class TemperaturesModel
         foreach ($config['sensors'] as $sensor) {
             //$this->debug->debugVariable($sensor, "{$debugHeading} -- sensor");
             $temps[$sensor['id']] = [];
-            $temps[$sensor['id']]['cur'] = $this->fetchCurrentTemperature($sensor['id'], $config['system'])[0];
+            $temps[$sensor['id']]['cur'] = $this->fetchCurrentTemperature(
+                $sensor['id'],
+                $config['system']
+            )[0];
             //$this->debug->debugVariable($temps, "{$debugHeading} -- temps");
-            $temps[$sensor['id']]['all'] = $this->fetchTemperatureRange($sensor['id'], $config['system'], $config['timestamp']);
+            $temps[$sensor['id']]['all'] = $this->fetchTemperatureRange(
+                $sensor['id'],
+                $config['system'],
+                $config['timestamp']
+            );
             //$this->debug->debugVariable($temps, "{$debugHeading} -- temps");
         }
         return $temps;
@@ -111,9 +119,16 @@ class TemperaturesModel
         foreach ($config['sensors'] as $sensor) {
             //$this->debug->debugVariable($sensor, "{$debugHeading} -- sensor");
             $temps[$sensor['id']] = [];
-            $temps[$sensor['id']]['cur'] = $this->fetchCurrentTemperature($sensor['id'], null)[0];
+            $temps[$sensor['id']]['cur'] = $this->fetchCurrentTemperature(
+                $sensor['id'],
+                null
+            )[0];
             //$this->debug->debugVariable($temps, "{$debugHeading} -- temps");
-            $temps[$sensor['id']]['all'] = $this->fetchTemperatureRange($sensor['id'], null, $config['timestamp']);
+            $temps[$sensor['id']]['all'] = $this->fetchTemperatureRange(
+                $sensor['id'],
+                null,
+                $config['timestamp']
+            );
             //$this->debug->debugVariable($temps, "{$debugHeading} -- temps");
         }
         return $temps;
@@ -174,7 +189,9 @@ class TemperaturesModel
         foreach ($data as $section => $channels) {
             $result[$section] = [];
             // Get the sensors configuration for the current section
-            $sensorsConfig = isset($tempsConfig[$section]['sensors']) ? $tempsConfig[$section]['sensors'] : [];
+            $sensorsConfig = isset($tempsConfig[$section]['sensors'])
+                ? $tempsConfig[$section]['sensors']
+                : [];
             // Map sensor IDs to labels for quick lookup
             $sensorLabels = [];
             foreach ($sensorsConfig as $sensor) {
@@ -183,7 +200,9 @@ class TemperaturesModel
             // Iterate over each channel within the section
             foreach ($channels as $channel => $channelData) {
                 // Get the label for this channel
-                $label = isset($sensorLabels[$channel]) ? $sensorLabels[$channel] : $channel;
+                $label = isset($sensorLabels[$channel])
+                    ? $sensorLabels[$channel]
+                    : $channel;
                 // Only include the 'cur' data for each channel
                 $result[$section][$label] = $channelData['cur'];
             }

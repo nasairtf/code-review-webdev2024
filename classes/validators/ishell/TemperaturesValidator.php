@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\validators\ishell;
 
 use Exception;
-
 use App\core\common\Debug;
 use App\core\irtf\IrtfUtilities;
 
