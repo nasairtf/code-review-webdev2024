@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\views\forms;
 
 use App\core\common\Debug;
@@ -153,8 +155,8 @@ abstract class BaseFormView
     /**
      * Retrieves the HTML formatting preference.
      *
-     * This method returns the value of the `$formatHtml` property, 
-     * which indicates whether the HTML output should be formatted 
+     * This method returns the value of the `$formatHtml` property,
+     * which indicates whether the HTML output should be formatted
      * with indentation and line breaks for readability.
      *
      * @return bool True if HTML formatting is enabled; false otherwise.

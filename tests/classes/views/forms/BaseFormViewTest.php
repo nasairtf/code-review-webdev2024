@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\classes\views\forms;
 
-use Mockery as Mockery;
 use PHPUnit\Framework\TestCase;
+use Mockery as Mockery;
 use App\views\forms\BaseFormView;
 
 class BaseFormViewTest extends TestCase
