@@ -4,7 +4,7 @@
          bootstrap="bootstrap.php"
          colors="true"
          processIsolation="true"
-         stopOnFailure="true">
+         stopOnFailure="false">
     <php>
         <!-- Define environment variables for tests -->
         <env name="TEST_TMP_DIR" value="/home/webdev2024/tmp" />
