@@ -1,26 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\core\htmlbuilder;
 
 /**
  * /home/webdev2024/classes/core/htmlbuilder/HtmlBuildUtility.php
  *
- * A utility class that provides common methods for building HTML elements.
+ * Provides utility methods for common HTML-related operations, such as escaping content,
+ * building attributes, and formatting HTML output.
  *
  * @category Utilities
  * @package  IRTF
- * @author   Miranda Hawarden-Ogata
  * @version  1.0.1
+ * @since    1.0.0
  */
 
 class HtmlBuildUtility
 {
     /**
-     * Formats an individual string with optional left padding based on the format flag.
+     * Formats an individual string with optional left padding and line breaks.
      *
-     * @param string $content       The HTML content to format.
-     * @param bool   $formatOutput  Whether to format with padding and newlines.
-     * @param int    $pad           Number of spaces for left padding (only applies if $format is true).
+     * If `$formatOutput` is true, the string is padded with spaces to align with `$pad`.
+     * A newline can optionally be prepended to the output.
+     *
+     * @param string $content        The string content to format.
+     * @param bool   $formatOutput   [optional] Whether to apply formatting. Default is false.
+     * @param bool   $prependNewline [optional] Whether to prepend a newline to the string. Default is false.
+     * @param int    $pad            [optional] The number of spaces to pad the string. Default is 0.
      *
      * @return string The formatted string.
      */
@@ -30,8 +37,12 @@ class HtmlBuildUtility
         bool $prependNewline = false,
         int $pad = 0
     ): string {
-        $formattedContent = $formatOutput ? self::padLeftString($content, $pad) : $content;
-        return $prependNewline ? PHP_EOL . $formattedContent : $formattedContent;
+        $formattedContent = $formatOutput
+            ? self::padLeftString($content, $pad)
+            : $content;
+        return $prependNewline
+            ? PHP_EOL . $formattedContent
+            : $formattedContent;
     }
 
     /**
@@ -46,28 +57,48 @@ class HtmlBuildUtility
         array $parts,
         bool $formatOutput = false
     ): string {
-        return $formatOutput ? implode(PHP_EOL, $parts) : implode('', $parts);
+        return $formatOutput
+            ? implode(PHP_EOL, $parts)
+            : implode('', $parts);
     }
 
     /**
-     * Escapes a string for HTML output.
+     * Escapes a string for safe HTML output.
      *
-     * @param string $string The string to escape.
-     * @param bool   $isHtml Whether to skip escaping if the content is already HTML.
+     * Converts special characters to their HTML entities, unless `$isHtml` is true.
+     * Skips escaping for trusted HTML content.
+     * This method assumes input strings are UTF-8 encoded.
      *
-     * @return string The escaped or raw string.
+     * Example:
+     *  escape('<div>', false) => '&lt;div&gt;'
+     *  escape('<div>', true) => '<div>'
+     *
+     * @param string $string  The string to escape.
+     * @param bool   $isHtml  [optional] If true, the string is treated as pre-escaped HTML
+     *                        and will not be escaped. Default is false.
+     *
+     * @return string The escaped string.
      */
     public static function escape(
         string $string,
         bool $isHtml = false
     ): string {
-        return $isHtml ? $string : htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+        return $isHtml
+            ? $string
+            : htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
     }
 
     /**
      * Builds a string of HTML attributes from an associative array.
      *
-     * @param array $attributes  An associative array of attributes (e.g., 'class' => 'button').
+     * Each key-value pair in the array is transformed into an attribute string.
+     * Attribute keys and values are escaped to prevent injection attacks.
+     *
+     * Example:
+     * - Input: ['class' => 'button', 'data-role' => 'submit']
+     * - Output: ' class="button" data-role="submit"'
+     *
+     * @param array $attributes An associative array of attributes (e.g., 'class' => 'button').
      *
      * @return string The concatenated string of attributes.
      */
@@ -76,7 +107,11 @@ class HtmlBuildUtility
     ): string {
         $attrString = '';
         foreach ($attributes as $key => $value) {
-            $attrString .= sprintf(' %s="%s"', htmlspecialchars($key), htmlspecialchars($value));
+            $attrString .= sprintf(
+                ' %s="%s"',
+                htmlspecialchars((string)$key),
+                htmlspecialchars((string)$value)
+            );
         }
         return $attrString;
     }

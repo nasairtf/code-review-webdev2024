@@ -1,16 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\core\htmlbuilder;
 
+use App\core\htmlbuilder\HtmlBuildUtility;
+use App\core\htmlbuilder\FormElementsBuilder;
+use App\core\htmlbuilder\HtmlBuilder;
+use App\core\htmlbuilder\LayoutBuilder;
+use App\core\htmlbuilder\TableLayoutBuilder;
+
 /**
- * /home/webdev2024/classes/core/htmlbuilder/CompositeBuilder.php
+ * Provides an interface for generating composite HTML components and forms.
  *
- * A utility class for building commonly used HTML composite components such as date pulldowns,
- * semester pulldowns, and rating radio button groups with optional formatting.
+ * This utility class builds reusable, high-level HTML components by combining
+ * various elements such as pulldowns, tables, buttons, and form fields. It uses
+ * dependency-injected builder classes for modular and consistent generation of
+ * formatted or raw HTML.
+ *
+ * Key Features:
+ * - Encapsulation of composite component logic (e.g., date selectors, rating forms).
+ * - Extensible through injected builder instances.
+ * - Optional support for formatted HTML output with indentation and line breaks.
  *
  * @category Utilities
- * @package  IRTF
+ * @package  App\Core\HtmlBuilder
  * @version  1.0.0
+ * @license  MIT License
  */
 
 class CompositeBuilder
@@ -36,29 +52,49 @@ class CompositeBuilder
     private $layoutBuilder;
 
     /**
-     * Initializes the CompositeBuilder with optional builder dependencies and a flag for formatted output.
+     * Initializes the CompositeBuilder with optional dependencies and formatting preferences.
      *
-     * If builder instances are not provided, the constructor will create new instances using
-     * the same formatting preference.
+     * This constructor supports dependency injection for various builder classes used
+     * to generate composite HTML components. If no builders are provided, new instances
+     * are created internally, inheriting the specified formatting preference.
      *
-     * @param bool                 $formatOutput     If true, output will be formatted with indentation and line breaks.
-     * @param HtmlBuilder          $htmlBuilder      [optional] Instance of HtmlBuilder. A new instance is created if omitted.
-     * @param FormElementsBuilder  $elemBuilder  [optional] Instance of FormElementsBuilder. A new instance is created if omitted.
-     * @param TableLayoutBuilder   $tableBuilder     [optional] Instance of TableLayoutBuilder. A new instance is created if omitted.
-     * @param LayoutBuilder        $layoutBuilder    [optional] Instance of LayoutBuilder. A new instance is created if omitted.
+     * @param bool|null                $formatOutput  Whether to format the output with indentation and line breaks.
+     *                                                 Defaults to false.
+     * @param HtmlBuilder|null         $htmlBuilder   [optional] Custom instance of HtmlBuilder.
+     *                                                 Defaults to a new instance.
+     * @param FormElementsBuilder|null $elemBuilder   [optional] Custom instance of FormElementsBuilder.
+     *                                                 Defaults to a new instance.
+     * @param TableLayoutBuilder|null  $tableBuilder  [optional] Custom instance of TableLayoutBuilder.
+     *                                                 Defaults to a new instance.
+     * @param LayoutBuilder|null       $layoutBuilder [optional] Custom instance of LayoutBuilder.
+     *                                                 Defaults to a new instance.
      */
     public function __construct(
-        bool $formatOutput = false,
+        ?bool $formatOutput = null,
         ?HtmlBuilder $htmlBuilder = null,
         ?FormElementsBuilder $elemBuilder = null,
         ?TableLayoutBuilder $tableBuilder = null,
         ?LayoutBuilder $layoutBuilder = null
     ) {
-        $this->formatOutput = $formatOutput;
-        $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder($formatOutput);
-        $this->elemBuilder = $elemBuilder ?? new FormElementsBuilder($formatOutput, $this->htmlBuilder);
-        $this->tableBuilder = $tableBuilder ?? new TableLayoutBuilder($formatOutput, $this->htmlBuilder, $this->elemBuilder);
-        $this->layoutBuilder = $layoutBuilder ?? new LayoutBuilder($formatOutput, $this->htmlBuilder, $this->elemBuilder, $this->tableBuilder);
+        $this->formatOutput = $formatOutput ?? false;
+        $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder(
+            $formatOutput
+        );
+        $this->elemBuilder = $elemBuilder ?? new FormElementsBuilder(
+            $formatOutput,
+            $this->htmlBuilder
+        );
+        $this->tableBuilder = $tableBuilder ?? new TableLayoutBuilder(
+            $formatOutput,
+            $this->htmlBuilder,
+            $this->elemBuilder
+        );
+        $this->layoutBuilder = $layoutBuilder ?? new LayoutBuilder(
+            $formatOutput,
+            $this->htmlBuilder,
+            $this->elemBuilder,
+            $this->tableBuilder
+        );
     }
 
     /**
@@ -73,7 +109,10 @@ class CompositeBuilder
         int $colspan = 1,
         int $pad = 0
     ): string {
-        return $this->elemBuilder->buildLineTableCell($colspan, $pad);
+        return $this->elemBuilder->buildLineTableCell(
+            $colspan,
+            $pad
+        );
     }
 
     /**
@@ -88,7 +127,10 @@ class CompositeBuilder
         string $button,
         int $pad = 0
     ): string {
-        return $this->elemBuilder->buildSemesterChooserActionButtons($button, $pad);
+        return $this->elemBuilder->buildSemesterChooserActionButtons(
+            $button,
+            $pad
+        );
     }
 
     /**
@@ -109,7 +151,13 @@ class CompositeBuilder
         string $color,
         int $pad = 0
     ): string {
-        return $this->elemBuilder->buildProposalActionTrigger($button, $label, $id, $color, $pad);
+        return $this->elemBuilder->buildProposalActionTrigger(
+            $button,
+            $label,
+            $id,
+            $color,
+            $pad
+        );
     }
 
     /**
@@ -128,7 +176,12 @@ class CompositeBuilder
         string $color,
         int $pad = 0
     ): string {
-        return $this->elemBuilder->buildSemesterProposalListButtonForm($action, $id, $color, $pad);
+        return $this->elemBuilder->buildSemesterProposalListButtonForm(
+            $action,
+            $id,
+            $color,
+            $pad
+        );
     }
 
     /**
@@ -147,16 +200,25 @@ class CompositeBuilder
         string $bgColor,
         int $pad = 0
     ): string {
-        return $this->elemBuilder->buildSemesterProposalListFormRow($action, $proposal, $bgColor, $pad);
+        return $this->elemBuilder->buildSemesterProposalListFormRow(
+            $action,
+            $proposal,
+            $bgColor,
+            $pad
+        );
     }
 
     /**
-     * Generates a set of pulldown menus for date selection (year, month, day) using FormElementsBuilder.
+     * Generates a set of labeled pulldowns for date selection (year, month, day).
      *
-     * @param array $names       Associative array with 'year', 'month', and 'day' keys,
-     *                           representing name attributes for each pulldown.
-     * @param array $options     [optional] Array with pre-selected options:
-     *                           'year', 'month', and 'day'. Defaults to current date if not provided.
+     * Each pulldown menu allows the user to select a specific part of a date.
+     * The year pulldown range can be customized using `$startYear` and `$endYear`.
+     * Defaults to the current date if no pre-selected values are provided.
+     *
+     * @param array $names       Associative array with mandatory keys 'year', 'month', and 'day', representing
+     *                            the pulldown names.
+     * @param array $options     [optional] Pre-selected options with keys 'year', 'month', and 'day'.
+     *                            Defaults to the current date.
      * @param int   $startYear   [optional] Start year for the year pulldown. Defaults to current year - 5.
      * @param int   $endYear     [optional] End year for the year pulldown. Defaults to current year + 3.
      * @param int   $pad         [optional] Indentation level for formatted output. Default is 0.
@@ -170,22 +232,26 @@ class CompositeBuilder
         int $endYear = null,
         int $pad = 0
     ): string {
-        return $this->elemBuilder->buildDatePulldowns($names, $options, $startYear, $endYear, $pad);
+        return $this->elemBuilder->buildDatePulldowns(
+            $names,
+            $options,
+            $startYear,
+            $endYear,
+            $pad
+        );
     }
 
     /**
-     * Generates three pulldown menus for selecting single-digit numbers from 0 to 9.
+     * Generates three pulldown menus for selecting single-digit numbers (0-9).
      *
-     * This method creates three pulldowns, each displaying the numbers 0 through 9.
-     * The selected value for each pulldown defaults to 0 if not specified in `$options`.
-     * Custom `name` attributes for each pulldown are defined in `$names`.
+     * Each pulldown corresponds to a number selection, with names and default values
+     * specified in `$names` and `$options`. Defaults to 0 if no pre-selected values are provided.
      *
-     * @param array $names      An array specifying custom names for the pulldowns,
-     *                          where `$names[1]`, `$names[2]`, and `$names[3]` correspond
-     *                          to the `name` attributes for the first, second, and third pulldowns.
-     * @param array $options    [optional] An array specifying the selected value for each pulldown,
-     *                          with keys `[1]`, `[2]`, and `[3]` for each pulldown's selected option.
-     *                          If not provided, each defaults to 0.
+     * @param array $names      Indexed array specifying custom names for the pulldowns
+     *                           (e.g., `$names[1]`, `$names[2]`, `$names[3]`).
+     * @param array $options    [optional] Indexed array specifying pre-selected values for each pulldown
+     *                           (e.g., `$options[1]`, `$options[2]`, `$options[3]`).
+     *                          Defaults to 0 for all pulldowns.
      * @param int   $pad        [optional] Indentation level for formatted output. Default is 0.
      *
      * @return string The HTML for the three-number pulldown set.
@@ -195,7 +261,11 @@ class CompositeBuilder
         array $options = [],
         int $pad = 0
     ): string {
-        return $this->elemBuilder->buildThreeNumberPulldowns($names, $options, $pad);
+        return $this->elemBuilder->buildThreeNumberPulldowns(
+            $names,
+            $options,
+            $pad
+        );
     }
 
     /**
@@ -217,36 +287,65 @@ class CompositeBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildMessagePageTable($message, $isSuccess, $attributes, $pad);
+        return $this->tableBuilder->buildMessagePageTable(
+            $message,
+            $isSuccess,
+            $attributes,
+            $pad
+        );
     }
 
+    /**
+     * Generates a styled HTML table layout for displaying multiple messages.
+     *
+     * This method creates a table to display one or more messages, styled for either
+     * success or error contexts based on the `$isSuccess` flag. Additional table attributes
+     * and indentation can be customized.
+     *
+     * @param string $messages    The message(s) to display in the table. For multiple messages, use a
+     *                             pre-formatted string.
+     * @param bool   $isSuccess   Indicates if the messages represent success (true) or error (false). Default is true.
+     * @param array  $attributes  [optional] Additional attributes for the <table> element. Default is an empty array.
+     * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string The generated HTML for the messages table.
+     */
     public function buildMessagesPageTable(
         string $messages,
         bool $isSuccess = true,
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildMessagesPageTable($messages, $isSuccess, $attributes, $pad);
+        return $this->tableBuilder->buildMessagesPageTable(
+            $messages,
+            $isSuccess,
+            $attributes,
+            $pad
+        );
     }
 
     /**
-     * Generates an HTML table for semester selection with reset/submit buttons and instructions.
+     * Generates a table for semester selection with instructions and action buttons.
      *
-     * This table includes year and semester pulldowns, instructions at the top, and a button row
-     * for submission or resetting selections.
+     * The table includes year and semester pulldowns, a customizable instruction
+     * row at the top, and a row of action buttons (e.g., Reset, Submit).
      *
      * @param string $instructions  Instructions to display at the top of the table.
      * @param array  $attributes    [optional] Additional attributes for the <table> element. Default is an empty array.
      * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
      *
-     * @return string The generated HTML for the semester chooser form.
+     * @return string The generated HTML for the semester chooser table.
      */
     public function buildSemesterChooserTable(
         string $instructions,
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildSemesterChooserTable($instructions, $attributes, $pad);
+        return $this->tableBuilder->buildSemesterChooserTable(
+            $instructions,
+            $attributes,
+            $pad
+        );
     }
 
     /**
@@ -259,7 +358,9 @@ class CompositeBuilder
     public function buildSemesterChooserPulldownsTable(
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildSemesterChooserPulldownsTable($pad);
+        return $this->tableBuilder->buildSemesterChooserPulldownsTable(
+            $pad
+        );
     }
 
     /**
@@ -282,7 +383,13 @@ class CompositeBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildSemesterProposalListTable($action, $instructions, $proposals, $attributes, $pad);
+        return $this->tableBuilder->buildSemesterProposalListTable(
+            $action,
+            $instructions,
+            $proposals,
+            $attributes,
+            $pad
+        );
     }
 
     /**
@@ -304,7 +411,13 @@ class CompositeBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildProposalUpdateConfirmationTable($instructions, $proposal, $inputField, $attributes, $pad);
+        return $this->tableBuilder->buildProposalUpdateConfirmationTable(
+            $instructions,
+            $proposal,
+            $inputField,
+            $attributes,
+            $pad
+        );
     }
 
     /**
@@ -327,20 +440,28 @@ class CompositeBuilder
         string $note = '',
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildTextareaTable($name, $label, $value, $bgColor, $note, $pad);
+        return $this->tableBuilder->buildTextareaTable(
+            $name,
+            $label,
+            $value,
+            $bgColor,
+            $note,
+            $pad
+        );
     }
 
     /**
      * Creates an HTML table containing a label and content, with optional styling and layout settings.
      *
-     * This method generates a table with a specified background color, optional inline display for the label and content,
-     * and configurable layout for the label row. It can produce either a single row with both label and content in cells
-     * or two rows, one for the label and one for the content.
+     * This method generates a table with a specified background color, optional inline display for the label
+     * and content, and configurable layout for the label row. It can produce either a single row with both
+     * label and content in cells or two rows, one for the label and one for the content.
      *
      * @param string $label         The label text to display in the first cell.
      * @param string $content       The content to display in the second cell.
      * @param string $bgColor       The background color for the table rows.
-     * @param bool   $labelRow      [optional] If true, the label appears in its own row; otherwise, both cells are in the same row. Default is true.
+     * @param bool   $labelRow      [optional] If true, the label appears in its own row; otherwise, both cells are
+     *                               in the same row. Default is true.
      * @param bool   $inlineLabel   [optional] If true, displays the label as inline content. Default is false.
      * @param bool   $inlineContent [optional] If true, displays the content as inline content. Default is false.
      * @param int    $pad           [optional] The indentation level for formatted output. Default is 0.
@@ -356,7 +477,15 @@ class CompositeBuilder
         bool $inlineContent = false,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildLabeledElementTable($label, $content, $bgColor, $labelRow, $inlineLabel, $inlineContent, $pad);
+        return $this->tableBuilder->buildLabeledElementTable(
+            $label,
+            $content,
+            $bgColor,
+            $labelRow,
+            $inlineLabel,
+            $inlineContent,
+            $pad
+        );
     }
 
     /**
@@ -379,7 +508,14 @@ class CompositeBuilder
         bool $position = false,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildLabeledRemoteObsTable($name, $label, $selectedOption, $bgColor, $position, $pad);
+        return $this->tableBuilder->buildLabeledRemoteObsTable(
+            $name,
+            $label,
+            $selectedOption,
+            $bgColor,
+            $position,
+            $pad
+        );
     }
 
     /**
@@ -404,7 +540,15 @@ class CompositeBuilder
         bool $labelRow = false,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildLabeledRatingTable($name, $label, $selectedOption, $bgColor, $addNA, $labelRow, $pad);
+        return $this->tableBuilder->buildLabeledRatingTable(
+            $name,
+            $label,
+            $selectedOption,
+            $bgColor,
+            $addNA,
+            $labelRow,
+            $pad
+        );
     }
 
     /**
@@ -432,7 +576,15 @@ class CompositeBuilder
         bool $labelRow = false,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildLabeledCheckboxTable($name, $options, $selectedOptions, $label, $bgColor, $labelRow, $pad);
+        return $this->tableBuilder->buildLabeledCheckboxTable(
+            $name,
+            $options,
+            $selectedOptions,
+            $label,
+            $bgColor,
+            $labelRow,
+            $pad
+        );
     }
 
     /**
@@ -456,9 +608,31 @@ class CompositeBuilder
         string $bgColor,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildCheckboxTable($name, $options, $selectedOptions, $bgColor, $pad);
+        return $this->tableBuilder->buildCheckboxTable(
+            $name,
+            $options,
+            $selectedOptions,
+            $bgColor,
+            $pad
+        );
     }
 
+    /**
+     * Generates a table with labeled checkboxes and a pulldown menu for instruments.
+     *
+     * This method creates an HTML table containing labeled checkboxes alongside
+     * a pulldown menu for instrument selection. Selected options are pre-checked,
+     * and the table's background color and indentation can be customized.
+     *
+     * @param array  $names           An associative array specifying names for the checkboxes and pulldown elements.
+     * @param array  $options         An associative array of options for the pulldown menu, where keys are values
+     *                                and values are labels.
+     * @param array  $selectedOptions An array of values corresponding to pre-selected checkboxes.
+     * @param string $bgColor         The background color for the table rows.
+     * @param int    $pad             [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string The generated HTML for the instrument selection table.
+     */
     public function buildInstrumentCheckboxPulldownTable(
         array $names,
         array $options,
@@ -466,7 +640,13 @@ class CompositeBuilder
         string $bgColor,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildInstrumentCheckboxPulldownTable($names, $options, $selectedOptions, $bgColor, $pad);
+        return $this->tableBuilder->buildInstrumentCheckboxPulldownTable(
+            $names,
+            $options,
+            $selectedOptions,
+            $bgColor,
+            $pad
+        );
     }
 
     /**
@@ -489,7 +669,13 @@ class CompositeBuilder
         bool $addNA = false,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildRatingTable($name, $selectedOption, $bgColor, $addNA, $pad);
+        return $this->tableBuilder->buildRatingTable(
+            $name,
+            $selectedOption,
+            $bgColor,
+            $addNA,
+            $pad
+        );
     }
 
     /**
@@ -508,7 +694,12 @@ class CompositeBuilder
         string $bgColor,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildRemoteObsTable($name, $selectedOption, $bgColor, $pad);
+        return $this->tableBuilder->buildRemoteObsTable(
+            $name,
+            $selectedOption,
+            $bgColor,
+            $pad
+        );
     }
 
     /**
@@ -539,7 +730,15 @@ class CompositeBuilder
         string $bgColor = '',
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildDatePulldownsTable($names, $label, $options, $startYear, $endYear, $bgColor, $pad);
+        return $this->tableBuilder->buildDatePulldownsTable(
+            $names,
+            $label,
+            $options,
+            $startYear,
+            $endYear,
+            $bgColor,
+            $pad
+        );
     }
 
     /**
@@ -565,7 +764,13 @@ class CompositeBuilder
         string $bgColor = '',
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildThreeNumberPulldownsTable($names, $label, $options, $bgColor, $pad);
+        return $this->tableBuilder->buildThreeNumberPulldownsTable(
+            $names,
+            $label,
+            $options,
+            $bgColor,
+            $pad
+        );
     }
 
     /**
@@ -590,7 +795,12 @@ class CompositeBuilder
         array $options,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildSemesterProgramsPulldown($names, $selectedOption, $options, $pad);
+        return $this->tableBuilder->buildSemesterProgramsPulldown(
+            $names,
+            $selectedOption,
+            $options,
+            $pad
+        );
     }
 
     /**
@@ -601,8 +811,10 @@ class CompositeBuilder
      * the background color for each row is adjustable.
      *
      * @param string $name            The name attribute for the pulldown element.
-     * @param string $label           [optional] The label for the pulldown menu. If left blank, no label row is created.
-     * @param array  $programs        Associative array of programs where keys are display labels and values are program IDs.
+     * @param string $label           [optional] The label for the pulldown menu. If left blank, no label row
+     *                                 is created.
+     * @param array  $programs        Associative array of programs where keys are display labels and values are
+     *                                 program IDs.
      * @param string $selectedOption  The option to be pre-selected in the pulldown.
      * @param string $bgColor         The background color for the table rows.
      * @param int    $pad             [optional] Padding level for formatted output. Default is 0.
@@ -617,7 +829,14 @@ class CompositeBuilder
         string $bgColor = '',
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildProgramsListPulldownTable($name, $label, $programs, $selectedOption, $bgColor, $pad);
+        return $this->tableBuilder->buildProgramsListPulldownTable(
+            $name,
+            $label,
+            $programs,
+            $selectedOption,
+            $bgColor,
+            $pad
+        );
     }
 
     /**
@@ -625,7 +844,8 @@ class CompositeBuilder
      *
      * Contains a semester label and pulldown, a row for selecting programs, and a PI name input field.
      *
-     * @param array  $names          Associative array with field name mappings for the pulldown, hidden input, and PI field.
+     * @param array  $names          Associative array with field name mappings for the pulldown, hidden input,
+     *                                and PI field.
      * @param array  $labels         Associative array with text labels for semester, program, and PI fields.
      * @param array  $programs       Array of program options.
      * @param array  $options        [optional] Default selections for fields.
@@ -642,7 +862,14 @@ class CompositeBuilder
         string $bgColor = '',
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildProgramPulldownPINameTable($names, $labels, $programs, $options, $bgColor, $pad);
+        return $this->tableBuilder->buildProgramPulldownPINameTable(
+            $names,
+            $labels,
+            $programs,
+            $options,
+            $bgColor,
+            $pad
+        );
     }
 
     /**
@@ -668,7 +895,12 @@ class CompositeBuilder
         string $bgColor,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildSingleProposalTable($proposal, $program, $bgColor, $pad);
+        return $this->tableBuilder->buildSingleProposalTable(
+            $proposal,
+            $program,
+            $bgColor,
+            $pad
+        );
     }
 
     /**
@@ -697,7 +929,14 @@ class CompositeBuilder
         string $bgColor,
         int $pad = 0
     ): string {
-        return $this->tableBuilder->buildDateRangeTable($startnames, $endnames, $labels, $values, $bgColor, $pad);
+        return $this->tableBuilder->buildDateRangeTable(
+            $startnames,
+            $endnames,
+            $labels,
+            $values,
+            $bgColor,
+            $pad
+        );
     }
 
     /**
@@ -706,7 +945,8 @@ class CompositeBuilder
      * This form displays a success message styled within a table, with optional additional attributes.
      *
      * @param string $resultsMessage The message to display in the results page.
-     * @param array  $attributes     [optional] Additional attributes for the <table> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <table> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
      *
      * @return string The generated HTML for the results page.
@@ -716,7 +956,11 @@ class CompositeBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->layoutBuilder->buildResultsPage($resultsMessage, $attributes, $pad);
+        return $this->layoutBuilder->buildResultsPage(
+            $resultsMessage,
+            $attributes,
+            $pad
+        );
     }
 
     public function buildResultsBlockPage(
@@ -724,7 +968,11 @@ class CompositeBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->layoutBuilder->buildResultsBlockPage($resultsMessage, $attributes, $pad);
+        return $this->layoutBuilder->buildResultsBlockPage(
+            $resultsMessage,
+            $attributes,
+            $pad
+        );
     }
 
     /**
@@ -733,7 +981,8 @@ class CompositeBuilder
      * This form displays an error message styled within a table, with optional additional attributes.
      *
      * @param string $errorMessage The message to display in the error page.
-     * @param array  $attributes   [optional] Additional attributes for the <table> element. Default is an empty array.
+     * @param array  $attributes   [optional] Additional attributes for the <table> element.
+     *                              Default is an empty array.
      * @param int    $pad          [optional] Indentation level for formatted output. Default is 0.
      *
      * @return string The generated HTML for the error page.
@@ -743,7 +992,11 @@ class CompositeBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->layoutBuilder->buildErrorPage($errorMessage, $attributes, $pad);
+        return $this->layoutBuilder->buildErrorPage(
+            $errorMessage,
+            $attributes,
+            $pad
+        );
     }
 
     /**
@@ -754,7 +1007,8 @@ class CompositeBuilder
      *
      * @param string $action        The form's action URL.
      * @param string $instructions  Instructions to display at the top of the form.
-     * @param array  $attributes    [optional] Additional attributes for the <table> element. Default is an empty array.
+     * @param array  $attributes    [optional] Additional attributes for the <table> element.
+     *                               Default is an empty array.
      * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
      *
      * @return string The generated HTML for the semester chooser form.
@@ -765,7 +1019,12 @@ class CompositeBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->layoutBuilder->buildSemesterChooserForm($action, $instructions, $attributes, $pad);
+        return $this->layoutBuilder->buildSemesterChooserForm(
+            $action,
+            $instructions,
+            $attributes,
+            $pad
+        );
     }
 
     /**
@@ -788,7 +1047,13 @@ class CompositeBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->layoutBuilder->buildSemesterProposalListForm($action, $instructions, $proposals, $attributes, $pad);
+        return $this->layoutBuilder->buildSemesterProposalListForm(
+            $action,
+            $instructions,
+            $proposals,
+            $attributes,
+            $pad
+        );
     }
 
     /**
@@ -811,6 +1076,13 @@ class CompositeBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->layoutBuilder->buildProposalUpdateConfirmationForm($action, $instructions, $proposal, $inputField, $attributes, $pad);
+        return $this->layoutBuilder->buildProposalUpdateConfirmationForm(
+            $action,
+            $instructions,
+            $proposal,
+            $inputField,
+            $attributes,
+            $pad
+        );
     }
 }

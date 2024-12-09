@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\core\htmlbuilder;
+
+use App\exceptions\HtmlBuilderException;
+use App\core\htmlbuilder\HtmlBuildUtility;
+use App\core\htmlbuilder\HtmlBuilder;
 
 /**
  * /home/webdev2024/classes/core/htmlbuilder/FormElementsBuilder.php
@@ -15,6 +21,8 @@ namespace App\core\htmlbuilder;
 
 class FormElementsBuilder
 {
+    use BuilderValidationTrait;
+
     /**
      * Here are a list of element pad variables to use in each layout function to
      * ensure flexibility and consistency of padding values for the given form.
@@ -51,10 +59,10 @@ class FormElementsBuilder
      * @param HtmlBuilder $htmlBuilder   [optional] An instance of HtmlBuilder. Defaults to a new instance.
      */
     public function __construct(
-        bool $formatOutput = false,
+        ?bool $formatOutput = null,
         ?HtmlBuilder $htmlBuilder = null
     ) {
-        $this->formatOutput = $formatOutput;
+        $this->formatOutput = $formatOutput ?? false;
         $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder($formatOutput);
     }
 
@@ -70,7 +78,13 @@ class FormElementsBuilder
         int $colspan = 1,
         int $pad = 0
     ): string {
-        return $this->htmlBuilder->getHorizontalLine(false, '#FFFFFF', $colspan, $pad, false);
+        return $this->htmlBuilder->getHorizontalLine(
+            false,
+            '#FFFFFF',
+            $colspan,
+            $pad,
+            false
+        );
     }
 
     /**
@@ -86,9 +100,21 @@ class FormElementsBuilder
         int $pad = 0
     ): string {
         $buttonPad = $pad;
-        $resetButton = $this->htmlBuilder->getResetButton('Reset', ['style' => 'width: 120px;'], $buttonPad);
-        $submitButton = $this->htmlBuilder->getSubmitButton($button, 'Generate', ['style' => 'width: 120px;'], $buttonPad);
-        return $this->htmlBuilder->formatParts([$resetButton, $submitButton], $this->formatOutput);
+        $resetButton = $this->htmlBuilder->getResetButton(
+            'Reset',
+            ['style' => 'width: 120px;'],
+            $buttonPad
+        );
+        $submitButton = $this->htmlBuilder->getSubmitButton(
+            $button,
+            'Generate',
+            ['style' => 'width: 120px;'],
+            $buttonPad
+        );
+        return $this->htmlBuilder->formatParts(
+            [$resetButton, $submitButton],
+            $this->formatOutput
+        );
     }
 
     /**
@@ -112,9 +138,22 @@ class FormElementsBuilder
         $buttonPad = $pad;
         $inputPad = $pad;
         $buttonStyle = "width: 120px; background-color: {$color};";
-        $hiddenInput = $this->htmlBuilder->getHiddenInput('i', $id, [], $inputPad);
-        $submitButton = $this->htmlBuilder->getSubmitButton($button, $label, ['style' => $buttonStyle], $buttonPad);
-        return $this->htmlBuilder->formatParts([$hiddenInput, $submitButton], $this->formatOutput);
+        $hiddenInput = $this->htmlBuilder->getHiddenInput(
+            'i',
+            $id,
+            [],
+            $inputPad
+        );
+        $submitButton = $this->htmlBuilder->getSubmitButton(
+            $button,
+            $label,
+            ['style' => $buttonStyle],
+            $buttonPad
+        );
+        return $this->htmlBuilder->formatParts(
+            [$hiddenInput, $submitButton],
+            $this->formatOutput
+        );
     }
 
     /**
@@ -135,8 +174,21 @@ class FormElementsBuilder
     ): string {
         $triggerPad = $pad + 2;
         $formPad = $pad;
-        $html = trim($this->buildProposalActionTrigger('select', 'Edit', $id, $color, $triggerPad));
-        $html = $this->htmlBuilder->formatOutput($html, $this->formatOutput, false, 2);
+        $html = trim(
+            $this->buildProposalActionTrigger(
+                'select',
+                'Edit',
+                $id,
+                $color,
+                $triggerPad
+            )
+        );
+        $html = $this->htmlBuilder->formatOutput(
+            $html,
+            $this->formatOutput,
+            false,
+            2
+        );
         return $this->htmlBuilder->getForm(
             $action,
             'post',
@@ -156,6 +208,8 @@ class FormElementsBuilder
      * @param int    $pad      [optional] Indentation level for formatted output. Default is 0.
      *
      * @return string HTML for the proposal lister row.
+     *
+     * @throws HtmlBuilderException If the proposal array is missing required entries.
      */
     public function buildSemesterProposalListFormRow(
         string $action,
@@ -163,24 +217,81 @@ class FormElementsBuilder
         string $bgColor,
         int $pad = 0
     ): string {
+        // Validate proposal array elements
+        $this->validateProposalFields($proposal);
+
         $cellPad = $pad + 2;
         $formPad = $pad + 4;
         $tableRowPad = $pad;
         $proposalId = HtmlBuildUtility::escape($proposal['ObsApp_id'], false);
         $proposalCode = HtmlBuildUtility::escape($proposal['code'], false);
-        $programNumber = HtmlBuildUtility::escape($proposal['semesterYear'] . $proposal['semesterCode'] . sprintf("%03d", $proposal['ProgramNumber']), false);
+        $programNumber = HtmlBuildUtility::escape(
+            $proposal['semesterYear'] . $proposal['semesterCode'] . sprintf("%03d", $proposal['ProgramNumber']),
+            false
+        );
         $investigator = HtmlBuildUtility::escape('(' . $proposal['InvLastName1'] . ')', false);
         $buttonColor = $proposal['ProgramNumber'] === 0 ? 'lightblue' : 'lightgreen';
-        $editForm = $this->buildSemesterProposalListButtonForm($action, $proposalId, $buttonColor, $formPad);
+        $editForm = $this->buildSemesterProposalListButtonForm(
+            $action,
+            $proposalId,
+            $buttonColor,
+            $formPad
+        );
         $cells = [
-            $this->htmlBuilder->getTableCell('&nbsp;', false, true, ['style' => 'width: 75px;'], $cellPad, true),
-            $this->htmlBuilder->getTableCell($editForm, false, false, ['align' => 'right', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $cellPad, true),
-            $this->htmlBuilder->getTableCell($proposalCode, false, true, ['align' => 'center', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $cellPad, true),
-            $this->htmlBuilder->getTableCell($programNumber, false, true, ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $cellPad, true),
-            $this->htmlBuilder->getTableCell($investigator, false, true, ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $cellPad, true),
-            $this->htmlBuilder->getTableCell('&nbsp;', false, true, ['style' => 'width: 75px;'], $cellPad, true),
+            $this->htmlBuilder->getTableCell(
+                '&nbsp;',
+                false,
+                true,
+                ['style' => 'width: 75px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $editForm,
+                false,
+                false,
+                ['align' => 'right', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $proposalCode,
+                false,
+                true,
+                ['align' => 'center', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $programNumber,
+                false,
+                true,
+                ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $investigator,
+                false,
+                true,
+                ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                '&nbsp;',
+                false,
+                true,
+                ['style' => 'width: 75px;'],
+                $cellPad,
+                true
+            ),
         ];
-        return $this->htmlBuilder->getTableRowFromCells($cells, ['style' => 'height: 32px; background-color: ' . $bgColor], $tableRowPad);
+        return $this->htmlBuilder->getTableRowFromCells(
+            $cells,
+            ['style' => 'height: 32px; background-color: ' . $bgColor],
+            $tableRowPad
+        );
     }
 
     /**
@@ -208,10 +319,34 @@ class FormElementsBuilder
         $selectedMonth = $options['month'] ?? date('n');
         $selectedDay = $options['day'] ?? date('j');
 
-        $yearPulldown = $this->htmlBuilder->getYearsPulldown($names['year'], $selectedYear, $startYear, $endYear, [], $pad, false);
-        $monthPulldown = $this->htmlBuilder->getShortMonthNamesPulldown($names['month'], $selectedMonth, [], $pad, false);
-        $dayPulldown = $this->htmlBuilder->getDaysOfMonthPulldown($names['day'], $selectedDay, false, [], $pad, false);
-        return $this->htmlBuilder->formatParts([$monthPulldown, $dayPulldown, $yearPulldown], $this->formatOutput);
+        $yearPulldown = $this->htmlBuilder->getYearsPulldown(
+            $names['year'],
+            $selectedYear,
+            $startYear,
+            $endYear,
+            [],
+            $pad,
+            false
+        );
+        $monthPulldown = $this->htmlBuilder->getShortMonthNamesPulldown(
+            $names['month'],
+            $selectedMonth,
+            [],
+            $pad,
+            false
+        );
+        $dayPulldown = $this->htmlBuilder->getDaysOfMonthPulldown(
+            $names['day'],
+            $selectedDay,
+            false,
+            [],
+            $pad,
+            false
+        );
+        return $this->htmlBuilder->formatParts(
+            [$monthPulldown, $dayPulldown, $yearPulldown],
+            $this->formatOutput
+        );
     }
 
     /**
@@ -228,13 +363,43 @@ class FormElementsBuilder
         array $options = [],
         int $pad = 0
     ): string {
-        $selectedFirst = $options[1] ?? 0;
-        $selectedSecond = $options[2] ?? 0;
-        $selectedThird = $options[3] ?? 0;
-        $firstPulldown = $this->htmlBuilder->getNumbersPulldown($names[1], $selectedFirst, 0, 9, false, [], $pad, false);
-        $secondPulldown = $this->htmlBuilder->getNumbersPulldown($names[2], $selectedSecond, 0, 9, false, [], $pad, false);
-        $thirdPulldown = $this->htmlBuilder->getNumbersPulldown($names[3], $selectedThird, 0, 9, false, [], $pad, false);
-        return $this->htmlBuilder->formatParts([$firstPulldown, $secondPulldown, $thirdPulldown], $this->formatOutput);
+        $selectedFirst = (string) ($options[0] ?? 0);
+        $selectedSecond = (string) ($options[1] ?? 0);
+        $selectedThird = (string) ($options[2] ?? 0);
+        $firstPulldown = $this->htmlBuilder->getNumbersPulldown(
+            $names[0],
+            $selectedFirst,
+            0,
+            9,
+            false,
+            [],
+            $pad,
+            false
+        );
+        $secondPulldown = $this->htmlBuilder->getNumbersPulldown(
+            $names[1],
+            $selectedSecond,
+            0,
+            9,
+            false,
+            [],
+            $pad,
+            false
+        );
+        $thirdPulldown = $this->htmlBuilder->getNumbersPulldown(
+            $names[2],
+            $selectedThird,
+            0,
+            9,
+            false,
+            [],
+            $pad,
+            false
+        );
+        return $this->htmlBuilder->formatParts(
+            [$firstPulldown, $secondPulldown, $thirdPulldown],
+            $this->formatOutput
+        );
     }
 
     /**
@@ -253,7 +418,17 @@ class FormElementsBuilder
         array $options,
         int $pad = 0
     ): string {
-        $pulldown = $this->htmlBuilder->getPulldown($name, $selectedOption, $options, [], $pad, false);
-        return $this->htmlBuilder->formatParts([$pulldown], $this->formatOutput);
+        $pulldown = $this->htmlBuilder->getPulldown(
+            $name,
+            $selectedOption,
+            $options,
+            [],
+            $pad,
+            false
+        );
+        return $this->htmlBuilder->formatParts(
+            [$pulldown],
+            $this->formatOutput
+        );
     }
 }

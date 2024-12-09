@@ -1,20 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\core\htmlbuilder;
+
+use App\core\htmlbuilder\HtmlBuildUtility;
+use App\core\htmlbuilder\FormElementsBuilder;
+use App\core\htmlbuilder\HtmlBuilder;
 
 /**
  * /home/webdev2024/classes/core/htmlbuilder/TableLayoutBuilder.php
  *
- * A utility class responsible for building HTML table layouts with optional formatting.
+ * Generates a multi-select dropdown HTML element.
  *
- * @category Utilities
- * @package  IRTF
- * @author   Miranda Hawarden-Ogata
- * @version  1.0.0
+ * @param string $name           The name attribute for the <select> element.
+ * @param array  $selectedOptions An array of options that should be pre-selected.
+ * @param array  $options        An associative array of options (key = value attribute, value = display text).
+ * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+ * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
+ * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
+ *
+ * @return string The HTML for the multi-select pulldown.
  */
 
 class TableLayoutBuilder
 {
+    use BuilderValidationTrait;
+
     /**
      * Here are a list of element pad variables to use in each layout function to
      * ensure flexibility and consistency of padding values for the given form.
@@ -54,16 +66,17 @@ class TableLayoutBuilder
     /**
      * Constructor to set the formatting preference.
      *
-     * @param bool                $formatOutput    If true, output will be formatted with indentation.
-     * @param HtmlBuilder         $htmlBuilder     [optional] An instance of HtmlBuilder. Defaults to a new instance.
-     * @param FormElementsBuilder $formBuilder [optional] An instance of FormElementsBuilder. Defaults to a new instance.
+     * @param bool|null                $formatOutput If true, output will be formatted with indentation.
+     * @param HtmlBuilder|null         $htmlBuilder  [optional] An instance of HtmlBuilder. Defaults to a new instance.
+     * @param FormElementsBuilder|null $formBuilder  [optional] An instance of FormElementsBuilder.
+     *                                                Defaults to a new instance.
      */
     public function __construct(
-        bool $formatOutput = false,
+        ?bool $formatOutput = null,
         ?HtmlBuilder $htmlBuilder = null,
         ?FormElementsBuilder $formBuilder = null
     ) {
-        $this->formatOutput = $formatOutput;
+        $this->formatOutput = $formatOutput ?? false;
         $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder($formatOutput);
         $this->formBuilder = $formBuilder ?? new FormElementsBuilder($formatOutput, $this->htmlBuilder);
     }
@@ -71,15 +84,23 @@ class TableLayoutBuilder
     /**
      * Generates a styled HTML table layout with a centered message.
      *
-     * Used for creating both result and error pages by displaying the provided
-     * message inside a styled HTML table.
+     * This method creates a basic table layout, commonly used for displaying
+     * either success or error messages. It expects the message contents to be
+     * pre-sanitized and does not perform additional encoding or sanitization.
      *
-     * @param string $message     The message to display in the table.
-     * @param bool   $isSuccess   Indicates if the table is for a success page (true) or an error page (false).
-     * @param array  $attributes  [optional] Additional attributes for the <table> element. Default is an empty array.
+     * Example Output:
+     * <table>
+     *   <tr><td>--- Horizontal Line ---</td></tr>
+     *   <tr><td align="center">Your Message Here</td></tr>
+     *   <tr><td>--- Horizontal Line ---</td></tr>
+     * </table>
+     *
+     * @param string $message     The pre-sanitized message to display.
+     * @param bool   $isSuccess   Indicates whether the table is for success (true) or error (false).
+     * @param array  $attributes  [optional] HTML attributes for the <table> element. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
      *
-     * @return string HTML string for the message table layout.
+     * @return string The generated HTML for the message table layout.
      */
     public function buildMessagePageTable(
         string $message,
@@ -94,7 +115,10 @@ class TableLayoutBuilder
         $horizontalLine = $this->formBuilder->buildLineTableCell(1, $tableRowPad);
         $messageCell = $this->htmlBuilder->getTableCell($message, false, $isSuccess, [], $tableCellPad, false);
         $messageRow = $this->htmlBuilder->getTableRowFromCells([$messageCell], $rowAttributes, $tableRowPad);
-        $tableAttributes = array_merge(['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'], $attributes);
+        $tableAttributes = array_merge(
+            ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+            $attributes
+        );
         return $this->htmlBuilder->getTableFromRows(
             [$horizontalLine, $messageRow, $horizontalLine],
             $tableAttributes,
@@ -102,6 +126,20 @@ class TableLayoutBuilder
         );
     }
 
+    /**
+     * Generates a styled HTML table layout with a centered message.
+     *
+     * This method accepts raw message content, sanitizes it, and outputs a formatted
+     * HTML table layout. Commonly used for scenarios where the message content needs
+     * additional handling before display.
+     *
+     * @param string $messages    The raw message content to be displayed. Sanitization will be applied.
+     * @param bool   $isSuccess   Indicates whether the table is for success (true) or error (false).
+     * @param array  $attributes  [optional] HTML attributes for the <table> element. Default is an empty array.
+     * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string The generated HTML for the message table layout.
+     */
     public function buildMessagesPageTable(
         string $messages,
         bool $isSuccess = true,
@@ -115,7 +153,10 @@ class TableLayoutBuilder
         $horizontalLine = $this->formBuilder->buildLineTableCell(1, $tableRowPad);
         $messagesCell = $this->htmlBuilder->getTableCell($messages, false, $isSuccess, [], $tableCellPad, true);
         $messagesRow = $this->htmlBuilder->getTableRowFromCells([$messagesCell], $rowAttributes, $tableRowPad);
-        $tableAttributes = array_merge(['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'], $attributes);
+        $tableAttributes = array_merge(
+            ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+            $attributes
+        );
         return $this->htmlBuilder->getTableFromRows(
             [$horizontalLine, $messagesRow, $horizontalLine],
             $tableAttributes,
@@ -127,13 +168,21 @@ class TableLayoutBuilder
      * Generates an HTML table layout for selecting a semester.
      *
      * Includes instructions, year and semester pulldowns, and reset/submit buttons,
-     * wrapped in a styled table structure with horizontal lines.
+     * wrapped in a styled table structure with horizontal lines. Typically used
+     * as part of a semester selection form.
+     *
+     * Example Structure:
+     * <table>
+     *   <tr><td>Instructions</td></tr>
+     *   <tr><td>Year Pulldown | Semester Pulldown</td></tr>
+     *   <tr><td>Reset | Submit Buttons</td></tr>
+     * </table>
      *
      * @param string $instructions  Instructions displayed at the top of the table.
-     * @param array  $attributes    [optional] Additional attributes for the <table> element. Default is an empty array.
+     * @param array  $attributes    [optional] HTML attributes for the <table> element. Default is an empty array.
      * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
      *
-     * @return string HTML string for the semester chooser table.
+     * @return string The generated HTML for the semester chooser table.
      */
     public function buildSemesterChooserTable(
         string $instructions,
@@ -146,6 +195,10 @@ class TableLayoutBuilder
         $pulldownPad = $tableRowPad + 4;
         $colors = ['#C0C0C0', '#CCCCCC'];
         $rowAttributes = ['style' => 'height: 45px;', 'align' => 'center'];
+        $tableAttributes = array_merge(
+            ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+            $attributes
+        );
         $horizontalLine = $this->formBuilder->buildLineTableCell(1, $tableRowPad);
         $pulldowns = $this->buildSemesterChooserPulldownsTable($pulldownPad);
         $buttons = $this->formBuilder->buildSemesterChooserActionButtons('submit', $buttonPad);
@@ -178,7 +231,7 @@ class TableLayoutBuilder
         );
         return $this->htmlBuilder->getTableFromRows(
             [$horizontalLine, $tableInstructions, $tablePulldowns, $tableButtons, $horizontalLine],
-            ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+            $tableAttributes,
             $tablePad
         );
     }
@@ -217,7 +270,8 @@ class TableLayoutBuilder
      * @param string $action        The form's action URL.
      * @param string $instructions  Instructions displayed at the top of the table.
      * @param array  $proposals     Array of proposal data to be displayed in the table.
-     * @param array  $attributes    [optional] Additional attributes for the <table> element. Default is an empty array.
+     * @param array  $attributes    [optional] Additional attributes for the <table> element.
+     *                               Default is an empty array.
      * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
      *
      * @return string HTML string for the semester proposal list table.
@@ -233,6 +287,10 @@ class TableLayoutBuilder
         $tableRowPad = $pad + 2;
         $tableCellPad = $pad + 4;
         $colors = ['#CCCCCC', '#C0C0C0'];
+        $tableAttributes = array_merge(
+            ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+            $attributes
+        );
         $tableParts = [];
         $instructionsCell = $this->htmlBuilder->getTableCell(
             $instructions,
@@ -249,16 +307,16 @@ class TableLayoutBuilder
         );
         foreach ($proposals as $index => $proposal) {
             $color = $colors[$index % 2];
-            $tableParts[] = $this->formBuilder->buildSemesterProposalListFormRow($action, $proposal, $color, $tableRowPad);
+            $tableParts[] = $this->formBuilder->buildSemesterProposalListFormRow(
+                $action,
+                $proposal,
+                $color,
+                $tableRowPad
+            );
         }
         return $this->htmlBuilder->getTableFromRows(
             $tableParts,
-            [
-                'width' => '100%',
-                'border' => '0',
-                'cellspacing' => '0',
-                'cellpadding' => '6'
-            ],
+            $tableAttributes,
             $tablePad
         );
     }
@@ -271,7 +329,8 @@ class TableLayoutBuilder
      * @param string $instructions  Instructions to display at the top of the table.
      * @param array  $proposal      Array of proposal data (id, code, program number, investigator).
      * @param string $inputField    The input field HTML, customizable per form.
-     * @param array  $attributes    [optional] Additional attributes for the <table> element. Default is an empty array.
+     * @param array  $attributes    [optional] Additional attributes for the <table> element.
+     *                               Default is an empty array.
      * @param int    $pad           [optional] Padding level for formatted output. Default is 0.
      *
      * @return string HTML string for the proposal update confirmation table.
@@ -283,29 +342,113 @@ class TableLayoutBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
+        // Validate proposal array elements
+        $this->validateProposalFields($proposal);
+
         $tablePad = $pad + 2;
         $tableRowPad = $tablePad + 2;
         $tableCellPad = $tableRowPad + 2;
         $buttonPad = $tableCellPad + 2;
+        $tableAttributes = array_merge(
+            ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+            $attributes
+        );
         $proposalId = HtmlBuildUtility::escape($proposal['ObsApp_id'], false);
         $proposalCode = HtmlBuildUtility::escape($proposal['code'], false);
-        $programNumber = HtmlBuildUtility::escape($proposal['semesterYear'] . $proposal['semesterCode'] . sprintf("%03d", $proposal['ProgramNumber']), false);
+        $programNumber = HtmlBuildUtility::escape(
+            $proposal['semesterYear'] . $proposal['semesterCode'] . sprintf("%03d", $proposal['ProgramNumber']),
+            false
+        );
         $investigator = HtmlBuildUtility::escape('(' . $proposal['InvLastName1'] . ')', false);
-        $instructionsCell = $this->htmlBuilder->getTableCell($instructions, false, true, ['colspan' => '7'], $tableCellPad, true);
-        $instructionRow = $this->htmlBuilder->getTableRowFromCells([$instructionsCell], ['style' => 'height: 32px; background-color: #c0c0c0;'], $tableRowPad);
+        $instructionsCell = $this->htmlBuilder->getTableCell(
+            $instructions,
+            false,
+            true,
+            ['colspan' => '7'],
+            $tableCellPad,
+            true
+        );
+        $instructionRow = $this->htmlBuilder->getTableRowFromCells(
+            [$instructionsCell],
+            ['style' => 'height: 32px; background-color: #c0c0c0;'],
+            $tableRowPad
+        );
         $buttonColor = $proposal['ProgramNumber'] === 0 ? 'lightblue' : 'lightgreen';
-        $buttonInputs = $this->formBuilder->buildProposalActionTrigger('confirm', 'Update', $proposalId, $buttonColor, $buttonPad);
+        $buttonInputs = $this->formBuilder->buildProposalActionTrigger(
+            'confirm',
+            'Update',
+            $proposalId,
+            $buttonColor,
+            $buttonPad
+        );
         $cells = [
-            $this->htmlBuilder->getTableCell('&nbsp;', false, true, ['style' => 'width: 75px;'], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($buttonInputs, false, false, ['align' => 'right', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($proposalCode, false, true, ['align' => 'center', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($inputField, false, false, ['align' => 'center', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($programNumber, false, true, ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($investigator, false, true, ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell('&nbsp;', false, true, ['style' => 'width: 75px;'], $tableCellPad, true),
+            $this->htmlBuilder->getTableCell(
+                '&nbsp;',
+                false,
+                true,
+                ['style' => 'width: 75px;'],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $buttonInputs,
+                false,
+                false,
+                ['align' => 'right', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $proposalCode,
+                false,
+                true,
+                ['align' => 'center', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $inputField,
+                false,
+                false,
+                ['align' => 'center', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $programNumber,
+                false,
+                true,
+                ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $investigator,
+                false,
+                true,
+                ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                '&nbsp;',
+                false,
+                true,
+                ['style' => 'width: 75px;'],
+                $tableCellPad,
+                true
+            ),
         ];
-        $proposalRow = $this->htmlBuilder->getTableRowFromCells($cells, ['style' => 'height: 32px; background-color: #cccccc;'], $tableRowPad);
-        return $this->htmlBuilder->getTableFromRows([$instructionRow, $proposalRow], ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'], $tablePad);
+        $proposalRow = $this->htmlBuilder->getTableRowFromCells(
+            $cells,
+            ['style' => 'height: 32px; background-color: #cccccc;'],
+            $tableRowPad
+        );
+        return $this->htmlBuilder->getTableFromRows(
+            [$instructionRow, $proposalRow],
+            $tableAttributes,
+            $tablePad
+        );
     }
 
     /**
@@ -336,11 +479,32 @@ class TableLayoutBuilder
         $textarea = $this->htmlBuilder->getTextarea($name, $value, 10, 56, [], 0, false);
         $rows = [];
         $htmlParts = [];
-        $rows[] = $this->htmlBuilder->getTableRowFromArray([$label], false, [true], $rowAttributes, $tableRowPad, true);
+        $rows[] = $this->htmlBuilder->getTableRowFromArray(
+            [$label],
+            false,
+            [true],
+            $rowAttributes,
+            $tableRowPad,
+            true
+        );
         if (!empty($note)) {
-            $rows[] = $this->htmlBuilder->getTableRowFromArray([$note], false, [true], $rowAttributes, $tableRowPad, true);
+            $rows[] = $this->htmlBuilder->getTableRowFromArray(
+                [$note],
+                false,
+                [true],
+                $rowAttributes,
+                $tableRowPad,
+                true
+            );
         }
-        $rows[] = $this->htmlBuilder->getTableRowFromArray([$textarea], false, [true], $rowAttributes, $tableRowPad, true);
+        $rows[] = $this->htmlBuilder->getTableRowFromArray(
+            [$textarea],
+            false,
+            [true],
+            $rowAttributes,
+            $tableRowPad,
+            true
+        );
         $htmlParts[] = $this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad);
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
     }
@@ -378,7 +542,14 @@ class TableLayoutBuilder
         $cells = [];
         $htmlParts = [];
         $htmlParts[] = $this->htmlBuilder->getTableOpenTag($tableAttributes, $tablePad);
-        $labelCell = $this->htmlBuilder->getTableCell($label, false, $inlineLabel, ['width' => '150px'], $tableCellPad, true);
+        $labelCell = $this->htmlBuilder->getTableCell(
+            $label,
+            false,
+            $inlineLabel,
+            ['width' => '150px'],
+            $tableCellPad,
+            true
+        );
         if ($labelRow) {
             $htmlParts[] = $this->htmlBuilder->getTableRowFromCells(
                 [$labelCell],
@@ -423,8 +594,29 @@ class TableLayoutBuilder
         $htmlParts = [];
         $labelCell = $this->htmlBuilder->getTableCell($label, false, true, [], $tableCellPad, true);
         $radioCells = [
-            $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '0', 'checked', $selectedOption, 'Remote', true), false, true, [], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '1', 'checked', $selectedOption, 'Onsite (at the summit)', true), false, true, [], $tableCellPad, true),
+            $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton($name, '0', 'checked', $selectedOption, 'Remote', true),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton(
+                    $name,
+                    '1',
+                    'checked',
+                    $selectedOption,
+                    'Onsite (at the summit)',
+                    true
+                ),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            ),
         ];
         $cells = $position ? array_merge([$labelCell], $radioCells) : array_merge($radioCells, [$labelCell]);
         $htmlParts[] = $this->htmlBuilder->getTableOpenTag($tableAttributes, $tablePad);
@@ -474,13 +666,55 @@ class TableLayoutBuilder
         } else {
             $cells[] = $this->htmlBuilder->getTableCell($label, false, true, ['width' => '100px'], $tableCellPad, true);
         }
-        $cells[] = $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '5', 'checked', $selectedOption, 'Excellent', true), false, true, [], $tableCellPad, true);
-        $cells[] = $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '4', 'checked', $selectedOption, 'Very Good', true), false, true, [], $tableCellPad, true);
-        $cells[] = $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '3', 'checked', $selectedOption, 'Good', true), false, true, [], $tableCellPad, true);
-        $cells[] = $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '2', 'checked', $selectedOption, 'Fair', true), false, true, [], $tableCellPad, true);
-        $cells[] = $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '1', 'checked', $selectedOption, 'Poor', true), false, true, [], $tableCellPad, true);
+        $cells[] = $this->htmlBuilder->getTableCell(
+            $this->htmlBuilder->getLabeledRadioButton($name, '5', 'checked', $selectedOption, 'Excellent', true),
+            false,
+            true,
+            [],
+            $tableCellPad,
+            true
+        );
+        $cells[] = $this->htmlBuilder->getTableCell(
+            $this->htmlBuilder->getLabeledRadioButton($name, '4', 'checked', $selectedOption, 'Very Good', true),
+            false,
+            true,
+            [],
+            $tableCellPad,
+            true
+        );
+        $cells[] = $this->htmlBuilder->getTableCell(
+            $this->htmlBuilder->getLabeledRadioButton($name, '3', 'checked', $selectedOption, 'Good', true),
+            false,
+            true,
+            [],
+            $tableCellPad,
+            true
+        );
+        $cells[] = $this->htmlBuilder->getTableCell(
+            $this->htmlBuilder->getLabeledRadioButton($name, '2', 'checked', $selectedOption, 'Fair', true),
+            false,
+            true,
+            [],
+            $tableCellPad,
+            true
+        );
+        $cells[] = $this->htmlBuilder->getTableCell(
+            $this->htmlBuilder->getLabeledRadioButton($name, '1', 'checked', $selectedOption, 'Poor', true),
+            false,
+            true,
+            [],
+            $tableCellPad,
+            true
+        );
         if ($addNA) {
-            $cells[] = $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '0', 'checked', $selectedOption, 'N/A', true), false, true, [], $tableCellPad, true);
+            $cells[] = $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton($name, '0', 'checked', $selectedOption, 'N/A', true),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            );
         }
         $htmlParts[] = $this->htmlBuilder->getTableRowFromCells($cells, $rowAttributes, $tableRowPad, true);
         $htmlParts[] = $this->htmlBuilder->getTableCloseTag($tablePad);
@@ -534,7 +768,14 @@ class TableLayoutBuilder
         foreach ($options as $value => $optionLabel) {
             $isChecked = in_array($value, $selectedOptions) ? 'checked' : '';
             $cells[] = $this->htmlBuilder->getTableCell(
-                $this->htmlBuilder->getLabeledCheckbox($name . '[]', $value, $optionLabel, in_array($value, $selectedOptions), false, true),
+                $this->htmlBuilder->getLabeledCheckbox(
+                    $name . '[]',
+                    $value,
+                    $optionLabel,
+                    in_array($value, $selectedOptions),
+                    false,
+                    true
+                ),
                 false,
                 true,
                 [],
@@ -684,14 +925,56 @@ class TableLayoutBuilder
         $cells = [];
         $htmlParts = [];
         $cells = [
-            $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '5', 'checked', $selectedOption, 'Excellent', true), false, true, [], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '4', 'checked', $selectedOption, 'Very Good', true), false, true, [], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '3', 'checked', $selectedOption, 'Good', true), false, true, [], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '2', 'checked', $selectedOption, 'Fair', true), false, true, [], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '1', 'checked', $selectedOption, 'Poor', true), false, true, [], $tableCellPad, true),
+            $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton($name, '5', 'checked', $selectedOption, 'Excellent', true),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton($name, '4', 'checked', $selectedOption, 'Very Good', true),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton($name, '3', 'checked', $selectedOption, 'Good', true),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton($name, '2', 'checked', $selectedOption, 'Fair', true),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton($name, '1', 'checked', $selectedOption, 'Poor', true),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            ),
         ];
         if ($addNA) {
-            $cells[] = $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '0', 'checked', $selectedOption, 'N/A', true), false, true, [], $tableCellPad, true);
+            $cells[] = $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton($name, '0', 'checked', $selectedOption, 'N/A', true),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            );
         }
         $htmlParts = [
             $this->htmlBuilder->getTableOpenTag($tableAttributes, $tablePad),
@@ -725,8 +1008,36 @@ class TableLayoutBuilder
         $rowAttributes = ['bgcolor' => $bgColor];
         $htmlParts = [];
         $cells = [
-            $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '0', 'checked', $selectedOption, 'Remote', true), false, true, [], $tableCellPad, true),
-            $this->htmlBuilder->getTableCell($this->htmlBuilder->getLabeledRadioButton($name, '1', 'checked', $selectedOption, 'Onsite (at the summit)', true), false, true, [], $tableCellPad, true),
+            $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton(
+                    $name,
+                    '0',
+                    'checked',
+                    $selectedOption,
+                    'Remote',
+                    true
+                ),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $this->htmlBuilder->getLabeledRadioButton(
+                    $name,
+                    '1',
+                    'checked',
+                    $selectedOption,
+                    'Onsite (at the summit)',
+                    true
+                ),
+                false,
+                true,
+                [],
+                $tableCellPad,
+                true
+            ),
         ];
         $htmlParts = [
             $this->htmlBuilder->getTableOpenTag($tableAttributes, $tablePad),
@@ -765,11 +1076,13 @@ class TableLayoutBuilder
         $tableAttributes = ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '0'];
         $rowAttributes = ['bgcolor' => $bgColor];
         $pulldowns = $this->formBuilder->buildDatePulldowns($names, $options, $startYear, $endYear, $pulldownPad);
-        $rows = [];
-        $htmlParts = [];
-        $rows[] = $this->htmlBuilder->getTableRowFromArray([$label], false, [true], $rowAttributes, $tableRowPad, true);
-        $rows[] = $this->htmlBuilder->getTableRowFromArray([$pulldowns], false, [false], $rowAttributes, $tableRowPad, true);
-        $htmlParts[] = $this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad);
+        $rows = [
+            $this->htmlBuilder->getTableRowFromArray([$label], false, [true], $rowAttributes, $tableRowPad, true),
+            $this->htmlBuilder->getTableRowFromArray([$pulldowns], false, [false], $rowAttributes, $tableRowPad, true),
+        ];
+        $htmlParts = [
+            $this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad),
+        ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
     }
 
@@ -800,16 +1113,47 @@ class TableLayoutBuilder
         $tableCellPad = $tableRowPad + 2;
         $tableAttributes = ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '0'];
         $rowAttributes = ['bgcolor' => $bgColor];
-        $startPulldowns = $this->buildDatePulldownsTable($startnames, $labels['start'], $values['start'], date('Y') - 5, date('Y') + 5, $bgColor, 12);
-        $startCell = $this->htmlBuilder->getTableCell($startPulldowns, false, false, [], $tableCellPad, true);
-        $endPulldowns = $this->buildDatePulldownsTable($endnames, $labels['end'], $values['end'], date('Y') - 5, date('Y') + 5, $bgColor, 12);
-        $endCell = $this->htmlBuilder->getTableCell($endPulldowns, false, false, [], $tableCellPad, true);
-        $rows = [];
-        $rows[] = $this->htmlBuilder->getTableRowFromCells(
-            [$startCell, $endCell],
-            $rowAttributes,
-            $tableRowPad
+        $startPulldowns = $this->buildDatePulldownsTable(
+            $startnames,
+            $labels['start'],
+            $values['start'],
+            date('Y') - 5,
+            date('Y') + 5,
+            $bgColor,
+            12
         );
+        $startCell = $this->htmlBuilder->getTableCell(
+            $startPulldowns,
+            false,
+            false,
+            [],
+            $tableCellPad,
+            true
+        );
+        $endPulldowns = $this->buildDatePulldownsTable(
+            $endnames,
+            $labels['end'],
+            $values['end'],
+            date('Y') - 5,
+            date('Y') + 5,
+            $bgColor,
+            12
+        );
+        $endCell = $this->htmlBuilder->getTableCell(
+            $endPulldowns,
+            false,
+            false,
+            [],
+            $tableCellPad,
+            true
+        );
+        $rows = [
+            $this->htmlBuilder->getTableRowFromCells(
+                [$startCell, $endCell],
+                $rowAttributes,
+                $tableRowPad
+            ),
+        ];
         return $this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad);
     }
 
@@ -841,11 +1185,13 @@ class TableLayoutBuilder
         $tableAttributes = ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '0'];
         $rowAttributes = ['bgcolor' => $bgColor];
         $pulldowns = $this->formBuilder->buildThreeNumberPulldowns($names, $options, $pulldownPad);
-        $rows = [];
-        $htmlParts = [];
-        $rows[] = $this->htmlBuilder->getTableRowFromArray([$label], false, [true], $rowAttributes, $tableRowPad, true);
-        $rows[] = $this->htmlBuilder->getTableRowFromArray([$pulldowns], false, [false], $rowAttributes, $tableRowPad, true);
-        $htmlParts[] = $this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad);
+        $rows = [
+            $this->htmlBuilder->getTableRowFromArray([$label], false, [true], $rowAttributes, $tableRowPad, true),
+            $this->htmlBuilder->getTableRowFromArray([$pulldowns], false, [false], $rowAttributes, $tableRowPad, true),
+        ];
+        $htmlParts = [
+            $this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad),
+        ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
     }
 
@@ -878,15 +1224,35 @@ class TableLayoutBuilder
         $pulldownPad = $tableCellPad + 2;
         $tableAttributes = ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '0'];
         $rowAttributes = ['bgcolor' => $bgColor];
-        $pulldown = $this->formBuilder->buildSemesterProgramsPulldown($name, $selectedOption, $programs, $pulldownPad);
+        $pulldown = $this->formBuilder->buildSemesterProgramsPulldown(
+            $name,
+            $selectedOption,
+            $programs,
+            $pulldownPad
+        );
         $rows = [];
-        $htmlParts = [];
         if ($label !== '') {
-            $rows[] = $this->htmlBuilder->getTableRowFromArray([$label], false, [true], $rowAttributes, $tableRowPad, true);
+            $rows[] = $this->htmlBuilder->getTableRowFromArray(
+                [$label],
+                false,
+                [true],
+                $rowAttributes,
+                $tableRowPad,
+                true
+            );
         }
-        $rows[] = $this->htmlBuilder->getTableRowFromArray([$pulldown], false, [false], $rowAttributes, $tableRowPad, true);
-        $htmlParts[] = $this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad);
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+        $rows[] = $this->htmlBuilder->getTableRowFromArray(
+            [$pulldown],
+            false,
+            [false],
+            $rowAttributes,
+            $tableRowPad,
+            true
+        );
+        return $this->htmlBuilder->formatParts(
+            [$this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad)],
+            $this->formatOutput
+        );
     }
 
     /**
@@ -894,7 +1260,8 @@ class TableLayoutBuilder
      *
      * Contains a semester label and pulldown, a row for selecting programs, and a PI name input field.
      *
-     * @param array  $names          Associative array with field name mappings for the pulldown, hidden input, and PI field.
+     * @param array  $names          Associative array with field name mappings for the pulldown, hidden input,
+     *                                and PI field.
      * @param array  $labels         Associative array with text labels for semester, program, and PI fields.
      * @param array  $programs       Array of program options.
      * @param array  $options        [optional] Default selections for fields.
@@ -911,6 +1278,11 @@ class TableLayoutBuilder
         string $bgColor = '',
         int $pad = 0
     ): string {
+        // Validate proposal array elements
+        $this->validateProgramFields($names);
+        $this->validateProgramFields($labels);
+        $this->validateProgramFields($options);
+
         $tablePad = $pad;
         $tableRowPad = $tablePad + 2;
         $tableCellPad = $tableRowPad + 2;
@@ -919,7 +1291,13 @@ class TableLayoutBuilder
         $rowAttributes = ['bgcolor' => $bgColor];
         $hiddenElement = $this->buildLabeledElementTable(
             $labels['semester'],
-            $this->htmlBuilder->getHiddenInput($names['semester'], '2024B', [], 0, false),
+            $this->htmlBuilder->getHiddenInput(
+                $names['semester'],
+                '2024B', // FIX THIS HARDCODED SEMESTER TAG
+                [],
+                0,
+                false
+            ),
             $bgColor,
             true,
             true,
@@ -944,22 +1322,61 @@ class TableLayoutBuilder
         );
         $piElement = $this->buildLabeledElementTable(
             $labels['pi'],
-            $this->htmlBuilder->getTextInput($names['pi'], $options['pi'], 10, ['maxlength' => '50'], 0, false),
+            $this->htmlBuilder->getTextInput(
+                $names['pi'],
+                $options['pi'],
+                10,
+                ['maxlength' => '50'],
+                0,
+                false
+            ),
             $bgColor,
             true,
             true,
             true,
             $elementPad
         );
-        $programAndPIElementsRow = $this->htmlBuilder->getTableRowFromArray([$pulldownElement, $piElement], false, [false, false], $rowAttributes, $tableRowPad, true);
-        $programAndPIElements = $this->htmlBuilder->getTableFromRows([$programAndPIElementsRow], $tableAttributes, $tablePad);
-        $rows = [];
-        $htmlParts = [];
-        $rows[] = $this->htmlBuilder->getTableRowFromArray([$hiddenElement, $programElement], false, [false, false], $rowAttributes, $tableRowPad, true);
-        $rows[] = $this->htmlBuilder->getHorizontalLine(false, $bgColor, 2, $tableRowPad);
-        $rows[] = $this->htmlBuilder->getTableRowFromArray([$programsLabel, $programAndPIElements], false, [false, false], $rowAttributes, $tableRowPad, true);
-        $htmlParts[] = $this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad);
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+        $programAndPIElementsRow = $this->htmlBuilder->getTableRowFromArray(
+            [$pulldownElement, $piElement],
+            false,
+            [false, false],
+            $rowAttributes,
+            $tableRowPad,
+            true
+        );
+        $programAndPIElements = $this->htmlBuilder->getTableFromRows(
+            [$programAndPIElementsRow],
+            $tableAttributes,
+            $tablePad
+        );
+        $rows = [
+            $this->htmlBuilder->getTableRowFromArray(
+                [$hiddenElement, $programElement],
+                false,
+                [false, false],
+                $rowAttributes,
+                $tableRowPad,
+                true
+            ),
+            $this->htmlBuilder->getHorizontalLine(
+                false,
+                $bgColor,
+                2,
+                $tableRowPad
+            ),
+            $this->htmlBuilder->getTableRowFromArray(
+                [$programsLabel, $programAndPIElements],
+                false,
+                [false, false],
+                $rowAttributes,
+                $tableRowPad,
+                true
+            ),
+        ];
+        return $this->htmlBuilder->formatParts(
+            [$this->htmlBuilder->getTableFromRows($rows, $tableAttributes, $tablePad)],
+            $this->formatOutput
+        );
     }
 
     /**
@@ -970,9 +1387,10 @@ class TableLayoutBuilder
      *
      * @param string $proposal The program number or proposal identifier to display.
      * @param array  $program  An associative array with program details:
-     *                         - 'i': Observation application ID.
+     *                         - 'a': Program ID.
+     *                         - 'i': Database application ID.
      *                         - 'n': PI's last name.
-     *                         - 's': Semester identifier (e.g., '2024B').
+     *                         - 's': Semester tag (e.g., '2024B').
      * @param string $bgColor  The background color for the table row.
      * @param int    $pad      Optional. Padding for the table and cells.
      *                         Defaults to 0.
@@ -985,6 +1403,9 @@ class TableLayoutBuilder
         string $bgColor,
         int $pad = 0
     ): string {
+        // Validate proposal array elements
+        $this->validateFeedbackProposalFields($program);
+
         $tablePad = $pad + 2;
         $tableRowPad = $tablePad + 2;
         $tableCellPad = $tableRowPad + 2;

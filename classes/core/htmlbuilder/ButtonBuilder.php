@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\core\htmlbuilder;
+
+use App\core\htmlbuilder\HtmlBuildUtility;
 
 /**
  * /home/webdev2024/classes/core/htmlbuilder/ButtonBuilder.php
  *
- * A utility class responsible for building HTML buttons with optional formatting.
+ * Provides utility methods for generating HTML button elements.
+ * This includes standard buttons, submit buttons, reset buttons, and buttons with custom attributes.
  *
  * @category Utilities
  * @package  IRTF
  * @author   Miranda Hawarden-Ogata
  * @version  1.0.0
+ * @since    1.0.0
  */
 
 class ButtonBuilder
@@ -25,47 +31,25 @@ class ButtonBuilder
     /**
      * Constructor to set the formatting preference.
      *
-     * @param bool $formatOutput If true, output will be formatted with indentation.
+     * @param bool $formatOutput Whether to format the HTML (indentation, line breaks).
      */
-    public function __construct(bool $formatOutput = false)
-    {
-        $this->formatOutput = $formatOutput;
+    public function __construct(
+        ?bool $formatOutput = null
+    ) {
+        $this->formatOutput = $formatOutput ?? false;
     }
 
     /**
-     * Builds the button HTML with type, attributes, name, and label.
+     * Generates a standard button element.
      *
-     * @param string      $type       The button type.
-     * @param string      $label      The button label.
-     * @param string|null $name       [optional] The name attribute for the button.
-     * @param array       $attributes [optional] Additional attributes for the button.
-     * @param bool        $isHtml     [optional] Whether the content is HTML. Default is false.
-     *
-     * @return string The complete button HTML.
-     */
-    private function buildElement(
-        string $type,
-        string $label,
-        ?string $name,
-        array $attributes,
-        bool $isHtml
-    ): string {
-        $escapedType = HtmlBuildUtility::escape($type, $isHtml);
-        $escapedLabel = HtmlBuildUtility::escape($label, $isHtml);
-        $nameAttr = ($name !== null) ? sprintf(' name="%s"', HtmlBuildUtility::escape($name, $isHtml)) : '';
-        $attrString = HtmlBuildUtility::buildAttributes($attributes);
-        return sprintf('<button type="%s"%s%s>%s</button>', $escapedType, $attrString, $nameAttr, $escapedLabel);
-    }
-
-    /**
-     * Generates a button element.
-     *
-     * @param string      $label       The label to be displayed on the button.
-     * @param string      $type        [optional] The button type (e.g., "submit", "button", "reset"). Default is 'button'.
-     * @param string|null $name        [optional] Optional name attribute for the button. Default is null.
+     * @param string      $label       The label to display inside the button.
+     * @param string      $type        [optional] The button type (e.g., "button", "submit", "reset").
+     *                                  Default is "button".
+     * @param string|null $name        [optional] The name attribute for the button. Default is null.
      * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, attributes and content are treated as pre-escaped HTML.
+     *                                  Default is false.
      *
      * @return string The HTML for the button element.
      */
@@ -82,13 +66,14 @@ class ButtonBuilder
     }
 
     /**
-     * Generates a submit button with optional width styling.
+     * Generates a submit button.
      *
-     * @param string      $name        The name attribute for the submit button.
-     * @param string      $label       The label for the submit button.
-     * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
-     * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param string $name        The name attribute for the button.
+     * @param string $label       The label to display inside the button.
+     * @param array  $attributes  [optional] Additional attributes for the button. Default is an empty array.
+     * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML.
+     *                             Default is false.
      *
      * @return string The HTML for the submit button.
      */
@@ -111,7 +96,7 @@ class ButtonBuilder
      * @param string|null $name        [optional] Optional name attribute for the button. Default is null.
      * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the disabled button element.
      */
@@ -133,7 +118,7 @@ class ButtonBuilder
      * @param string      $label       [optional] The label to be displayed on the reset button. Default is 'Reset'.
      * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the reset button.
      */
@@ -153,7 +138,7 @@ class ButtonBuilder
      * @param string      $href        The URL the link should point to.
      * @param array       $attributes  [optional] Additional attributes for the link. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the link styled as a button.
      */
@@ -180,7 +165,7 @@ class ButtonBuilder
      * @param string|null $name        [optional] Optional name attribute for the button. Default is null.
      * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the button with an icon.
      */
@@ -204,7 +189,7 @@ class ButtonBuilder
      *
      * @param array       $buttons     An array of button configurations (e.g., 'name', 'label', 'type', etc.).
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the group of buttons.
      */
@@ -230,11 +215,16 @@ class ButtonBuilder
      *
      * @param string      $label              The label to be displayed on the button.
      * @param string      $confirmationMessage The message for the confirmation dialog.
-     * @param string      $type               [optional] The button type (e.g., "submit", "button"). Default is 'button'.
-     * @param string|null $name               [optional] Optional name attribute for the button. Default is null.
-     * @param array       $attributes         [optional] Additional attributes for the button. Default is an empty array.
-     * @param int         $pad                [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml             [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param string      $type               [optional] The button type (e.g., "submit", "button").
+     *                                         Default is 'button'.
+     * @param string|null $name               [optional] Optional name attribute for the button.
+     *                                         Default is null.
+     * @param array       $attributes         [optional] Additional attributes for the button.
+     *                                         Default is an empty array.
+     * @param int         $pad                [optional] Indentation level for formatted output.
+     *                                         Default is 0.
+     * @param bool        $isHtml             [optional] If true, content is treated as pre-escaped
+     *                                         HTML. Default is false.
      *
      * @return string The HTML for the confirmation button.
      */
@@ -247,7 +237,10 @@ class ButtonBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        $attributes['onclick'] = sprintf("return confirm('%s')", HtmlBuildUtility::escape($confirmationMessage, $isHtml));
+        $attributes['onclick'] = sprintf(
+            "return confirm('%s')",
+            HtmlBuildUtility::escape($confirmationMessage, $isHtml)
+        );
         $html = $this->buildElement($type, $label, $name, $attributes, $isHtml);
         return HtmlBuildUtility::formatOutput($html, $this->formatOutput, false, $pad);
     }
@@ -255,15 +248,20 @@ class ButtonBuilder
     /**
      * Generates a dropdown button with a list of items.
      *
-     * @param string      $label       The label to be displayed on the button.
-     * @param array       $dropdownItems An array of items with 'link' and 'label' keys for the dropdown.
-     * @param string      $type        [optional] The button type (e.g., "button"). Default is 'button'.
-     * @param string|null $name        [optional] Optional name attribute for the button. Default is null.
-     * @param array       $buttonAttributes  [optional] Additional attributes for the button. Default is an empty array.
-     * @param array       $dropdownAttributes [optional] Additional attributes for the dropdown container. Default is an empty array.
-     * @param array       $contentAttributes [optional] Additional attributes for the dropdown-content div. Default is an empty array.
-     * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param string      $label                The label to be displayed on the button.
+     * @param array       $dropdownItems        An array of items with 'link' and 'label' keys for the dropdown.
+     * @param string      $type                 [optional] The button type (e.g., "button"). Default is 'button'.
+     * @param string|null $name                 [optional] Optional name attribute for the button.
+     *                                          Default is null.
+     * @param array       $buttonAttributes     [optional] Additional attributes for the button.
+     *                                          Default is an empty array.
+     * @param array       $dropdownAttributes   [optional] Additional attributes for the dropdown container.
+     *                                          Default is an empty array.
+     * @param array       $contentAttributes    [optional] Additional attributes for the dropdown-content div.
+     *                                          Default is an empty array.
+     * @param int         $pad                  [optional] Indentation level for formatted output. Default is 0.
+     * @param bool        $isHtml               [optional] If true, content is treated as pre-escaped HTML.
+     *                                          Default is false.
      *
      * @return string The HTML for the dropdown button.
      */
@@ -289,5 +287,30 @@ class ButtonBuilder
         }
         $html .= '</div></div>';
         return HtmlBuildUtility::formatOutput($html, $this->formatOutput, false, $pad);
+    }
+
+    /**
+     * Builds the button HTML with type, attributes, name, and label.
+     *
+     * @param string      $type       The button type.
+     * @param string      $label      The button label.
+     * @param string|null $name       [optional] The name attribute for the button.
+     * @param array       $attributes [optional] Additional attributes for the button.
+     * @param bool        $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
+     *
+     * @return string The complete button HTML.
+     */
+    private function buildElement(
+        string $type,
+        string $label,
+        ?string $name,
+        array $attributes,
+        bool $isHtml
+    ): string {
+        $escapedType = HtmlBuildUtility::escape($type, $isHtml);
+        $escapedLabel = HtmlBuildUtility::escape($label, $isHtml);
+        $nameAttr = ($name !== null) ? sprintf(' name="%s"', HtmlBuildUtility::escape($name, $isHtml)) : '';
+        $attrString = HtmlBuildUtility::buildAttributes($attributes);
+        return sprintf('<button type="%s"%s%s>%s</button>', $escapedType, $attrString, $nameAttr, $escapedLabel);
     }
 }

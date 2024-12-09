@@ -1,15 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\core\htmlbuilder;
 
+use App\core\htmlbuilder\HtmlBuildUtility;
+use App\core\htmlbuilder\BaseHtmlBuilder;
+use App\core\htmlbuilder\ButtonBuilder;
+use App\core\htmlbuilder\CheckboxBuilder;
+use App\core\htmlbuilder\PulldownBuilder;
+use App\core\htmlbuilder\RadioBuilder;
+use App\core\htmlbuilder\TableBuilder;
+use App\core\htmlbuilder\TextBuilder;
+
 /**
- * /home/webdev2024/classes/core/htmlbuilder/HtmlBuilder.php
+ * Provides a unified interface for generating common HTML elements.
  *
- * A utility class responsible for building common HTML components such as select boxes, text fields, etc.
+ * This utility class simplifies the creation of HTML components such as
+ * forms, tables, input fields, buttons, and dropdowns. It utilizes specialized
+ * builder classes (e.g., TableBuilder, TextBuilder) to handle the details
+ * of generating clean, reusable HTML code with optional formatting.
+ *
+ * Features:
+ * - Encapsulation of HTML generation logic.
+ * - Support for formatted or raw HTML output.
+ * - Extensibility via dependency injection of specific builders.
  *
  * @category Utilities
- * @package  IRTF
- * @author   Miranda Hawarden-Ogata
+ * @package  App\Core\HtmlBuilder
+ * @author
+ * @license  MIT License
  * @version  1.0.0
  */
 
@@ -42,25 +62,32 @@ class HtmlBuilder
     private $textBuilder;
 
     /**
-     * Constructor for the HtmlBuilder class.
+     * Initializes the HtmlBuilder class with optional dependencies and configuration.
      *
-     * Initializes the HtmlBuilder with optional builder dependencies and a flag to determine whether
-     * to format the output (i.e., indent and add line breaks).
+     * This constructor allows for dependency injection of specific builder instances
+     * or automatic initialization of default builders. It also supports a global flag
+     * for enabling formatted output, which applies indentation and line breaks to
+     * the generated HTML.
      *
-     * If no builder instances are provided, the constructor will create new instances with the same
-     * formatting preference.
-     *
-     * @param bool              $formatOutput     If true, output will be formatted with indentation and line breaks.
-     * @param BaseHtmlBuilder   $baseHtmlBuilder  [optional] An instance of BaseHtmlBuilder. If not provided, a new one is created.
-     * @param ButtonBuilder     $buttonBuilder    [optional] An instance of ButtonBuilder. If not provided, a new one is created.
-     * @param CheckboxBuilder   $checkboxBuilder  [optional] An instance of CheckboxBuilder. If not provided, a new one is created.
-     * @param PulldownBuilder   $pulldownBuilder  [optional] An instance of PulldownBuilder. If not provided, a new one is created.
-     * @param RadioBuilder      $radioBuilder     [optional] An instance of RadioBuilder. If not provided, a new one is created.
-     * @param TableBuilder      $tableBuilder     [optional] An instance of TableBuilder. If not provided, a new one is created.
-     * @param TextBuilder       $textBuilder      [optional] An instance of TextBuilder. If not provided, a new one is created.
+     * @param bool|null            $formatOutput     If true, enables formatted output with indentation
+     *                                               and line breaks.
+     * @param BaseHtmlBuilder|null $baseHtmlBuilder [optional] Custom instance of BaseHtmlBuilder.
+     *                                               Defaults to a new instance.
+     * @param ButtonBuilder|null   $buttonBuilder   [optional] Custom instance of ButtonBuilder.
+     *                                               Defaults to a new instance.
+     * @param CheckboxBuilder|null $checkboxBuilder [optional] Custom instance of CheckboxBuilder.
+     *                                               Defaults to a new instance.
+     * @param PulldownBuilder|null $pulldownBuilder [optional] Custom instance of PulldownBuilder.
+     *                                               Defaults to a new instance.
+     * @param RadioBuilder|null    $radioBuilder    [optional] Custom instance of RadioBuilder.
+     *                                               Defaults to a new instance.
+     * @param TableBuilder|null    $tableBuilder    [optional] Custom instance of TableBuilder.
+     *                                               Defaults to a new instance.
+     * @param TextBuilder|null     $textBuilder     [optional] Custom instance of TextBuilder.
+     *                                               Defaults to a new instance.
      */
     public function __construct(
-        bool $formatOutput = false,
+        ?bool $formatOutput = null,
         ?BaseHtmlBuilder $baseHtmlBuilder = null,
         ?ButtonBuilder $buttonBuilder = null,
         ?CheckboxBuilder $checkboxBuilder = null,
@@ -69,7 +96,7 @@ class HtmlBuilder
         ?TableBuilder $tableBuilder = null,
         ?TextBuilder $textBuilder = null
     ) {
-        $this->formatOutput = $formatOutput;
+        $this->formatOutput = $formatOutput ?? false;
         $this->baseHtmlBuilder = $baseHtmlBuilder ?? new BaseHtmlBuilder($formatOutput);
         $this->buttonBuilder = $buttonBuilder ?? new ButtonBuilder($formatOutput);
         $this->checkboxBuilder = $checkboxBuilder ?? new CheckboxBuilder($formatOutput);
@@ -114,7 +141,7 @@ class HtmlBuilder
      * @param string $label      The label for the link.
      * @param array  $attributes [optional] Additional attributes for the <a> element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the anchor element.
      */
@@ -125,7 +152,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getLink($url, $label, $attributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getLink(
+            $url,
+            $label,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -135,7 +168,7 @@ class HtmlBuilder
      * @param string $label      [optional] The label for the link. Default is the email address.
      * @param array  $attributes [optional] Additional attributes for the <a> element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the mailto link.
      */
@@ -146,7 +179,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getEmailLink($email, $label, $attributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getEmailLink(
+            $email,
+            $label,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -155,7 +194,7 @@ class HtmlBuilder
      * @param string $name       The name attribute for the file input.
      * @param array  $attributes [optional] Additional attributes for the input element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the file input element.
      */
@@ -165,7 +204,12 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getFileInput($name, $attributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getFileInput(
+            $name,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -175,7 +219,7 @@ class HtmlBuilder
      * @param string $alt        [optional] The alt text for the image. Default is an empty string.
      * @param array  $attributes [optional] Additional attributes for the image element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the image element.
      */
@@ -186,7 +230,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getImage($src, $alt, $attributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getImage(
+            $src,
+            $alt,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -196,7 +246,7 @@ class HtmlBuilder
      * @param string $content    The content of the label.
      * @param array  $attributes [optional] Additional attributes for the label element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the label element.
      */
@@ -207,7 +257,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getLabel($for, $content, $attributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getLabel(
+            $for,
+            $content,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -216,7 +272,7 @@ class HtmlBuilder
      * @param string $content    The content of the paragraph.
      * @param array  $attributes [optional] Additional attributes for the paragraph element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the paragraph element.
      */
@@ -226,7 +282,12 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getParagraph($content, $attributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getParagraph(
+            $content,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -235,7 +296,7 @@ class HtmlBuilder
      * @param string $content    The content of the span.
      * @param array  $attributes [optional] Additional attributes for the span element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the span element.
      */
@@ -245,7 +306,12 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getSpan($content, $attributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getSpan(
+            $content,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -253,10 +319,11 @@ class HtmlBuilder
      *
      * @param string $action     The action URL for the form.
      * @param string $method     [optional] The HTTP method (GET or POST). Default is POST.
-     * @param string $content    [optional] The content inside the form (e.g., input fields). Default is an empty string.
+     * @param string $content    [optional] The content inside the form (e.g., input fields).
+     *                            Default is an empty string.
      * @param array  $attributes [optional] Additional attributes for the form element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the form element.
      */
@@ -268,7 +335,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getForm($action, $method, $content, $attributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getForm(
+            $action,
+            $method,
+            $content,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -278,7 +352,7 @@ class HtmlBuilder
      * @param int    $level      The heading level (1-6).
      * @param array  $attributes [optional] Additional attributes for the heading element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the heading element.
      */
@@ -289,18 +363,25 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getHeading($content, $level, $attributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getHeading(
+            $content,
+            $level,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
      * Generates an HTML list element (<ul> or <ol>) using BaseHtmlBuilder.
      *
      * @param array  $items       An array of list item content.
-     * @param bool   $ordered     [optional] If true, generates an ordered list (<ol>), otherwise <ul>. Default is false.
+     * @param bool   $ordered     [optional] If true, generates an ordered list (<ol>), otherwise <ul>.
+     *                             Default is false.
      * @param array  $attributes  [optional] Additional attributes for the list element. Default is an empty array.
      * @param array  $liAttributes [optional] Additional attributes for each <li> element. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the list.
      */
@@ -312,7 +393,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getList($items, $ordered, $attributes, $liAttributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getList(
+            $items,
+            $ordered,
+            $attributes,
+            $liAttributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -323,7 +411,7 @@ class HtmlBuilder
      * @param array $liAttributes [optional] Additional attributes for each <li> element. Default is an empty array.
      * @param array $aAttributes  [optional] Additional attributes for each <a> element. Default is an empty array.
      * @param int   $pad          [optional] Indentation level for formatted output. Default is 0.
-     * @param bool  $isHtml       [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool  $isHtml       [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the navigation bar.
      */
@@ -335,13 +423,21 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->baseHtmlBuilder->getNavBar($links, $ulAttributes, $liAttributes, $aAttributes, $pad, $isHtml);
+        return $this->baseHtmlBuilder->getNavBar(
+            $links,
+            $ulAttributes,
+            $liAttributes,
+            $aAttributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
      * Generates the opening <table> tag with attributes.
      *
-     * @param array  $attributes  [optional] Additional attributes for the <table> element (e.g., width, border). Default is an empty array.
+     * @param array  $attributes  [optional] Additional attributes for the <table> element (e.g., width, border).
+     *                             Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
      *
      * @return string The opening <table> tag.
@@ -373,7 +469,7 @@ class HtmlBuilder
      * @param string $color      The background color of the line's cell.
      * @param int    $colspan    [optional] How many columns the line will span. Default is 1.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the horizontal divider line.
      */
@@ -384,18 +480,27 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->tableBuilder->getHorizontalLine($isOwnTable, $color, $colspan, $pad, $isHtml);
+        return $this->tableBuilder->getHorizontalLine(
+            $isOwnTable,
+            $color,
+            $colspan,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
      * Generates a table cell using TableBuilder.
      *
      * @param string $content       The content for the cell.
-     * @param bool   $header        [optional] Whether the cell is a header (<th>) or data (<td>) cell. Default is false.
-     * @param bool   $inline        [optional] Whether the cell should be rendered inline or block-level. Default is false.
-     * @param array  $attributes    [optional] Additional attributes for the cell (e.g., class, id). Default is an empty array.
+     * @param bool   $header        [optional] Whether the cell is a header (<th>) or data (<td>) cell.
+     *                               Default is false.
+     * @param bool   $inline        [optional] Whether the cell should be rendered inline or block-level.
+     *                               Default is false.
+     * @param array  $attributes    [optional] Additional attributes for the cell (e.g., class, id).
+     *                               Default is an empty array.
      * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml        [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml        [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the table cell.
      */
@@ -407,7 +512,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->tableBuilder->getTableCell($content, $header, $inline, $attributes, $pad, $isHtml);
+        return $this->tableBuilder->getTableCell(
+            $content,
+            $header,
+            $inline,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -418,7 +530,7 @@ class HtmlBuilder
      * @param array  $inlines    [optional] Array of inline flags for each cell. Default is all cells non-inline.
      * @param array  $attributes [optional] Additional attributes for the row <tr> element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the table row.
      */
@@ -430,7 +542,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->tableBuilder->getTableRowFromArray($cells, $header, $inlines, $attributes, $pad, $isHtml);
+        return $this->tableBuilder->getTableRowFromArray(
+            $cells,
+            $header,
+            $inlines,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -447,7 +566,11 @@ class HtmlBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->tableBuilder->getTableRowFromCells($cells, $attributes, $pad);
+        return $this->tableBuilder->getTableRowFromCells(
+            $cells,
+            $attributes,
+            $pad
+        );
     }
 
     /**
@@ -458,7 +581,7 @@ class HtmlBuilder
      * @param bool   $inline     [optional] Whether the cell should be displayed inline. Default is false.
      * @param array  $attributes [optional] Additional attributes for the row <tr> element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the single-cell row.
      */
@@ -470,7 +593,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->tableBuilder->getSingleCellRow($content, $header, $inline, $attributes, $pad, $isHtml);
+        return $this->tableBuilder->getSingleCellRow(
+            $content,
+            $header,
+            $inline,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -478,11 +608,13 @@ class HtmlBuilder
      *
      * @param array  $cells         Array of cell content to be placed in the row.
      * @param string $currentColor  The current background color.
-     * @param array  $colors        [optional] An array of colors to alternate between. Default is ['#FFFFFF', '#CCCCCC'].
+     * @param array  $colors        [optional] An array of colors to alternate between.
+     *                               Default is ['#FFFFFF', '#CCCCCC'].
      * @param array  $inlines       [optional] Array of inline flags for each cell. Default is all cells non-inline.
-     * @param array  $attributes    [optional] Additional attributes for the row <tr> element. Default is an empty array.
+     * @param array  $attributes    [optional] Additional attributes for the row <tr> element.
+     *                               Default is an empty array.
      * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml        [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml        [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the table row with alternating colors.
      */
@@ -495,7 +627,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->tableBuilder->getTableRowFromArrayWithAlternatingColor($cells, $currentColor, $colors, $inlines, $attributes, $pad, $isHtml);
+        return $this->tableBuilder->getTableRowFromArrayWithAlternatingColor(
+            $cells,
+            $currentColor,
+            $colors,
+            $inlines,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -506,7 +646,7 @@ class HtmlBuilder
      * @param array  $inlines    [optional] Array of inline flags for each cell. Default is all cells non-inline.
      * @param array  $attributes [optional] Additional attributes for the row <tr> element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the table row with status-based color.
      */
@@ -518,7 +658,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->tableBuilder->getTableRowFromArrayWithStatusColor($cells, $status, $inlines, $attributes, $pad, $isHtml);
+        return $this->tableBuilder->getTableRowFromArrayWithStatusColor(
+            $cells,
+            $status,
+            $inlines,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -529,7 +676,7 @@ class HtmlBuilder
      * @param array  $inlines    [optional] An array of inline flags for each row. Default is all rows non-inline.
      * @param array  $attributes [optional] Additional attributes for the <table> element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the single-column table.
      */
@@ -541,7 +688,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->tableBuilder->getSingleColumnTable($rows, $header, $inlines, $attributes, $pad, $isHtml);
+        return $this->tableBuilder->getSingleColumnTable(
+            $rows,
+            $header,
+            $inlines,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -558,7 +712,11 @@ class HtmlBuilder
         array $attributes = [],
         int $pad = 0
     ): string {
-        return $this->tableBuilder->getTableFromRows($rows, $attributes, $pad);
+        return $this->tableBuilder->getTableFromRows(
+            $rows,
+            $attributes,
+            $pad
+        );
     }
 
     /**
@@ -566,10 +724,11 @@ class HtmlBuilder
      *
      * @param array  $rows       A 2D array where each sub-array is a row of cells.
      * @param bool   $header     [optional] Whether the first row is treated as a header. Default is false.
-     * @param array  $inlines    [optional] A 2D array of inline flags for each cell. Each sub-array corresponds to a row. Default is all cells non-inline.
+     * @param array  $inlines    [optional] A 2D array of inline flags for each cell. Each sub-array corresponds
+     *                            to a row. Default is all cells non-inline.
      * @param array  $attributes [optional] Additional attributes for the <table> element. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the table.
      */
@@ -581,7 +740,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->tableBuilder->getTableFromArray($rows, $header, $inlines, $attributes, $pad, $isHtml);
+        return $this->tableBuilder->getTableFromArray(
+            $rows,
+            $header,
+            $inlines,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -592,7 +758,7 @@ class HtmlBuilder
      * @param int    $size       [optional] The size of the input field. Default is 25.
      * @param array  $attributes [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the text input field.
      */
@@ -604,7 +770,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getTextInput($name, $value, $size, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getTextInput(
+            $name,
+            $value,
+            $size,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -616,7 +789,7 @@ class HtmlBuilder
      * @param int    $cols       [optional] The number of columns for the textarea. Default is 40.
      * @param array  $attributes [optional] Additional attributes for the textarea. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the textarea.
      */
@@ -629,7 +802,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getTextarea($name, $content, $rows, $cols, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getTextarea(
+            $name,
+            $content,
+            $rows,
+            $cols,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -639,7 +820,7 @@ class HtmlBuilder
      * @param int    $size       [optional] The size of the password field. Default is 25.
      * @param array  $attributes [optional] Additional attributes for the password field. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the password field.
      */
@@ -650,7 +831,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getPasswordInput($name, $size, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getPasswordInput(
+            $name,
+            $size,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -661,7 +848,7 @@ class HtmlBuilder
      * @param int    $size       [optional] The size of the email field. Default is 25.
      * @param array  $attributes [optional] Additional attributes for the email field. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the email field.
      */
@@ -673,7 +860,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getEmailInput($name, $value, $size, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getEmailInput(
+            $name,
+            $value,
+            $size,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -685,7 +879,7 @@ class HtmlBuilder
      * @param int    $max        [optional] The maximum value allowed. Default is 100.
      * @param array  $attributes [optional] Additional attributes for the number field. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the number input field.
      */
@@ -698,7 +892,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getNumberInput($name, $value, $min, $max, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getNumberInput(
+            $name,
+            $value,
+            $min,
+            $max,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -708,7 +910,7 @@ class HtmlBuilder
      * @param string $value       [optional] The value of the timestamp field. Default is an empty string.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the Unix timestamp input field.
      */
@@ -719,7 +921,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getUnixTimestampInput($name, $value, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getUnixTimestampInput(
+            $name,
+            $value,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -729,7 +937,7 @@ class HtmlBuilder
      * @param string $value      [optional] The value of the URL field. Default is an empty string.
      * @param array  $attributes [optional] Additional attributes for the URL field. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the URL field.
      */
@@ -740,7 +948,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getUrlInput($name, $value, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getUrlInput(
+            $name,
+            $value,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -750,7 +964,7 @@ class HtmlBuilder
      * @param string $value      [optional] The value of the hidden field. Default is an empty string.
      * @param array  $attributes [optional] Additional attributes for the hidden field. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the hidden input field.
      */
@@ -761,7 +975,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getHiddenInput($name, $value, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getHiddenInput(
+            $name,
+            $value,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -771,7 +991,7 @@ class HtmlBuilder
      * @param string $value      [optional] The value of the search field. Default is an empty string.
      * @param array  $attributes [optional] Additional attributes for the search field. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the search field.
      */
@@ -782,7 +1002,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getSearchInput($name, $value, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getSearchInput(
+            $name,
+            $value,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -792,7 +1018,7 @@ class HtmlBuilder
      * @param string $value      [optional] The value of the telephone field. Default is an empty string.
      * @param array  $attributes [optional] Additional attributes for the telephone field. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the telephone field.
      */
@@ -803,7 +1029,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->textBuilder->getTelInput($name, $value, $attributes, $pad, $isHtml);
+        return $this->textBuilder->getTelInput(
+            $name,
+            $value,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -814,7 +1046,7 @@ class HtmlBuilder
      * @param string|null $name        [optional] Optional name attribute for the button. Default is null.
      * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the button element.
      */
@@ -826,7 +1058,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buttonBuilder->getButton($label, $type, $name, $attributes, $pad, $isHtml);
+        return $this->buttonBuilder->getButton(
+            $label,
+            $type,
+            $name,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -836,7 +1075,7 @@ class HtmlBuilder
      * @param string      $label       The label for the submit button.
      * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the submit button.
      */
@@ -847,7 +1086,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buttonBuilder->getSubmitButton($name, $label, $attributes, $pad, $isHtml);
+        return $this->buttonBuilder->getSubmitButton(
+            $name,
+            $label,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -859,7 +1104,7 @@ class HtmlBuilder
      * @param string|null $name        [optional] Optional name attribute for the button. Default is null.
      * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the button with an icon.
      */
@@ -872,7 +1117,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buttonBuilder->getIconButton($label, $iconClass, $type, $name, $attributes, $pad, $isHtml);
+        return $this->buttonBuilder->getIconButton(
+            $label,
+            $iconClass,
+            $type,
+            $name,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -880,11 +1133,14 @@ class HtmlBuilder
      *
      * @param string      $label              The label to be displayed on the button.
      * @param string      $confirmationMessage The message for the confirmation dialog.
-     * @param string      $type               [optional] The button type (e.g., "submit", "button"). Default is 'button'.
+     * @param string      $type               [optional] The button type (e.g., "submit", "button").
+     *                                         Default is 'button'.
      * @param string|null $name               [optional] Optional name attribute for the button. Default is null.
-     * @param array       $attributes         [optional] Additional attributes for the button. Default is an empty array.
+     * @param array       $attributes         [optional] Additional attributes for the button.
+     *                                         Default is an empty array.
      * @param int         $pad                [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml             [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml             [optional] If true, content is treated as pre-escaped HTML.
+     *                                         Default is false.
      *
      * @return string The generated HTML for the confirmation button.
      */
@@ -897,7 +1153,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buttonBuilder->getConfirmButton($label, $confirmationMessage, $type, $name, $attributes, $pad, $isHtml);
+        return $this->buttonBuilder->getConfirmButton(
+            $label,
+            $confirmationMessage,
+            $type,
+            $name,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -908,7 +1172,7 @@ class HtmlBuilder
      * @param string|null $name        [optional] Optional name attribute for the button. Default is null.
      * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the disabled button.
      */
@@ -920,7 +1184,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buttonBuilder->getDisabledButton($label, $type, $name, $attributes, $pad, $isHtml);
+        return $this->buttonBuilder->getDisabledButton(
+            $label,
+            $type,
+            $name,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -930,11 +1201,14 @@ class HtmlBuilder
      * @param array       $dropdownItems An array of items with 'link' and 'label' keys for the dropdown.
      * @param string      $type          [optional] The button type (e.g., "button"). Default is 'button'.
      * @param string|null $name          [optional] Optional name attribute for the button. Default is null.
-     * @param array       $buttonAttributes  [optional] Additional attributes for the button. Default is an empty array.
-     * @param array       $dropdownAttributes [optional] Additional attributes for the dropdown container. Default is an empty array.
-     * @param array       $contentAttributes [optional] Additional attributes for the dropdown-content div. Default is an empty array.
+     * @param array       $buttonAttributes  [optional] Additional attributes for the button.
+     *                                    Default is an empty array.
+     * @param array       $dropdownAttributes [optional] Additional attributes for the dropdown container.
+     *                                    Default is an empty array.
+     * @param array       $contentAttributes [optional] Additional attributes for the dropdown-content div.
+     *                                    Default is an empty array.
      * @param int         $pad           [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml        [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the dropdown button.
      */
@@ -949,7 +1223,17 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buttonBuilder->getDropdownButton($label, $dropdownItems, $type, $name, $buttonAttributes, $dropdownAttributes, $contentAttributes, $pad, $isHtml);
+        return $this->buttonBuilder->getDropdownButton(
+            $label,
+            $dropdownItems,
+            $type,
+            $name,
+            $buttonAttributes,
+            $dropdownAttributes,
+            $contentAttributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -958,7 +1242,7 @@ class HtmlBuilder
      * @param string      $label       [optional] The label to be displayed on the reset button. Default is 'Reset'.
      * @param array       $attributes  [optional] Additional attributes for the button. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the reset button.
      */
@@ -968,7 +1252,12 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buttonBuilder->getResetButton($label, $attributes, $pad, $isHtml);
+        return $this->buttonBuilder->getResetButton(
+            $label,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -978,7 +1267,7 @@ class HtmlBuilder
      * @param string      $href        The URL the link should point to.
      * @param array       $attributes  [optional] Additional attributes for the link. Default is an empty array.
      * @param int         $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the link styled as a button.
      */
@@ -989,7 +1278,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buttonBuilder->getLinkButton($label, $href, $attributes, $pad, $isHtml);
+        return $this->buttonBuilder->getLinkButton(
+            $label,
+            $href,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -997,7 +1292,7 @@ class HtmlBuilder
      *
      * @param array $buttons     An array of button configurations (e.g., 'name', 'label', 'type', etc.).
      * @param int   $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool  $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool  $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the group of buttons.
      */
@@ -1006,7 +1301,12 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buttonBuilder->getButtonGroup($buttons, $buttonWidth, $pad, $isHtml);
+        return $this->buttonBuilder->getButtonGroup(
+            $buttons,
+            $buttonWidth,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1018,7 +1318,7 @@ class HtmlBuilder
      * @param string $data       The data used to determine whether the radio button is checked.
      * @param array  $attributes [optional] Additional attributes for the radio input. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the radio button element.
      */
@@ -1031,7 +1331,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->radioBuilder->getRadioButton($name, $value, $status, $data, $attributes, $pad, $isHtml);
+        return $this->radioBuilder->getRadioButton(
+            $name,
+            $value,
+            $status,
+            $data,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1045,7 +1353,7 @@ class HtmlBuilder
      * @param bool        $labelAfter [optional] Whether to place the label after the radio button. Default is true.
      * @param array       $attributes [optional] Additional attributes for the radio input. Default is an empty array.
      * @param int         $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the labeled radio button.
      */
@@ -1060,7 +1368,17 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->radioBuilder->getLabeledRadioButton($name, $value, $status, $data, $label, $labelAfter, $attributes, $pad, $isHtml);
+        return $this->radioBuilder->getLabeledRadioButton(
+            $name,
+            $value,
+            $status,
+            $data,
+            $label,
+            $labelAfter,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1073,7 +1391,7 @@ class HtmlBuilder
      * @param string|null $id         [optional] Optional unique ID for the radio button. Default is null.
      * @param array       $attributes [optional] Additional attributes for the radio input. Default is an empty array.
      * @param int         $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool        $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool        $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the radio button with an ID.
      */
@@ -1087,7 +1405,16 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->radioBuilder->getRadioButtonWithID($name, $value, $status, $data, $id, $attributes, $pad, $isHtml);
+        return $this->radioBuilder->getRadioButtonWithID(
+            $name,
+            $value,
+            $status,
+            $data,
+            $id,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1099,7 +1426,7 @@ class HtmlBuilder
      * @param bool   $inline         [optional] Whether to display the radio buttons inline. Default is false.
      * @param array  $attributes     [optional] Additional attributes for the radio inputs. Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the group of radio buttons.
      */
@@ -1112,7 +1439,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->radioBuilder->getRadioGroupWithInlineOption($name, $selectedOption, $options, $inline, $attributes, $pad, $isHtml);
+        return $this->radioBuilder->getRadioGroupWithInlineOption(
+            $name,
+            $selectedOption,
+            $options,
+            $inline,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1122,7 +1457,7 @@ class HtmlBuilder
      * @param array  $options    An associative array of options (key => value).
      * @param array  $attributes [optional] Additional attributes for the radio inputs. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the disabled radio group.
      */
@@ -1133,7 +1468,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->radioBuilder->getDisabledRadioGroup($name, $options, $attributes, $pad, $isHtml);
+        return $this->radioBuilder->getDisabledRadioGroup(
+            $name,
+            $options,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1144,7 +1485,7 @@ class HtmlBuilder
      * @param array  $options        An associative array of options (key => value).
      * @param array  $attributes     [optional] Additional attributes for the radio inputs. Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the radio group.
      */
@@ -1156,7 +1497,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->radioBuilder->getRadioGroup($name, $selectedOption, $options, $attributes, $pad, $isHtml);
+        return $this->radioBuilder->getRadioGroup(
+            $name,
+            $selectedOption,
+            $options,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1168,7 +1516,7 @@ class HtmlBuilder
      * @param bool   $isDisabled [optional] Whether the checkbox is disabled. Default is false.
      * @param array  $attributes [optional] Additional attributes for the checkbox input. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the checkbox element.
      */
@@ -1181,7 +1529,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->checkboxBuilder->getCheckbox($name, $value, $isChecked, $isDisabled, $attributes, $pad, $isHtml);
+        return $this->checkboxBuilder->getCheckbox(
+            $name,
+            $value,
+            $isChecked,
+            $isDisabled,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1193,7 +1549,7 @@ class HtmlBuilder
      * @param bool   $isDisabled [optional] Whether the checkbox is disabled. Default is false.
      * @param array  $attributes [optional] Additional attributes for the checkbox input. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the custom checkbox.
      */
@@ -1206,7 +1562,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->checkboxBuilder->getCustomCheckbox($name, $value, $data, $isDisabled, $attributes, $pad, $isHtml);
+        return $this->checkboxBuilder->getCustomCheckbox(
+            $name,
+            $value,
+            $data,
+            $isDisabled,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1220,7 +1584,7 @@ class HtmlBuilder
      * @param bool   $labelAfter [optional] Whether the label should appear after the checkbox. Default is true.
      * @param array  $attributes [optional] Additional attributes for the checkbox input. Default is an empty array.
      * @param int    $pad        [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml     [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml     [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the labeled checkbox.
      */
@@ -1235,7 +1599,17 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->checkboxBuilder->getLabeledCheckbox($name, $value, $label, $isChecked, $isDisabled, $labelAfter, $attributes, $pad, $isHtml);
+        return $this->checkboxBuilder->getLabeledCheckbox(
+            $name,
+            $value,
+            $label,
+            $isChecked,
+            $isDisabled,
+            $labelAfter,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1244,9 +1618,10 @@ class HtmlBuilder
      * @param string $name           The name attribute for the checkbox inputs.
      * @param array  $selectedValues An array of values that should be pre-selected (checked).
      * @param array  $options        An associative array of options (key => value).
-     * @param array  $attributes     [optional] Additional attributes for the checkbox inputs. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the checkbox inputs.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the group of checkboxes.
      */
@@ -1258,7 +1633,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->checkboxBuilder->getCheckboxGroup($name, $selectedValues, $options, $attributes, $pad, $isHtml);
+        return $this->checkboxBuilder->getCheckboxGroup(
+            $name,
+            $selectedValues,
+            $options,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1267,7 +1649,7 @@ class HtmlBuilder
      * @param string $name      The name attribute for the checkbox inputs.
      * @param array  $options   An associative array of options (key => value).
      * @param int    $pad       [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml    [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml    [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the disabled checkbox group.
      */
@@ -1277,7 +1659,12 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->checkboxBuilder->getDisabledCheckboxGroup($name, $options, $pad, $isHtml);
+        return $this->checkboxBuilder->getDisabledCheckboxGroup(
+            $name,
+            $options,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1287,7 +1674,7 @@ class HtmlBuilder
      * @param string $value     [optional] The value attribute for the hidden checkbox. Default is 'on'.
      * @param bool   $isChecked [optional] Whether the checkbox is checked. Default is false.
      * @param int    $pad       [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml    [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml    [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the hidden checkbox.
      */
@@ -1298,7 +1685,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->checkboxBuilder->getHiddenCheckbox($name, $value, $isChecked, $pad, $isHtml);
+        return $this->checkboxBuilder->getHiddenCheckbox(
+            $name,
+            $value,
+            $isChecked,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1307,9 +1700,10 @@ class HtmlBuilder
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The value of the option that should be pre-selected.
      * @param array  $options        An associative array of options (key = value attribute, value = display text).
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the dropdown.
      */
@@ -1321,7 +1715,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getPulldown($name, $selectedOption, $options, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getPulldown(
+            $name,
+            $selectedOption,
+            $options,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1330,9 +1731,10 @@ class HtmlBuilder
      * @param string $name           The name attribute for the <select> element.
      * @param array  $selectedOptions An array of options that should be pre-selected.
      * @param array  $options        An associative array of options (key = value attribute, value = display text).
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the multi-select dropdown.
      */
@@ -1344,7 +1746,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getMultiSelectPulldown($name, $selectedOptions, $options, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getMultiSelectPulldown(
+            $name,
+            $selectedOptions,
+            $options,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1352,10 +1761,12 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The value of the option that should be pre-selected.
-     * @param array  $groups         An associative array of groups, where each key is the group label and the value is an array of options.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $groups         An associative array of groups, where each key is the group label and the
+     *                                value is an array of options.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the grouped pulldown.
      */
@@ -1367,7 +1778,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getGroupedPulldown($name, $selectedOption, $groups, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getGroupedPulldown(
+            $name,
+            $selectedOption,
+            $groups,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1376,7 +1794,7 @@ class HtmlBuilder
      * @param string $name   The name attribute for the <select> element.
      * @param array  $options An associative array of options (key = value attribute, value = display text).
      * @param int    $pad    [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the disabled dropdown.
      */
@@ -1386,7 +1804,12 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getDisabledPulldown($name, $options, $pad, $isHtml);
+        return $this->pulldownBuilder->getDisabledPulldown(
+            $name,
+            $options,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1397,9 +1820,10 @@ class HtmlBuilder
      * @param int    $start          The starting number.
      * @param int    $end            The ending number.
      * @param bool   $zeroPadded     [optional] Whether the numbers should be zero-padded. Default is false.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the numbers pulldown.
      */
@@ -1413,7 +1837,16 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getNumbersPulldown($name, $selectedOption, $start, $end, $zeroPadded, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getNumbersPulldown(
+            $name,
+            $selectedOption,
+            $start,
+            $end,
+            $zeroPadded,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1421,9 +1854,10 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The selected option (1 for Yes, 0 for No).
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the Yes/No pulldown.
      */
@@ -1434,7 +1868,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getYesNoPulldown($name, $selectedOption, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getYesNoPulldown(
+            $name,
+            $selectedOption,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1442,9 +1882,10 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The selected semester (A for Spring, B for Fall).
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the semester pulldown.
      */
@@ -1455,7 +1896,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getSemestersPulldown($name, $selectedOption, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getSemestersPulldown(
+            $name,
+            $selectedOption,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1465,9 +1912,10 @@ class HtmlBuilder
      * @param string $selectedOption The selected year in the range.
      * @param int    $startYear      The starting year.
      * @param int    $endYear        [optional] The ending year. Default is 3 years from the current year.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the years pulldown.
      */
@@ -1480,7 +1928,15 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getYearsPulldown($name, $selectedOption, $startYear, $endYear, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getYearsPulldown(
+            $name,
+            $selectedOption,
+            $startYear,
+            $endYear,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1488,10 +1944,12 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The selected month.
-     * @param bool   $zeroPadded     [optional] Whether the months should be zero-padded (e.g., 01, 02, ...). Default is false.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param bool   $zeroPadded     [optional] Whether the months should be zero-padded (e.g., 01, 02, ...).
+     *                                Default is false.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the numeric months pulldown.
      */
@@ -1503,7 +1961,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getMonthsPulldown($name, $selectedOption, $zeroPadded, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getMonthsPulldown(
+            $name,
+            $selectedOption,
+            $zeroPadded,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1511,9 +1976,10 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The selected month.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the short month names pulldown.
      */
@@ -1524,7 +1990,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getShortMonthNamesPulldown($name, $selectedOption, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getShortMonthNamesPulldown(
+            $name,
+            $selectedOption,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1532,9 +2004,10 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The selected month.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the full month names pulldown.
      */
@@ -1545,7 +2018,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getFullMonthNamesPulldown($name, $selectedOption, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getFullMonthNamesPulldown(
+            $name,
+            $selectedOption,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1553,10 +2032,12 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The selected day.
-     * @param bool   $zeroPadded     [optional] Whether the days should be zero-padded (e.g., 01, 02, ...). Default is false.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param bool   $zeroPadded     [optional] Whether the days should be zero-padded (e.g., 01, 02, ...).
+     *                                Default is false.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the days pulldown.
      */
@@ -1568,7 +2049,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getDaysOfMonthPulldown($name, $selectedOption, $zeroPadded, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getDaysOfMonthPulldown(
+            $name,
+            $selectedOption,
+            $zeroPadded,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1576,10 +2064,12 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The selected day.
-     * @param bool   $zeroPadded     [optional] Whether the days should be zero-padded (e.g., 01 for Monday). Default is false.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param bool   $zeroPadded     [optional] Whether the days should be zero-padded (e.g., 01 for Monday).
+     *                                Default is false.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the days of the week pulldown.
      */
@@ -1591,7 +2081,14 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getDaysOfWeekPulldown($name, $selectedOption, $zeroPadded, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getDaysOfWeekPulldown(
+            $name,
+            $selectedOption,
+            $zeroPadded,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1599,9 +2096,10 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The selected day of the week.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the short day names pulldown.
      */
@@ -1612,7 +2110,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getShortDayNamesPulldown($name, $selectedOption, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getShortDayNamesPulldown(
+            $name,
+            $selectedOption,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1620,9 +2124,10 @@ class HtmlBuilder
      *
      * @param string $name           The name attribute for the <select> element.
      * @param string $selectedOption The selected day of the week.
-     * @param array  $attributes     [optional] Additional attributes for the <select> element. Default is an empty array.
+     * @param array  $attributes     [optional] Additional attributes for the <select> element.
+     *                                Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The generated HTML for the full day names pulldown.
      */
@@ -1633,7 +2138,13 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getFullDayNamesPulldown($name, $selectedOption, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getFullDayNamesPulldown(
+            $name,
+            $selectedOption,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1647,7 +2158,7 @@ class HtmlBuilder
      * @param bool   $labelAfter     [optional] If true, the label appears after the dropdown. Default is true.
      * @param array  $attributes     [optional] Additional attributes for the dropdown. Default is an empty array.
      * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml         [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml         [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the labeled dropdown element.
      */
@@ -1661,7 +2172,16 @@ class HtmlBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->pulldownBuilder->getLabeledPulldown($name, $selectedOption, $options, $label, $labelAfter, $attributes, $pad, $isHtml);
+        return $this->pulldownBuilder->getLabeledPulldown(
+            $name,
+            $selectedOption,
+            $options,
+            $label,
+            $labelAfter,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -1674,13 +2194,18 @@ class HtmlBuilder
      *
      * @return string The formatted string.
      */
-    public function formatOutput(
+    public static function formatOutput(
         string $content,
         bool $formatOutput = false,
         bool $prependNewline = false,
         int $pad = 0
     ): string {
-        return HtmlBuildUtility::formatOutput($content, $formatOutput, $prependNewline, $pad);
+        return HtmlBuildUtility::formatOutput(
+            $content,
+            $formatOutput,
+            $prependNewline,
+            $pad
+        );
     }
 
     /**

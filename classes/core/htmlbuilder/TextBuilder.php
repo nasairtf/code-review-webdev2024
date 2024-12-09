@@ -1,16 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\core\htmlbuilder;
+
+use App\core\htmlbuilder\HtmlBuildUtility;
 
 /**
  * /home/webdev2024/classes/core/htmlbuilder/TextBuilder.php
  *
- * A utility class responsible for building HTML text input fields with optional formatting.
+ * A utility class for generating HTML input fields, including text, password, email, and textarea elements.
+ * Offers options for size, additional attributes, and pre-escaped content handling.
+ *
+ * Formatting preferences determine whether the output includes indentation and line breaks.
+ *
+ * Example:
+ * ```
+ * $builder = new TextBuilder(true);
+ * echo $builder->getTextInput('username', 'JohnDoe', 25, ['class' => 'input-class']);
+ * ```
  *
  * @category Utilities
  * @package  IRTF
- * @author   Miranda Hawarden-Ogata
  * @version  1.0.1
+ * @since    1.0.0
  */
 
 class TextBuilder
@@ -25,46 +38,12 @@ class TextBuilder
     /**
      * Constructor to set the formatting preference.
      *
-     * @param bool $formatOutput If true, output will be formatted with indentation.
+     * @param bool $formatOutput Whether to format the HTML (indentation, line breaks).
      */
-    public function __construct(bool $formatOutput = false)
-    {
-        $this->formatOutput = $formatOutput;
-    }
-
-    /**
-     * Generates a generic input field.
-     *
-     * @param string $type        The input type (e.g., 'text', 'email', 'password').
-     * @param string $name        The name attribute for the input field.
-     * @param string $value       [optional] The value of the input field. Default is an empty string.
-     * @param int    $size        [optional] The size of the input field. Default is 25.
-     * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
-     * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
-     *
-     * @return string The HTML for the input field.
-     */
-    private function buildElement(
-        string $type,
-        string $name,
-        string $value = '',
-        ?int $size = null,
-        ?int $min = null,
-        ?int $max = null,
-        array $attributes = [],
-        int $pad = 0,
-        bool $isHtml = false
-    ): string {
-        $escapedName = HtmlBuildUtility::escape($name, $isHtml);
-        $escapedValue = HtmlBuildUtility::escape($value, $isHtml);
-        $attrString = HtmlBuildUtility::buildAttributes($attributes);
-        $html = sprintf('<input type="%s" name="%s" value="%s"', $type, $escapedName, $escapedValue);
-        $html .= ($size !== null) ? sprintf(' size="%d"', $size) : '';
-        $html .= ($min !== null) ? sprintf(' min="%d"', $min) : '';
-        $html .= ($max !== null) ? sprintf(' max="%d"', $max) : '';
-        $html .= $attrString . ' />';
-        return HtmlBuildUtility::formatOutput($html, $this->formatOutput, false, $pad);
+    public function __construct(
+        ?bool $formatOutput = null
+    ) {
+        $this->formatOutput = $formatOutput ?? false;
     }
 
     /**
@@ -76,7 +55,7 @@ class TextBuilder
      * @param int    $cols        [optional] The number of columns for the textarea. Default is 40.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the textarea element.
      */
@@ -100,20 +79,25 @@ class TextBuilder
             $attrString,
             $escapedContents
         );
-        return HtmlBuildUtility::formatOutput($html, $this->formatOutput, false, $pad);
+        return HtmlBuildUtility::formatOutput(
+            $html,
+            $this->formatOutput,
+            false,
+            $pad
+        );
     }
 
     /**
      * Generates a text input field.
      *
      * @param string $name        The name attribute for the input field.
-     * @param string $value       [optional] The value of the input field. Default is an empty string.
-     * @param int    $size        [optional] The size of the input field. Default is 25.
-     * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
-     * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param string $value       [optional] The default value for the input field. Default: empty string.
+     * @param int    $size        [optional] The size of the input field. Default: 25.
+     * @param array  $attributes  [optional] Additional attributes for the input field. Default: empty array.
+     * @param int    $pad         [optional] Indentation level for formatted output. Default: 0.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default: false.
      *
-     * @return string The HTML for the text input field.
+     * @return string The formatted text input element.
      */
     public function getTextInput(
         string $name,
@@ -123,7 +107,17 @@ class TextBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buildElement('text', $name, $value, $size, null, null, $attributes, $pad, $isHtml);
+        return $this->buildElement(
+            'text',
+            $name,
+            $value,
+            $size,
+            null,
+            null,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -133,7 +127,7 @@ class TextBuilder
      * @param int    $size        [optional] The size of the password field. Default is 25.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the password input field.
      */
@@ -144,7 +138,17 @@ class TextBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buildElement('password', $name, '', $size, null, null, $attributes, $pad, $isHtml);
+        return $this->buildElement(
+            'password',
+            $name,
+            '',
+            $size,
+            null,
+            null,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -155,7 +159,7 @@ class TextBuilder
      * @param int    $size        [optional] The size of the email field. Default is 25.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the email input field.
      */
@@ -167,7 +171,17 @@ class TextBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buildElement('email', $name, $value, $size, null, null, $attributes, $pad, $isHtml);
+        return $this->buildElement(
+            'email',
+            $name,
+            $value,
+            $size,
+            null,
+            null,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -179,7 +193,7 @@ class TextBuilder
      * @param int    $max         [optional] The maximum value allowed. Default is 100.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the number input field.
      */
@@ -192,7 +206,17 @@ class TextBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buildElement('number', $name, $value, null, $min, $max, $attributes, $pad, $isHtml);
+        return $this->buildElement(
+            'number',
+            $name,
+            $value,
+            null,
+            $min,
+            $max,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -202,7 +226,7 @@ class TextBuilder
      * @param string $value       [optional] The value of the timestamp field. Default is an empty string.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the Unix timestamp input field.
      */
@@ -215,7 +239,15 @@ class TextBuilder
     ): string {
         $minTimestamp = 0;           // Earliest possible Unix timestamp
         $maxTimestamp = 2147483647;  // Maximum value for 32-bit Unix timestamps
-        return $this->getNumberInput($name, $value, $minTimestamp, $maxTimestamp, $attributes, $pad, $isHtml);
+        return $this->getNumberInput(
+            $name,
+            $value,
+            $minTimestamp,
+            $maxTimestamp,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -225,7 +257,7 @@ class TextBuilder
      * @param string $value       [optional] The value of the URL field. Default is an empty string.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the URL input field.
      */
@@ -236,7 +268,17 @@ class TextBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buildElement('url', $name, $value, null, null, null, $attributes, $pad, $isHtml);
+        return $this->buildElement(
+            'url',
+            $name,
+            $value,
+            null,
+            null,
+            null,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -246,7 +288,7 @@ class TextBuilder
      * @param string $value       [optional] The value of the hidden field. Default is an empty string.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the hidden input field.
      */
@@ -257,7 +299,17 @@ class TextBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buildElement('hidden', $name, $value, null, null, null, $attributes, $pad, $isHtml);
+        return $this->buildElement(
+            'hidden',
+            $name,
+            $value,
+            null,
+            null,
+            null,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -267,7 +319,7 @@ class TextBuilder
      * @param string $value       [optional] The value of the search field. Default is an empty string.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the search input field.
      */
@@ -278,7 +330,17 @@ class TextBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buildElement('search', $name, $value, null, null, null, $attributes, $pad, $isHtml);
+        return $this->buildElement(
+            'search',
+            $name,
+            $value,
+            null,
+            null,
+            null,
+            $attributes,
+            $pad,
+            $isHtml
+        );
     }
 
     /**
@@ -288,7 +350,7 @@ class TextBuilder
      * @param string $value       [optional] The value of the tel field. Default is an empty string.
      * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
      * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
-     * @param bool   $isHtml      [optional] If true, content will not be escaped by htmlspecialchars. Default is false.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
      *
      * @return string The HTML for the tel input field.
      */
@@ -299,6 +361,61 @@ class TextBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        return $this->buildElement('tel', $name, $value, null, null, null, $attributes, $pad, $isHtml);
+        return $this->buildElement(
+            'tel',
+            $name,
+            $value,
+            null,
+            null,
+            null,
+            $attributes,
+            $pad,
+            $isHtml
+        );
+    }
+
+    /**
+     * Generates a generic input field.
+     *
+     * @param string $type        The input type (e.g., 'text', 'email', 'password').
+     * @param string $name        The name attribute for the input field.
+     * @param string $value       [optional] The value of the input field. Default is an empty string.
+     * @param int    $size        [optional] The size of the input field. Default is 25.
+     * @param array  $attributes  [optional] Additional attributes for the input field. Default is an empty array.
+     * @param int    $pad         [optional] Indentation level for formatted output. Default is 0.
+     * @param bool   $isHtml      [optional] If true, content is treated as pre-escaped HTML. Default is false.
+     *
+     * @return string The HTML for the input field.
+     */
+    private function buildElement(
+        string $type,
+        string $name,
+        string $value = '',
+        ?int $size = null,
+        ?int $min = null,
+        ?int $max = null,
+        array $attributes = [],
+        int $pad = 0,
+        bool $isHtml = false
+    ): string {
+        $escapedName = HtmlBuildUtility::escape($name, $isHtml);
+        $escapedValue = HtmlBuildUtility::escape($value, $isHtml);
+        $attrString = HtmlBuildUtility::buildAttributes($attributes);
+        $html = sprintf(
+            '<input type="%s" name="%s" value="%s"',
+            $type,
+            $escapedName,
+            $escapedValue
+        );
+        $html .= ($size !== null) ? sprintf(' size="%d"', $size) : '';
+        $html .= ($min !== null) ? sprintf(' min="%d"', $min) : '';
+        $html .= ($max !== null) ? sprintf(' max="%d"', $max) : '';
+        $html .= $attrString . ' />';
+        return HtmlBuildUtility::formatOutput(
+            $html,
+            $this->formatOutput,
+            false,
+            $pad
+        );
     }
 }
