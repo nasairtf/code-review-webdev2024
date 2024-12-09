@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\core\common;
 
 use Exception;
@@ -116,26 +118,6 @@ class Debug
     public function getDefaultColor(): string
     {
         return $this->defaultColor;
-    }
-
-    /**
-     * Logs a message and prepares the exception message for fail methods.
-     *
-     * This method logs the provided message and returns the exception message.
-     * It uses the specified color for logging, or falls back to the default color.
-     *
-     * @param string      $message   The debug message to log.
-     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
-     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
-     *
-     * @return string The exception message to throw.
-     */
-    private function handleFail(string $message, string $throwMsg = '', ?string $color = null): string
-    {
-        $throw = $throwMsg !== '' ? $throwMsg : $message;
-        $color = $color ?? $this->defaultColor;
-        $this->log($message, $color);
-        return $throw;
     }
 
     /**
@@ -281,5 +263,25 @@ class Debug
             $color = $color ?? $this->defaultColor;
             echo "<pre style='color: {$color};'>DEBUG ({$label}): " . print_r($variable, true) . "</pre>\n";
         }
+    }
+
+    /**
+     * Logs a message and prepares the exception message for fail methods.
+     *
+     * This method logs the provided message and returns the exception message.
+     * It uses the specified color for logging, or falls back to the default color.
+     *
+     * @param string      $message   The debug message to log.
+     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
+     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
+     *
+     * @return string The exception message to throw.
+     */
+    private function handleFail(string $message, string $throwMsg = '', ?string $color = null): string
+    {
+        $throw = $throwMsg !== '' ? $throwMsg : $message;
+        $color = $color ?? $this->defaultColor;
+        $this->log($message, $color);
+        return $throw;
     }
 }
