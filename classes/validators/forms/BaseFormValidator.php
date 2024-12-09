@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\validators\forms;
 
 use Exception;
-
 use App\exceptions\ValidationException;
-
 use App\core\common\Debug;
 use App\core\irtf\IrtfUtilities;
 
