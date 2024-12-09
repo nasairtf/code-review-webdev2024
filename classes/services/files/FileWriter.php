@@ -8,6 +8,12 @@ use Exception;
 use App\core\common\Debug;
 
 /**
+ * FileWriter Service
+ *
+ * Provides functionality for writing data to various file formats, including CSV,
+ * log, and schedule files. Supports configurable delimiters and enclosures
+ * depending on the file type.
+ *
  * @category Services
  * @package  IRTF
  * @version  1.0.0
@@ -15,16 +21,37 @@ use App\core\common\Debug;
 
 class FileWriter
 {
+    /**
+     * @var Debug Debugging utility for logging and error reporting.
+     */
     protected $debug;
+
+    /**
+     * @var string The type of file to be written (e.g., 'csv', 'log', 'schedulesql').
+     */
     protected $fileType;
+
+    /**
+     * @var string The delimiter used to separate fields in the file.
+     */
     protected $delimiter;
+
+    /**
+     * @var string The encloser used to wrap fields in the file.
+     */
     protected $encloser;
+
+    /**
+     * @var string|null The path to the file to be written.
+     */
     protected $filePath;
 
     /**
-     * Constructs a new FileWriterService instance.
+     * Constructs a new FileWriter instance.
      *
-     * @param bool   $debugMode Whether to enable debug mode.
+     * @param string      $fileType  The type of file to be written (e.g., 'csv', 'log').
+     * @param string|null $filePath  Optional file path to use for writing data.
+     * @param bool|null   $debugMode Optional flag to enable debug mode.
      */
     public function __construct(
         string $fileType,
@@ -48,6 +75,8 @@ class FileWriter
 
     /**
      * Configures the writer based on the file type.
+     *
+     * Sets the delimiter and enclosure characters used when writing files.
      *
      * @return void
      */
@@ -76,12 +105,16 @@ class FileWriter
     /**
      * Writes an array of lines to a file.
      *
-     * @param array  $data     The data to write (array of arrays).
-     * @param string $filePath Optional path to write the file. Uses constructor's path if not provided.
+     * This method writes structured data to the specified file path using the appropriate
+     * format for the configured file type. Supports CSV, log, and schedule files.
+     *
+     * @param array       $data     The data to write (array of arrays or strings).
+     * @param string|null $filePath Optional path to write the file. Defaults to the
+     *                              constructor-defined path.
      *
      * @return bool True if the file was successfully written, false otherwise.
      *
-     * @throws Exception If any error occurs during file writing.
+     * @throws Exception If the file path is invalid or writing fails.
      */
     public function writeFile(array $data, ?string $filePath = null): bool
     {
@@ -130,10 +163,12 @@ class FileWriter
     }
 
     /**
-     * Writes prepared line data to a file.
+     * Writes raw lines of data to a file.
      *
-     * @param resource $handle File handle.
-     * @param array    $data   Array of lines to be written.
+     * @param resource $handle File handle to write to.
+     * @param array    $data   Array of strings to write as lines.
+     *
+     * @return void
      *
      * @throws Exception If writing fails.
      */
@@ -163,10 +198,12 @@ class FileWriter
     }
 
     /**
-     * Writes CSV data to a file.
+     * Writes structured data to a CSV file.
      *
-     * @param resource $handle File handle.
-     * @param array    $data   Array of arrays to be written as CSV.
+     * @param resource $handle File handle to write to.
+     * @param array    $data   Array of arrays to write as rows.
+     *
+     * @return void
      *
      * @throws Exception If writing fails.
      */
@@ -196,7 +233,14 @@ class FileWriter
     }
 
     /**
-     * PLACEHOLDER
+     * Writes log data to a file.
+     *
+     * Currently, this method uses the CSV writer as a placeholder.
+     *
+     * @param resource $handle File handle to write to.
+     * @param array    $data   Array of arrays to write as rows.
+     *
+     * @return void
      */
     protected function writeLog($handle, array $data): void
     {

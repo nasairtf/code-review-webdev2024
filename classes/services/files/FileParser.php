@@ -8,23 +8,60 @@ use Exception;
 use App\core\common\Debug;
 
 /**
+ * Class FileParser
+ *
+ * Provides functionality for parsing files of various types (e.g., CSV, log, schedule).
+ * This service supports different file formats and configurations, ensuring structured
+ * data extraction while offering robust error handling and debugging capabilities.
+ *
  * @category Services
- * @package  IRTF
+ * @package  App\services\files
  * @version  1.0.0
  */
 
 class FileParser
 {
+    /**
+     * Debugging utility instance.
+     *
+     * @var Debug
+     */
     protected $debug;
+
+    /**
+     * Type of the file being parsed (e.g., csv, log, schedule).
+     *
+     * @var string
+     */
     protected $fileType;
+
+    /**
+     * Delimiter used for parsing the file.
+     *
+     * @var string
+     */
     protected $delimiter;
+
+    /**
+     * Maximum length of each line to be parsed.
+     *
+     * @var int
+     */
     protected $lineLength;
+
+    /**
+     * File path of the file to be parsed.
+     *
+     * @var string|null
+     */
     protected $filePath;
 
     /**
-     * Constructs a new FileParserService instance.
+     * Constructs a new FileParser instance.
      *
-     * @param bool   $debugMode Whether to enable debug mode.
+     * @param string      $fileType  The type of file to parse (e.g., csv, log, schedule).
+     * @param string|null $filePath  [optional] The path to the file. Can be set later via methods.
+     * @param bool|null   $debugMode [optional] Whether to enable debug mode. Default is false.
      */
     public function __construct(
         string $fileType,
@@ -48,6 +85,8 @@ class FileParser
 
     /**
      * Configures the parser based on the file type.
+     *
+     * Sets appropriate delimiter and line length depending on the file type.
      *
      * @return void
      */
@@ -76,11 +115,11 @@ class FileParser
     /**
      * Parses the file and returns structured data.
      *
-     * @param string|null $filePath Optional file path to parse.
+     * @param string|null $filePath [optional] Path to the file. If null, uses the pre-set file path.
      *
-     * @return array Parsed data with 'header' and 'lines'.
+     * @return array Parsed data including 'header' and 'lines' arrays.
      *
-     * @throws Exception If the file path is not provided or valid.
+     * @throws Exception If the file path is invalid, the file cannot be read, or parsing fails.
      */
     public function parseFile(?string $filePath = null): array
     {
@@ -138,13 +177,13 @@ class FileParser
     }
 
     /**
-     * Parses a CSV file and returns structured data.
+     * Parses a CSV file and extracts data.
      *
-     * @param resource $handle Open file handle to parse.
+     * @param resource $handle The file handle for reading the file.
      *
-     * @return array Parsed data with 'header' and 'lines'.
+     * @return array An array with 'header' and 'lines' extracted from the CSV.
      *
-     * @throws Exception If an error occurs during parsing.
+     * @throws Exception If parsing fails or the file does not have a valid header.
      */
     protected function parseCSVFile($handle): array
     {
@@ -190,7 +229,11 @@ class FileParser
     }
 
     /**
-     * PLACEHOLDER
+     * Parses a log file and extracts data.
+     *
+     * @param resource $handle The file handle for reading the file.
+     *
+     * @return array An array with 'header' (empty) and 'lines' extracted from the log file.
      */
     protected function parseLogFile($handle): array
     {
@@ -204,6 +247,7 @@ class FileParser
             $this->debug->fail("Invalid file handle provided to parseLogFile().");
         }
 
+        // Placeholder for log file parsing logic.
         // Prepare to parse the log file
         $lines = [];
 
@@ -217,9 +261,9 @@ class FileParser
     /**
      * Checks if an array contains any non-empty, non-whitespace values.
      *
-     * @param array $array The array to check.
+     * @param array $array The array to evaluate.
      *
-     * @return bool True if the array has at least one non-empty, non-whitespace value; false otherwise.
+     * @return bool True if at least one non-empty value exists; false otherwise.
      */
     protected function hasNonEmptyValues(array $array): bool
     {
