@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\models\feedback;
 
 use App\core\common\Debug;
 use App\core\irtf\IrtfUtilities;
-
 use App\services\database\troublelog\read\EngProgramService as EngProgramServiceRead;
 use App\services\database\troublelog\read\HardwareService as HardwareServiceRead;
 use App\services\database\troublelog\read\ObsAppService as ObsAppServiceRead;
 use App\services\database\troublelog\read\OperatorService as OperatorServiceRead;
 use App\services\database\troublelog\read\SupportAstronomerService as SupportAstronomerServiceRead;
-
 use App\services\database\feedback\FeedbackService as BaseServiceWrite;
-
 use App\services\database\feedback\write\FeedbackService as FeedbackServiceWrite;
 use App\services\database\feedback\write\InstrumentService as InstrumentServiceWrite;
 use App\services\database\feedback\write\OperatorService as OperatorServiceWrite;

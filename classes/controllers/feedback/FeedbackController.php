@@ -1,16 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\controllers\feedback;
 
 use Exception;
-
 use App\exceptions\ValidationException;
-
 use App\core\common\Config;
 use App\core\common\Debug;
-
 use App\services\email\feedback\FeedbackService as Email;
-
 use App\models\feedback\FeedbackModel as Model;
 use App\views\forms\feedback\FeedbackView as View;
 use App\validators\forms\feedback\FeedbackValidator as Validator;
@@ -37,12 +35,12 @@ class FeedbackController
     /**
      * Constructs the Controller, initializing all required dependencies.
      *
-     * @param bool|null     $formatHtml Enable or disable HTML formatting (default: false).
-     * @param Debug|null    $debug      Debug instance for logging and debugging (default: new Debug instance).
-     * @param Model|null    $model      Model instance (default: new Model).
-     * @param View|null     $view       View instance (default: new View).
-     * @param Validator|null $valid     Validator instance (default: new Validator).
-     * @param Email|null    $email      Email instance (default: new Email).
+     * @param bool|null      $formatHtml Enable or disable HTML formatting (default: false).
+     * @param Debug|null     $debug      Debug instance for logging and debugging (default: new Debug instance).
+     * @param Model|null     $model      Model instance (default: new Model).
+     * @param View|null      $view       View instance (default: new View).
+     * @param Validator|null $valid      Validator instance (default: new Validator).
+     * @param Email|null     $email      Email instance (default: new Email).
      */
     public function __construct(
         ?bool $formatHtml = null,

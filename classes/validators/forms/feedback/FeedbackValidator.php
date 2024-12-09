@@ -1,14 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\validators\forms\feedback;
 
 use Exception;
-
 use App\exceptions\ValidationException;
-
 use App\core\common\Debug;
 use App\core\irtf\IrtfUtilities;
-
 use App\validators\forms\BaseFormValidator as BaseValidator;
 
 /**
@@ -126,8 +125,16 @@ class FeedbackValidator extends BaseValidator
             'dates',
             true
         );
-        $valid[$fb]['start_date'] = IrtfUtilities::returnUnixDate($form['startmonth'], $form['startday'], $form['startyear']);
-        $valid[$fb]['end_date'] = IrtfUtilities::returnUnixDate($form['endmonth'], $form['endday'], $form['endyear']);
+        $valid[$fb]['start_date'] = IrtfUtilities::returnUnixDate(
+            $form['startmonth'],
+            $form['startday'],
+            $form['startyear']
+        );
+        $valid[$fb]['end_date'] = IrtfUtilities::returnUnixDate(
+            $form['endmonth'],
+            $form['endday'],
+            $form['endyear']
+        );
         // Support Staff
         $valid[$sp] = $this->validateSelection(
             $form['support_staff'] ?? [],
@@ -145,7 +152,12 @@ class FeedbackValidator extends BaseValidator
             'Invalid telescope operator selection.'
         );
         // Instruments [nested filter removes 'none' from visitor arrays]
-        $instruments = $this->transformInstruments($form['instruments'], $form['visitor_instrument'], $db['facility'], $db['visitor']);
+        $instruments = $this->transformInstruments(
+            $form['instruments'],
+            $form['visitor_instrument'],
+            $db['facility'],
+            $db['visitor']
+        );
         $valid[$in] = $this->validateSelection(
             $instruments['form'],
             $instruments['db'],
@@ -256,7 +268,12 @@ class FeedbackValidator extends BaseValidator
         // Telescope Operators
         $email[$op] = $this->returnSelectionText($form['operator_staff'] ?? [], $db['operator']);
         // Instruments
-        $instruments = $this->transformInstruments($form['instruments'], $form['visitor_instrument'], $db['facility'], $db['visitor']);
+        $instruments = $this->transformInstruments(
+            $form['instruments'],
+            $form['visitor_instrument'],
+            $db['facility'],
+            $db['visitor']
+        );
         $email[$in] = $this->returnSelectionText(
             $instruments['form'],
             $instruments['db']

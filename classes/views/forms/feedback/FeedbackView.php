@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\views\forms\feedback;
 
 use App\core\common\Debug;
 use App\core\irtf\IrtfLinks;
-
 use App\views\forms\BaseFormView as BaseView;
 
 /**
@@ -133,12 +134,25 @@ class FeedbackView extends BaseView
         $tableAttr = ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'];
 
         $contactInfo = getContactInfoAutoEmails(false, "director");
-        $ack = $this->htmlBuilder->getLink($this->irtfLinks->getResearchAcknowledgment(), 'acknowledgement page', [], $pad, true);
+        $ack = $this->htmlBuilder->getLink(
+            $this->irtfLinks->getResearchAcknowledgment(),
+            'acknowledgement page',
+            [],
+            $pad,
+            true
+        );
         $email = $this->htmlBuilder->getEmailLink($contactInfo['email1'], $contactInfo['email1'], [], $pad, true);
         $paragraphs = [
-            "Please take a few moments to answer the following questions about your IRTF observing run. Your feedback is the most valuable information we have on the service the IRTF is providing to its community.",
-            "This Feedback Form is sent <u>ONLY</u> to {$contactInfo['name']}, the IRTF Director, who will review its content and remove sensitive material before distributing to appropriate members of the IRTF staff. Confidential comments may also be provided directly to {$contactInfo['name']} by telephone at {$contactInfo['phone']} or by email at {$email}.",
-            "If you have an interesting result, please consider making it available as a science highlight for NASA Headquarters and contact {$contactInfo['name']} to do this. Published results should acknowledge the IRTF and the instrument used.  See our {$ack} for more information."
+            'Please take a few moments to answer the following questions about your IRTF observing run. '
+                . 'Your feedback is the most valuable information we have on the service the IRTF is '
+                . 'providing to its community.',
+            'This Feedback Form is sent <u>ONLY</u> to ' . $contactInfo['name'] . ', the IRTF Director, who will '
+                . 'review its content and remove sensitive material before distributing to appropriate members of '
+                . 'the IRTF staff. Confidential comments may also be provided directly to ' . $contactInfo['name']
+                . ' by telephone at ' . $contactInfo['phone'] . ' or by email at ' . $email . '.',
+            'If you have an interesting result, please consider making it available as a science highlight for '
+                . 'NASA Headquarters and contact ' . $contactInfo['name'] . ' to do this. Published results should '
+                . 'acknowledge the IRTF and the instrument used.  See our ' . $ack . ' for more information.',
         ];
 
         $paragraphTags = [
@@ -475,10 +489,44 @@ class FeedbackView extends BaseView
             $subcellPad
         );
 
-        $rows[] = $this->htmlBuilder->getTableRowFromArrayWithAlternatingColor([$heading], $colors[1], $colors, [true], $rowAttr, $tableRowPad, true);
-        $rows[] = $this->htmlBuilder->getTableRowFromArrayWithAlternatingColor([$site], $colors[0], $colors, [false], $rowAttr, $tableRowPad, true);
-        $rows[] = $this->htmlBuilder->getTableRowFromArrayWithAlternatingColor([$rating], $colors[1], $colors, [false], $rowAttr, $tableRowPad, true);
-        $rows[] = $this->htmlBuilder->getTableRowFromArrayWithAlternatingColor([$textarea], $colors[0], $colors, [false], $rowAttr, $tableRowPad, true);
+        $rows = [
+            $this->htmlBuilder->getTableRowFromArrayWithAlternatingColor(
+                [$heading],
+                $colors[1],
+                $colors,
+                [true],
+                $rowAttr,
+                $tableRowPad,
+                true
+            ),
+            $this->htmlBuilder->getTableRowFromArrayWithAlternatingColor(
+                [$site],
+                $colors[0],
+                $colors,
+                [false],
+                $rowAttr,
+                $tableRowPad,
+                true
+            ),
+            $this->htmlBuilder->getTableRowFromArrayWithAlternatingColor(
+                [$rating],
+                $colors[1],
+                $colors,
+                [false],
+                $rowAttr,
+                $tableRowPad,
+                true
+            ),
+            $this->htmlBuilder->getTableRowFromArrayWithAlternatingColor(
+                [$textarea],
+                $colors[0],
+                $colors,
+                [false],
+                $rowAttr,
+                $tableRowPad,
+                true
+            ),
+        ];
 
         $tableHtml = $this->htmlBuilder->getTableFromRows($rows, $tableAttr, $tablePad);
         $htmlParts = [
@@ -545,7 +593,8 @@ class FeedbackView extends BaseView
         );
         $textarea = $this->compBuilder->buildTextareaTable(
             'personnel',
-            'Please comment on the support you received from the telescope operators, staff astronomers, and other IRTF personnel.',
+            'Please comment on the support you received from the telescope operators, '
+                . 'staff astronomers, and other IRTF personnel.',
             $formData['personnel'],
             $colors[1],
             '',
