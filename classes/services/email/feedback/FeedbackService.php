@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\email\feedback;
 
 use App\core\irtf\IrtfUtilities;
-
 use App\services\email\EmailService as BaseService;
 
 /**

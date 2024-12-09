@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\email;
 
 use Exception;
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
-
 use App\core\common\Debug;
 
 /**
