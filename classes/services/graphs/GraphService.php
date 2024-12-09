@@ -1,12 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\services\graphs;
 
 use Exception;
-
 use App\core\common\Debug;
 
-// Include JpGraph dependencies
+
+/**
+ * JpGraph does not support Composer, so we manually include the required files here.
+ * This results in a PHPCS warning about mixing side effects with class declarations.
+ * Resolving this would require additional refactoring to centralize the includes
+ * (e.g., via a bootstrap file). For now, this structure is retained for simplicity.
+ */
 require_once __DIR__ . '/lib/jpgraph/src/jpgraph.php';
 require_once __DIR__ . '/lib/jpgraph/src/jpgraph_line.php';
 
