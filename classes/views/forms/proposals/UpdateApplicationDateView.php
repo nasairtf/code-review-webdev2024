@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\views\forms\proposals;
 
 use App\core\common\Debug;
-
-use App\core\htmlbuilder\HtmlBuilder as HtmlBuilder;
-use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
-use App\legacy\IRTFLayout as IrtfBuilder;
+use App\views\forms\BaseFormView as BaseView;
 
 /**
  * View for rendering the Update Application Date form.
@@ -17,26 +16,36 @@ use App\legacy\IRTFLayout as IrtfBuilder;
  * @version  1.0.0
  */
 
-class UpdateApplicationDateView
+class UpdateApplicationDateView extends BaseView
 {
-    private $formatHtml;
-    private $debug;
-    private $htmlBuilder;
-    private $compBuilder;
-    private $irtfBuilder;
-
+    /**
+     * Initializes the UpdateApplicationDateView with core builders and configurations.
+     *
+     * @param bool  $formatHtml Whether to format the HTML output.
+     * @param Debug $debug      Optional. Debugging utility instance.
+     */
     public function __construct(
         bool $formatHtml = false,
-        ?Debug $debug = null,
-        ?HtmlBuilder $htmlBuilder = null,
-        ?CompBuilder $compBuilder = null,
-        ?IrtfBuilder $irtfBuilder = null
+        ?Debug $debug = null
     ) {
-        $this->formatHtml = $formatHtml; // set the global html formatting
-        $this->debug = $debug ?? new Debug('default', false, 0);
-        $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder($this->formatHtml);
-        $this->compBuilder = $compBuilder ?? new CompBuilder($this->formatHtml, $this->htmlBuilder);
-        $this->irtfBuilder = $irtfBuilder ?? new IrtfBuilder();
+        // Use parent class' constructor
+        parent::__construct($formatHtml ?? false, $debug);
+        $debugHeading = $this->debug->debugHeading("View", "__construct");
+        $this->debug->debug($debugHeading);
+        $this->debug->log("{$debugHeading} -- Parent class is successfully constructed.");
+
+        // Class initialisation complete
+        $this->debug->log("{$debugHeading} -- View initialisation complete.");
+    }
+
+    public function getFieldLabels(): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "getFieldLabels");
+        $this->debug->debug($debugHeading);
+
+        // Map internal field names to user-friendly labels
+        return [];
     }
 
     public function renderForm1Page(
@@ -46,7 +55,7 @@ class UpdateApplicationDateView
         // Debug output
         $this->debug->debug("UpdateApplicationDate View: renderForm1Page()");
 
-        $instructions = "Select the semester to edit proposals for.";
+        $instructions = 'Select the semester to edit proposals for.';
         $content = $this->compBuilder->buildSemesterChooserForm($action, $instructions, [], 0);
         return $this->renderPage($title, $content);
     }
@@ -59,7 +68,8 @@ class UpdateApplicationDateView
         // Debug output
         $this->debug->debug("UpdateApplicationDate View: renderForm2Page()");
 
-        $instructions = "Select the proposal for which to update the submission date. The unix timestamp value will be needed on the next screen.";
+        $instructions = 'Select the proposal for which to update the submission date. '
+            . 'The unix timestamp value will be needed on the next screen.';
         $content = $this->compBuilder->buildSemesterProposalListForm($action, $instructions, $proposal, [], 0);
         return $this->renderPage($title, $content);
     }
@@ -72,49 +82,18 @@ class UpdateApplicationDateView
         // Debug output
         $this->debug->debug("UpdateApplicationDate View: renderForm3Page()");
 
-        $instructions = "Enter the new submission time for this proposal. Remember to use the unix timestamp. If you need to convert the timestamp, check out <a href='https://www.epochconverter.com'>https://www.epochconverter.com</a>.";
+        $instructions = 'Enter the new submission time for this proposal. Remember to use the unix timestamp. '
+            . 'If you need to convert the timestamp, check out <a href="https://www.epochconverter.com">'
+            . 'https://www.epochconverter.com</a>.';
         $timestampInput = $this->htmlBuilder->getUnixTimestampInput('t', $proposal['creationDate'], [], 0, false);
-        $content = $this->compBuilder->buildProposalUpdateConfirmationForm($action, $instructions, $proposal, $timestampInput, [], 0);
+        $content = $this->compBuilder->buildProposalUpdateConfirmationForm(
+            $action,
+            $instructions,
+            $proposal,
+            $timestampInput,
+            [],
+            0
+        );
         return $this->renderPage($title, $content);
-    }
-
-    public function renderResultsPage(
-        string $title = '',
-        string $message = ''
-    ): string {
-        // Debug output
-        $this->debug->debug("UpdateApplicationDate View: renderResultsPage()");
-
-        $content = $this->compBuilder->buildResultsPage($message, [], 0);
-        return $this->renderPage($title, $content);
-    }
-
-    public function renderErrorPage(
-        string $title = '',
-        string $message = ''
-    ): string {
-        // Debug output
-        $this->debug->debug("UpdateApplicationDate View: renderErrorPage()");
-
-        $content = $this->compBuilder->buildErrorPage($message, [], 0);
-        return $this->renderPage($title, $content);
-    }
-
-    /**
-     * Form helper method that builds the common parts for the form
-     */
-
-    private function renderPage(
-        string $title = '',
-        string $content = ''
-    ): string {
-        // Debug output
-        $this->debug->debug("UpdateApplicationDate View: renderPage()");
-
-        $htmlParts = [];
-        $htmlParts[] = $this->irtfBuilder->myHeader(false, $title, false);
-        $htmlParts[] = $content;
-        $htmlParts[] = $this->irtfBuilder->myFooter(__FILE__, false);
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
     }
 }

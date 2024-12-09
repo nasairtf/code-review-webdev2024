@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\controllers\proposals;
 
 use Exception;
-
 use App\core\common\Debug;
-
 use App\models\proposals\UpdateApplicationDateModel as Model;
 use App\views\forms\proposals\UpdateApplicationDateView as View;
 use App\validators\forms\proposals\UpdateApplicationDateValidator as Validator;

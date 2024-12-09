@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\validators\forms\proposals;
 
 use App\core\common\Debug;
@@ -33,14 +35,31 @@ class UpdateApplicationDateValidator
      * validateTimestamp - validates form3's timestamp field
      */
 
+    /**
+     * Validates a year input to ensure it is an integer within a valid range (1000-9999).
+     *
+     * @param mixed $year The year to validate.
+     *
+     * @return int The validated year.
+     *
+     * @throws \InvalidArgumentException If the year is invalid.
+     */
     public function validateYear($year): int
     {
         // Debug output
         $this->debug->debug("UpdateApplicationDate Validator: validateYear()");
 
-        if (is_null($year) || !filter_var($year, FILTER_VALIDATE_INT, ["options" => ["min_range" => 1000, "max_range" => 9999]])) {
-            $this->debug->fail("The year provided is invalid.");
+        $options = [
+            'options' => [
+                'min_range' => 1000,
+                'max_range' => 9999,
+            ],
+        ];
+
+        if ($year === null || !filter_var($year, FILTER_VALIDATE_INT, $options)) {
+            $this->debug->fail('The year provided is invalid.');
         }
+
         return (int) $year;
     }
 
