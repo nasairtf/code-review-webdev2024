@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\schedule\upload;
 
 use App\core\common\Debug;
-
-//use App\schedule\common\ScheduleUtility;
-
+use App\schedule\common\ScheduleUtility;
 use App\schedule\upload\ScheduleUploadModel as Model;
 
 /**

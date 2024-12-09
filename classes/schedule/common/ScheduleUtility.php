@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\schedule\common;
 
 use Exception;
@@ -19,11 +21,11 @@ class ScheduleUtility
 {
     public static function getCommentsList(): array
     {
-       /**
-        * Note that Service Obs is in the list but usually indicated manually
-        * by the scheduler.
-        */
-       return [
+        /**
+         * Note that Service Obs is in the list but usually indicated manually
+         * by the scheduler.
+         */
+        return [
             "Daylight Obs",
             "First Night",
             "Service Obs",
@@ -57,9 +59,9 @@ class ScheduleUtility
         string $shutdownstr,
         string $cm
     ): array {
-        $stime = sprintf( "%-5s", "-----" );
-        $sp    = sprintf( "%-11s", "" );
-        $noday = sprintf( "%-11s", "" );
+        $stime = sprintf("%-5s", "-----");
+        $sp    = sprintf("%-11s", "");
+        $noday = sprintf("%-11s", "");
 
         return [
             'sdate' => "",
@@ -235,5 +237,4 @@ class ScheduleUtility
     ): string {
         return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
     }
-
 }

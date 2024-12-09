@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\schedule;
 
 use Exception;
-
 use App\core\common\Debug;
-
 use App\schedule\build\ScheduleBuildManager as Builder;
 use App\schedule\upload\ScheduleUploadManager as Uploader;
 
