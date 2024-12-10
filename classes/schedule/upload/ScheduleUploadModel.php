@@ -75,7 +75,9 @@ class ScheduleUploadModel
         $deleteRows = $this->dbProgrmWrite->deletePrograms($deleteSQL);
         // Validate results
         if (!is_numeric($deleteRows)) {
-            $this->debug->log("Error: deletePrograms returned a non-numeric value: " . json_encode($deleteRows));
+            $this->debug->log(
+                "Error: deletePrograms returned a non-numeric value: " . json_encode($deleteRows)
+            );
             $deleteRows = -1; // Default to -1 if invalid
         }
         // Format results
@@ -95,7 +97,9 @@ class ScheduleUploadModel
         $deleteRows = $this->dbScheduWrite->deleteSchedule($deleteSQL);
         // Validate results
         if (!is_numeric($deleteRows)) {
-            $this->debug->log("Error: deleteSchedule returned a non-numeric value: " . json_encode($deleteRows));
+            $this->debug->log(
+                "Error: deleteSchedule returned a non-numeric value: " . json_encode($deleteRows)
+            );
             $deleteRows = -1; // Default to -1 if invalid
         }
         // Format results
@@ -115,7 +119,9 @@ class ScheduleUploadModel
         $deleteRows = $this->dbInstruWrite->deleteInstruments($deleteSQL);
         // Validate results
         if (!is_numeric($deleteRows)) {
-            $this->debug->log("Error: deleteInstruments returned a non-numeric value: " . json_encode($deleteRows));
+            $this->debug->log(
+                "Error: deleteInstruments returned a non-numeric value: " . json_encode($deleteRows)
+            );
             $deleteRows = -1; // Default to -1 if invalid
         }
         // Format results
@@ -135,7 +141,9 @@ class ScheduleUploadModel
         $deleteRows = $this->dbOperatWrite->deleteOperators($deleteSQL);
         // Validate results
         if (!is_numeric($deleteRows)) {
-            $this->debug->log("Error: deleteOperators returned a non-numeric value: " . json_encode($deleteRows));
+            $this->debug->log(
+                "Error: deleteOperators returned a non-numeric value: " . json_encode($deleteRows)
+            );
             $deleteRows = -1; // Default to -1 if invalid
         }
         // Format results
@@ -155,7 +163,9 @@ class ScheduleUploadModel
         $insertRows = $this->dbProgrmWrite->updateProgramsInfile($infile);
         // Validate results
         if (!is_numeric($insertRows)) {
-            $this->debug->log("Error: updateProgramsInfile returned a non-numeric value: " . json_encode($updateRows));
+            $this->debug->log(
+                "Error: updateProgramsInfile returned a non-numeric value: " . json_encode($updateRows)
+            );
             $insertRows = -1; // Default to -1 if invalid
         }
         // Format results
@@ -175,7 +185,9 @@ class ScheduleUploadModel
         $insertRows = $this->dbScheduWrite->updateScheduleInfile($infile);
         // Validate results
         if (!is_numeric($insertRows)) {
-            $this->debug->log("Error: updateScheduleInfile returned a non-numeric value: " . json_encode($updateRows));
+            $this->debug->log(
+                "Error: updateScheduleInfile returned a non-numeric value: " . json_encode($updateRows)
+            );
             $insertRows = -1; // Default to -1 if invalid
         }
         // Format results
@@ -195,7 +207,9 @@ class ScheduleUploadModel
         $insertRows = $this->dbInstruWrite->updateInstrumentsInfile($infile);
         // Validate results
         if (!is_numeric($insertRows)) {
-            $this->debug->log("Error: updateInstrumentsInfile returned a non-numeric value: " . json_encode($updateRows));
+            $this->debug->log(
+                "Error: updateInstrumentsInfile returned a non-numeric value: " . json_encode($updateRows)
+            );
             $insertRows = -1; // Default to -1 if invalid
         }
         // Format results
@@ -215,7 +229,9 @@ class ScheduleUploadModel
         $insertRows = $this->dbOperatWrite->updateOperatorsInfile($infile);
         // Validate results
         if (!is_numeric($insertRows)) {
-            $this->debug->log("Error: updateOperatorsInfile returned a non-numeric value: " . json_encode($updateRows));
+            $this->debug->log(
+                "Error: updateOperatorsInfile returned a non-numeric value: " . json_encode($updateRows)
+            );
             $insertRows = -1; // Default to -1 if invalid
         }
         // Format results
