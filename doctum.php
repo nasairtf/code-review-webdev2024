@@ -8,13 +8,13 @@ use Symfony\Component\Finder\Finder;
 $includeDirs = [
     'classes',
     'public_html',
+    'tests',
 ];
 
 // Define source directories to exclude
 $excludeDirs = [
     'legacy',
     'jpgraph',
-    'tests',
     'vendor',
 ];
 
