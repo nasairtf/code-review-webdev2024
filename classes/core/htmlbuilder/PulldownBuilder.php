@@ -133,7 +133,7 @@ class PulldownBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        $escapedName = HtmlBuildUtility::escape($name, $isHtml);
+        $escapedName = HtmlBuildUtility::escape((string) $name, $isHtml);
         $selectTag = sprintf(
             '<select name="%s"%s>',
             $escapedName,
@@ -146,7 +146,7 @@ class PulldownBuilder
             $pad
         );
         foreach ($groups as $groupLabel => $options) {
-            $escapedLabel = HtmlBuildUtility::escape((string)$groupLabel, $isHtml);
+            $escapedLabel = HtmlBuildUtility::escape((string) $groupLabel, $isHtml);
             $optgroup = sprintf('<optgroup label="%s">', $escapedLabel);
             $html .= HtmlBuildUtility::formatOutput(
                 $optgroup,
@@ -155,9 +155,9 @@ class PulldownBuilder
                 $pad + 2
             );
             foreach ($options as $key => $value) {
-                $escapedOptionKey = HtmlBuildUtility::escape((string)$key, $isHtml);
-                $escapedOptionValue = HtmlBuildUtility::escape((string)$value, $isHtml);
-                $isSelected = ((string)$key === (string)$selectedOption)
+                $escapedOptionKey = HtmlBuildUtility::escape((string) $key, $isHtml);
+                $escapedOptionValue = HtmlBuildUtility::escape((string) $value, $isHtml);
+                $isSelected = ((string) $key === (string) $selectedOption)
                     ? ' selected'
                     : '';
                 $option = sprintf(
@@ -614,7 +614,7 @@ class PulldownBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        $escapedLabel = HtmlBuildUtility::escape($label, $isHtml);
+        $escapedLabel = HtmlBuildUtility::escape((string) $label, $isHtml);
         $pulldownTag = $this->getPulldown(
             $name,
             $selectedOption,
@@ -658,7 +658,7 @@ class PulldownBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        $escapedName = HtmlBuildUtility::escape($name, $isHtml);
+        $escapedName = HtmlBuildUtility::escape((string) $name, $isHtml);
         $selectTag = sprintf(
             '<select name="%s"%s>',
             $escapedName,
@@ -677,9 +677,9 @@ class PulldownBuilder
             : [$selectedOption];
 
         foreach ($options as $key => $value) {
-            $escapedOptionKey = HtmlBuildUtility::escape((string)$key, $isHtml);
-            $escapedOptionValue = HtmlBuildUtility::escape((string)$value, $isHtml);
-            $isSelected = in_array((string)$key, $selectedOptions, true)
+            $escapedOptionKey = HtmlBuildUtility::escape((string) $key, $isHtml);
+            $escapedOptionValue = HtmlBuildUtility::escape((string) $value, $isHtml);
+            $isSelected = in_array((string) $key, $selectedOptions, true)
                 ? ' selected'
                 : '';
             $option = sprintf(

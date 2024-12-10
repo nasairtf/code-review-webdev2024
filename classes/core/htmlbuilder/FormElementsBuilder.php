@@ -226,7 +226,9 @@ class FormElementsBuilder
         $proposalId = HtmlBuildUtility::escape((string) $proposal['ObsApp_id'], false);
         $proposalCode = HtmlBuildUtility::escape((string) $proposal['code'], false);
         $programNumber = HtmlBuildUtility::escape(
-            $proposal['semesterYear'] . $proposal['semesterCode'] . sprintf("%03d", $proposal['ProgramNumber']),
+            $proposal['semesterYear']
+                . $proposal['semesterCode']
+                . sprintf("%03d", $proposal['ProgramNumber']),
             false
         );
         $investigator = HtmlBuildUtility::escape('(' . $proposal['InvLastName1'] . ')', false);

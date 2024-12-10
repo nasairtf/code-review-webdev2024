@@ -353,10 +353,12 @@ class TableLayoutBuilder
             ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
             $attributes
         );
-        $proposalId = HtmlBuildUtility::escape($proposal['ObsApp_id'], false);
-        $proposalCode = HtmlBuildUtility::escape($proposal['code'], false);
+        $proposalId = HtmlBuildUtility::escape((string) $proposal['ObsApp_id'], false);
+        $proposalCode = HtmlBuildUtility::escape((string) $proposal['code'], false);
         $programNumber = HtmlBuildUtility::escape(
-            $proposal['semesterYear'] . $proposal['semesterCode'] . sprintf("%03d", $proposal['ProgramNumber']),
+            $proposal['semesterYear']
+                . $proposal['semesterCode']
+                . sprintf("%03d", $proposal['ProgramNumber']),
             false
         );
         $investigator = HtmlBuildUtility::escape('(' . $proposal['InvLastName1'] . ')', false);
@@ -1411,7 +1413,7 @@ class TableLayoutBuilder
         $tableCellPad = $tableRowPad + 2;
         $tableAttributes = ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '0'];
         $rowAttributes = ['bgcolor' => $bgColor];
-        $programNumber = HtmlBuildUtility::escape($proposal, false);
+        $programNumber = HtmlBuildUtility::escape((string) $proposal, false);
         $investigator = HtmlBuildUtility::escape('(' . $program['n'] . ')', false);
         $hiddenProgram = $this->htmlBuilder->getHiddenInput('a', $program['a'], [], 0, false);
         $hiddenObsAppId = $this->htmlBuilder->getHiddenInput('i', $program['i'], [], 0, false);

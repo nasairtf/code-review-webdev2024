@@ -201,7 +201,7 @@ class TableBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        $escapedColor = HtmlBuildUtility::escape($color, $isHtml);
+        $escapedColor = HtmlBuildUtility::escape((string) $color, $isHtml);
         $htmlParts = [];
         if ($isOwnTable) {
             $htmlParts[] = $this->getTableOpenTag(
@@ -243,7 +243,7 @@ class TableBuilder
         int $pad = 0,
         bool $isHtml = false
     ): string {
-        $escapedContent = HtmlBuildUtility::escape(trim($content), $isHtml);
+        $escapedContent = HtmlBuildUtility::escape(trim((string) $content), $isHtml);
         $tag = $header ? 'th' : 'td';
         $attrString = HtmlBuildUtility::buildAttributes($attributes);
         // if formatOutput is false, use inline rendering even for non-inline content
