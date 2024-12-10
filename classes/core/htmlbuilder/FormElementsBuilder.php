@@ -223,8 +223,8 @@ class FormElementsBuilder
         $cellPad = $pad + 2;
         $formPad = $pad + 4;
         $tableRowPad = $pad;
-        $proposalId = HtmlBuildUtility::escape($proposal['ObsApp_id'], false);
-        $proposalCode = HtmlBuildUtility::escape($proposal['code'], false);
+        $proposalId = HtmlBuildUtility::escape((string) $proposal['ObsApp_id'], false);
+        $proposalCode = HtmlBuildUtility::escape((string) $proposal['code'], false);
         $programNumber = HtmlBuildUtility::escape(
             $proposal['semesterYear'] . $proposal['semesterCode'] . sprintf("%03d", $proposal['ProgramNumber']),
             false
