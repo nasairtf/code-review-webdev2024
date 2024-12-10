@@ -48,15 +48,37 @@ class UpdateApplicationDateView extends BaseView
         return [];
     }
 
+    protected function getPageContents(
+        array $dbData = [],
+        array $formData = [],
+        int $pad = 0
+    ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "getPageContents");
+        $this->debug->debug($debugHeading);
+
+        // Generate the main page content for a form
+        return '';
+    }
+
     public function renderForm1Page(
         string $title = '',
         string $action = ''
     ): string {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate View: renderForm1Page()");
+        $debugHeading = $this->debug->debugHeading("View", "renderForm1Page");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($title, "{$debugHeading} -- title");
+        $this->debug->debugVariable($action, "{$debugHeading} -- action");
 
+        // Generate the main page content for the form
         $instructions = 'Select the semester to edit proposals for.';
-        $content = $this->compBuilder->buildSemesterChooserForm($action, $instructions, [], 0);
+        $content = $this->compBuilder->buildSemesterChooserForm(
+            $action,
+            $instructions,
+            [],
+            0
+        );
         return $this->renderPage($title, $content);
     }
 
@@ -66,11 +88,22 @@ class UpdateApplicationDateView extends BaseView
         array $proposal = []
     ): string {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate View: renderForm2Page()");
+        $debugHeading = $this->debug->debugHeading("View", "renderForm2Page");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($title, "{$debugHeading} -- title");
+        $this->debug->debugVariable($action, "{$debugHeading} -- action");
+        $this->debug->debugVariable($proposal, "{$debugHeading} -- proposal");
 
+        // Generate the main page content for the form
         $instructions = 'Select the proposal for which to update the submission date. '
             . 'The unix timestamp value will be needed on the next screen.';
-        $content = $this->compBuilder->buildSemesterProposalListForm($action, $instructions, $proposal, [], 0);
+        $content = $this->compBuilder->buildSemesterProposalListForm(
+            $action,
+            $instructions,
+            $proposal,
+            [],
+            0
+        );
         return $this->renderPage($title, $content);
     }
 
@@ -80,12 +113,23 @@ class UpdateApplicationDateView extends BaseView
         array $proposal = []
     ): string {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate View: renderForm3Page()");
+        $debugHeading = $this->debug->debugHeading("View", "renderForm3Page");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($title, "{$debugHeading} -- title");
+        $this->debug->debugVariable($action, "{$debugHeading} -- action");
+        $this->debug->debugVariable($proposal, "{$debugHeading} -- proposal");
 
+        // Generate the main page content for the form
         $instructions = 'Enter the new submission time for this proposal. Remember to use the unix timestamp. '
             . 'If you need to convert the timestamp, check out <a href="https://www.epochconverter.com">'
             . 'https://www.epochconverter.com</a>.';
-        $timestampInput = $this->htmlBuilder->getUnixTimestampInput('t', $proposal['creationDate'], [], 0, false);
+        $timestampInput = $this->htmlBuilder->getUnixTimestampInput(
+            't',
+            (string) $proposal['creationDate'],
+            [],
+            0,
+            false
+        );
         $content = $this->compBuilder->buildProposalUpdateConfirmationForm(
             $action,
             $instructions,
