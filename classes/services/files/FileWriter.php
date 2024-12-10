@@ -151,7 +151,7 @@ class FileWriter
                     $this->writeLog($handle, $data);
                     break;
 
-                case 'schedulesql':
+                case 'infilesql':
                     $this->writeCSV($handle, $data);
                     break;
 
