@@ -27,4 +27,11 @@ trait PrivatePropertyTrait
         $propertyReflection->setAccessible(true);
         return $propertyReflection->getValue($object);
     }
+
+    private function setPrivateProperty(\ReflectionClass $reflection, $instance, string $property, $value): void
+    {
+        $property = $reflection->getProperty($property);
+        $property->setAccessible(true);
+        $property->setValue($instance, $value);
+    }
 }
