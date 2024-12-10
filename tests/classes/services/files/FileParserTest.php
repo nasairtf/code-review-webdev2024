@@ -165,20 +165,4 @@ class FileParserTest extends TestCase
         file_put_contents($filePath, $content);
         return $filePath;
     }
-
-    /**
-     * Accesses a private or protected property of an object for testing purposes.
-     *
-     * @param object $object   The object instance.
-     * @param string $property The name of the property to access.
-     *
-     * @return mixed The value of the property.
-     */
-    private function getPrivateProperty(object $object, string $property)
-    {
-        $reflection = new \ReflectionClass($object);
-        $propertyReflection = $reflection->getProperty($property);
-        $propertyReflection->setAccessible(true);
-        return $propertyReflection->getValue($object);
-    }
 }

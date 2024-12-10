@@ -103,13 +103,14 @@ class FileWriterTest extends TestCase
      */
     public function testWriteFileWritesSqlSuccessfully(): void
     {
+        $fileWriter = new FileWriter('infilesql', $this->testFilePath);
         $data = [
             ['Field1', 'Field2', 'Field3'],
             ['RecordAField1', 'RecordAField2', 'RecordAField3'],
             ['RecordBField1', 'RecordBField2', 'RecordBField3'],
         ];
 
-        $result = $this->fileWriter->writeFile($data);
+        $result = $fileWriter->writeFile($data);
 
         $this->assertTrue($result);
         $this->assertFileExists($this->testFilePath);
@@ -241,5 +242,4 @@ class FileWriterTest extends TestCase
 
         fclose($handle);
     }
-
 }
