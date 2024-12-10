@@ -102,7 +102,9 @@ class UploadScheduleFileView extends BaseView
 
         $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' >\n";
-        $code .= "     <td colspan='3' align='center'>For only private txt/pdf files (no public access), click 'Private' below.</td>\n";
+        $code .= "     <td colspan='3' align='center'>\n";
+        $code .= "       For only private txt/pdf files (no public access), click 'Private' below.\n";
+        $code .= "     </td>\n";
         $code .= "  </tr>\n";
         $code .= "  <tr bgcolor='#{$color}' >\n";
         $code .= "     <td align='center'>\n";
