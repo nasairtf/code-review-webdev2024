@@ -26,9 +26,6 @@ use App\controllers\proposals\UpdateApplicationDateController as Controller;
  * @version  1.0.0
  */
 
-// define legacy constant
-define('CONTACT', "hawarden at hawaii dot edu");
-
 // Enable debug mode for the entire application
 //$debugMode = isset($_GET['debug']) && $_GET['debug'] === 'true';  // Enable via a query param for example
 //$debugLevel = $debugMode ? 1 : 0;  // Set debug level based on query param or default

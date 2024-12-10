@@ -35,9 +35,6 @@ use App\controllers\feedback\FeedbackController as Controller;
  * @version  1.0.0
  */
 
-// define legacy constant
-define('CONTACT', "hawarden at hawaii dot edu");
-
 // Enable debug mode for the entire page
 $debugMode = false;
 $debugLevel = $debugMode ? 1 : 0;

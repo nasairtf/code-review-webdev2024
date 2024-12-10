@@ -28,9 +28,6 @@ use App\controllers\proposals\UploadScheduleFileController as Controller;
  * @version  1.0.0
  */
 
-// define legacy constant
-define('CONTACT', "hawarden at hawaii dot edu");
-
 // Enable debug mode for the entire application
 $debugMode = false;
 $debugLevel = $debugMode ? 1 : 0;
