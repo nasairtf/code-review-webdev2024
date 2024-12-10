@@ -27,7 +27,7 @@ class FileWriter
     protected $debug;
 
     /**
-     * @var string The type of file to be written (e.g., 'csv', 'log', 'schedulesql').
+     * @var string The type of file to be written (e.g., 'csv', 'log', 'infilesql').
      */
     protected $fileType;
 
@@ -83,8 +83,8 @@ class FileWriter
     protected function configureWriter(): void
     {
         switch ($this->fileType) {
-            case 'schedulesql':
-                $this->delimiter = ";";
+            case 'infilesql':
+                $this->delimiter = ';';
                 $this->encloser = '"';
                 break;
 
@@ -126,8 +126,18 @@ class FileWriter
             $this->debug->fail("File path must be provided.");
         }
 
-        // Check if file can be opened in write mode
-        $handle = fopen($this->filePath, 'w');
+        // Ensure the directory exists and is writable
+        $directory = dirname($this->filePath);
+        if (!is_dir($directory)) {
+            $this->debug->fail("The directory does not exist: {$directory}.");
+        }
+        if (!is_writable($directory)) {
+            $this->debug->fail("The directory is not writable: {$directory}.");
+        }
+
+        // Try to open the file in write mode
+        // (Suppress warnings with @ to handle them manually
+        $handle = @fopen($this->filePath, 'w');
         if (!$handle) {
             $this->debug->fail("Unable to open file: {$this->filePath}.");
         }

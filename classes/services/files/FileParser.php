@@ -151,7 +151,7 @@ class FileParser
         // even if an exception occurs during parsing.
         try {
             // Enable compatibility with macOS line endings
-            ini_set('auto_detect_line_endings', true);
+            ini_set('auto_detect_line_endings', (string) true);
 
             // Parse the file using the appropriate method
             switch (strtolower($this->fileType)) {
@@ -167,7 +167,7 @@ class FileParser
         // 'finally' clause executes even if return is reached in the 'try' clause
         } finally {
             // Disable macOS line ending compatibility
-            ini_set('auto_detect_line_endings', false);
+            ini_set('auto_detect_line_endings', (string) false);
 
             // Close the file
             if (is_resource($handle)) {
@@ -271,7 +271,7 @@ class FileParser
         // !array_filter($array, function ($value) { return trim($value) !== ''; })
         // !array_filter($array, fn($value) => trim($value) !== '')
         foreach ($array as $value) {
-            if (trim($value) !== '') {
+            if (is_string($value) && trim($value) !== '') {
                 return true;
             }
         }
