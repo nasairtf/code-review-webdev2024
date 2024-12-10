@@ -7,6 +7,7 @@ namespace App\core\htmlbuilder;
 use App\core\htmlbuilder\HtmlBuildUtility;
 use App\core\htmlbuilder\FormElementsBuilder;
 use App\core\htmlbuilder\HtmlBuilder;
+use App\core\htmlbuilder\BuilderValidationTrait;
 
 /**
  * /home/webdev2024/classes/core/htmlbuilder/TableLayoutBuilder.php
