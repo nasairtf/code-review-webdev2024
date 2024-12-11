@@ -7,34 +7,10 @@ namespace App\services\database;
 use App\core\common\Debug;
 
 /**
- * /home/webdev2024/classes/core/database/DB.php
+ * /home/webdev2024/classes/core/database/DBConnection.php
  *
- * DB class provides a singleton connection pool allowing interaction with multiple
+ * DBConnection class provides a singleton connection pool allowing interaction with multiple
  * IRTF databases, supporting basic CRUD and transaction operations.
- *
- * Created:
- *  2024/09/24 - Miranda Hawarden-Ogata
- *
- * Modified:
- *  2024/09/26 - Miranda Hawarden-Ogata
- *      - Refactored to use obsapp_id instead of SessionID for reliability.
- *      - Implemented Singleton pattern to reuse database connections.
- *      - PSR-12 formatting applied.
- *      - Refactored to throw exceptions instead of die() for better error handling.
- *      - Refactored to provide multi-line method signatures for methods with arguments.
- *      - Added outputDebugInfo method.
- *      - Added 'use mysqli' to import class.
- *      - Removed type hints due to PHP version 7.2. Can re-add after update to 7.4+.
- *  2024/10/15 - Miranda Hawarden-Ogata
- *      - Refactored logError/outputDebugInfo to DebugUtility class for better error handling.
- *      - Added connection verification method.
- *      - Added default debug colour of orange for DB debug output.
- *  2024/10/20 - Miranda Hawarden-Ogata
- *      - Updated DebugUtility:: calls to use Debug class instance calls.
- *  2024/10/21 - Miranda Hawarden-Ogata
- *      - Set up composer and autoloading.
- *  2024/10/29 - Miranda Hawarden-Ogata
- *      - Added instance pool handling to allow connections to multiple databases.
  *
  * @category Database
  * @package  IRTF
@@ -42,19 +18,19 @@ use App\core\common\Debug;
  * @version  1.2.4
  */
 
-class DB
+class DBConnection
 {
-    /** @var Debug       $debug      Debug instance for logging and output. */
+    /** @var Debug $debug Debug instance for logging and output. */
     private $debug;
 
     /** @var mysqli|null $connection Stores the MySQLi connection. */
     private $connection;
 
-    /** @var array       $instances  Singleton instance pool of the DB class. */
+    /** @var array $instances Singleton instance pool of the DBConnection class. */
     private static $instances = [];
 
     /**
-     * Constructor for DB class, initializes a database connection using provided credentials.
+     * Constructor for DBConnection class, initializes a database connection using provided credentials.
      *
      * @param string $dbName Database name for configuration lookup.
      * @param bool $debugMode Whether to enable debug mode.
@@ -67,7 +43,7 @@ class DB
         // Only set debug mode once during instance creation
         $this->debug = new Debug('db', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
 
-        // Load the config file for DB credentials
+        // Load the config file for DBConnection credentials
         $config = require CONFIG_PATH . 'db_config.php';
 
         // Check if the requested database exists in the config
@@ -104,16 +80,16 @@ class DB
     }
 
     /**
-     * Returns the singleton instance of the DB class for a specific database.
+     * Returns the singleton instance of the DBConnection class for a specific database.
      *
      * @param string $dbName Database name.
      * @param bool $debugMode Whether to enable debug mode.
-     * @return DB Database connection instance.
+     * @return DBConnection Database connection instance.
      */
     public static function getInstance(
         string $dbName,
         ?bool $debugMode = null
-    ): DB {
+    ): DBConnection {
         if (!isset(self::$instances[$dbName])) {
             self::$instances[$dbName] = new self($dbName, $debugMode ?? false); // base-level service class
         }
