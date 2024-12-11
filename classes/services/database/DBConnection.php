@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\services\database;
 
+use mysqli;
 use App\core\common\Config;
 use App\core\common\CustomDebug;
 use App\exceptions\DatabaseException;
@@ -14,12 +15,18 @@ use App\exceptions\DatabaseException;
  * This class supports CRUD operations, transactions, and singleton connection management.
  * It uses `CustomDebug` for error reporting and `Config` for database configuration.
  *
+ * The DBConnection class is immutable and locked to ensure system stability.
+ *
+ * NOTE: For additional features or domain-specific behavior, extend this class
+ * (e.g., CustomConfig).
+ *
  * @category Database
  * @package  IRTF
  * @author   Miranda Hawarden-Ogata
  * @version  1.2.4
  * @since    2024-10-29
  *
+ * @uses \mysqli
  * @uses \App\core\common\Config
  * @uses \App\core\common\CustomDebug
  * @uses \App\exceptions\DatabaseException
@@ -50,14 +57,16 @@ class DBConnection
     /**
      * Constructor for DBConnection class, initializes a database connection.
      *
-     * @param string $dbName    Database name for configuration lookup.
-     * @param bool   $debugMode Whether to enable debug mode.
+     * @param string      $dbName    Database name for configuration lookup.
+     * @param bool        $debugMode Whether to enable debug mode.
+     * @param mysqli|null $mysqli    Optional mysqli instance for testing.
      *
      * @throws DatabaseException If the database configuration is missing or the connection fails.
      */
     private function __construct(
         string $dbName,
-        ?bool $debugMode = null
+        ?bool $debugMode = null,
+        ?mysqli $mysqli = null
     ) {
         // Only set debug mode once during instance creation
         $this->debug = new CustomDebug('db', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
@@ -74,7 +83,7 @@ class DBConnection
         $dbConfig = $config[$dbName];
 
         // Establish the MySQLi connection
-        $this->connection = new \mysqli(
+        $this->connection =  $mysqli ?: new \mysqli(
             $dbConfig['host'],
             $dbConfig['username'],
             $dbConfig['password'],
@@ -101,20 +110,26 @@ class DBConnection
     /**
      * Returns the singleton instance of the DBConnection class for a specific database.
      *
-     * @param string $dbName    Database name.
-     * @param bool   $debugMode Whether to enable debug mode.
+     * @param string      $dbName    Database name.
+     * @param bool        $debugMode Whether to enable debug mode.
+     * @param mysqli|null $mysqli    Optional mysqli instance for testing.
      *
      * @return DBConnection Database connection instance.
      *
+     * @uses \mysqli
      * @uses \App\core\common\Config
      * @uses \App\core\common\CustomDebug
      */
     public static function getInstance(
         string $dbName,
-        ?bool $debugMode = null
+        ?bool $debugMode = null,
+        ?mysqli $mysqli = null
     ): DBConnection {
         if (!isset(self::$instances[$dbName])) {
-            self::$instances[$dbName] = new self($dbName, $debugMode ?? false); // base-level service class
+            self::$instances[$dbName] = new self($dbName, $debugMode ?? false, $mysqli); // base-level service class
+        } elseif ($mysqli && self::$instances[$dbName]->connection !== $mysqli) {
+            // Replace the existing connection with the provided $mysqli during testing
+            self::$instances[$dbName]->connection = $mysqli;
         }
         return self::$instances[$dbName];
     }
@@ -129,11 +144,10 @@ class DBConnection
     public static function clearInstance(string $dbName): void
     {
         if (isset(self::$instances[$dbName])) {
-            self::$instances[$dbName]->closeConnection();
+            $instance = self::$instances[$dbName];
+            $instance->closeConnection();
+            $instance->debug->debug("Connection to database {$dbName} has been closed.");
             unset(self::$instances[$dbName]);
-            // Debug information for MySQLi connection
-            $this->debug->debug("Connection to database {$dbName} has been closed.");
-            //self::$instances[$dbName]->debug->debug("Connection to database {$dbName} has been closed.");
         }
     }
 
