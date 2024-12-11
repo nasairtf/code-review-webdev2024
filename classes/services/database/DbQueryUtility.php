@@ -29,18 +29,18 @@ class DbQueryUtility
      * Logs the SQL query and parameters, executes the query using the provided database
      * instance, and returns the result set. Useful for debugging read operations.
      *
-     * @param Debug  $debug      Instance of the Debug class for logging and debugging.
-     * @param DB     $db         Instance of the DB class for executing queries.
-     * @param string $sql        SQL query string to execute.
-     * @param array  $params     Parameters to bind to the query (optional).
-     * @param string $types      Parameter types (e.g., 's' for string, 'i' for integer).
-     * @param int    $resultType Type of result array (e.g., MYSQLI_ASSOC).
+     * @param Debug        $debug      Instance of the Debug class for logging and debugging.
+     * @param DBConnection $db         Instance of the DBConnection class for executing queries.
+     * @param string       $sql        SQL query string to execute.
+     * @param array        $params     Parameters to bind to the query (optional).
+     * @param string       $types      Parameter types (e.g., 's' for string, 'i' for integer).
+     * @param int          $resultType Type of result array (e.g., MYSQLI_ASSOC).
      *
-     * @return array             Array of query results.
+     * @return array                   Array of query results.
      */
     public static function executeSelectQueryWithDebug(
         Debug $debug,
-        DB $db,
+        DBConnection $db,
         string $sql,
         array $params,
         string $types,
@@ -87,17 +87,17 @@ class DbQueryUtility
      * Logs the SQL query and parameters, executes the query using the provided database
      * instance, and returns the number of affected rows.
      *
-     * @param Debug  $debug        Instance of the Debug class for logging and debugging.
-     * @param DB     $db           Instance of the DB class for executing queries.
-     * @param string $sql          SQL query string to execute.
-     * @param array  $params       Parameters to bind to the query (optional).
-     * @param string $types        Parameter types (e.g., 's' for string, 'i' for integer).
+     * @param Debug        $debug        Instance of the Debug class for logging and debugging.
+     * @param DBConnection $db           Instance of the DBConnection class for executing queries.
+     * @param string       $sql          SQL query string to execute.
+     * @param array        $params       Parameters to bind to the query (optional).
+     * @param string       $types        Parameter types (e.g., 's' for string, 'i' for integer).
      *
-     * @return int                 Number of rows affected by the query.
+     * @return int                       Number of rows affected by the query.
      */
     public static function executeUpdateQueryWithDebug(
         Debug $debug,
-        DB $db,
+        DBConnection $db,
         string $sql,
         array $params = [],
         string $types = ''
@@ -115,17 +115,17 @@ class DbQueryUtility
      * If parameters are provided, executes a parameterized query. Otherwise, executes
      * a raw SQL query. Logs the query type and returns the number of affected rows.
      *
-     * @param Debug  $debug Instance of the Debug class for logging and debugging.
-     * @param DB     $db    Instance of the DB class for executing queries.
-     * @param string $sql   SQL query string to execute.
-     * @param array  $params Parameters to bind to the query (optional).
-     * @param string $types  Parameter types (optional).
+     * @param Debug        $debug  Instance of the Debug class for logging and debugging.
+     * @param DBConnection $db     Instance of the DBConnection class for executing queries.
+     * @param string       $sql    SQL query string to execute.
+     * @param array        $params Parameters to bind to the query (optional).
+     * @param string       $types  Parameter types (optional).
      *
-     * @return int           Number of rows affected by the query.
+     * @return int                 Number of rows affected by the query.
      */
     public static function executeQueryWithDebug(
         Debug $debug,
-        DB $db,
+        DBConnection $db,
         string $sql,
         array $params = [],
         string $types = ''
@@ -175,15 +175,15 @@ class DbQueryUtility
      * Logs the SQL query, executes it using the provided database instance, and returns
      * the number of affected rows.
      *
-     * @param Debug  $debug Instance of the Debug class for logging and debugging.
-     * @param DB     $db    Instance of the DB class for executing queries.
-     * @param string $sql   Raw SQL query string to execute.
+     * @param Debug        $debug Instance of the Debug class for logging and debugging.
+     * @param DBConnection $db    Instance of the DBConnection class for executing queries.
+     * @param string       $sql   Raw SQL query string to execute.
      *
      * @return int          Number of rows affected by the query.
      */
     public static function executeRawQueryWithDebug(
         Debug $debug,
-        DB $db,
+        DBConnection $db,
         string $sql
     ): int {
         // Debug the raw SQL
