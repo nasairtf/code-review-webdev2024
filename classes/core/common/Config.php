@@ -7,8 +7,6 @@ namespace App\core\common;
 use Exception;
 
 /**
- * /home/webdev2024/classes/core/common/Config.php
- *
  * Lightweight configuration loader and manager.
  *
  * This class provides methods to load and retrieve application configuration
@@ -22,7 +20,6 @@ use Exception;
  * @package  IRTF
  * @version  1.0.0
  */
-
 class Config
 {
     /**
