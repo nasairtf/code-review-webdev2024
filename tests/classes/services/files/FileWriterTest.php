@@ -39,47 +39,6 @@ class FileWriterTest extends TestCase
     private $fileWriter;
 
     /**
-     * Sets up the test environment before each test.
-     *
-     * Creates a temporary directory for test files and initializes a FileWriter instance.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        // Ensure the parent setup runs if needed
-        parent::setUp();
-        // Run the setup for this class
-        $this->tempDir = sys_get_temp_dir() . '/FileWriterTest';
-        if (!is_dir($this->tempDir)) {
-            mkdir($this->tempDir);
-        }
-        $this->testFilePath = $this->tempDir . DIRECTORY_SEPARATOR . 'test_file.csv';
-        $this->fileWriter = new FileWriter('csv', $this->testFilePath, false);
-    }
-
-    /**
-     * Cleans up the test environment after each test.
-     *
-     * Removes temporary files and directories created during testing.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        // Run the teardown logic for this class
-        if (file_exists($this->testFilePath)) {
-            unlink($this->testFilePath);
-        }
-        if (is_dir($this->tempDir)) {
-            array_map('unlink', glob($this->tempDir . '/*'));
-            rmdir($this->tempDir);
-        }
-        // Ensure PHPUnit's teardown logic runs too
-        parent::tearDown();
-    }
-
-    /**
      * Tests the constructor and default configuration of the FileWriter class.
      *
      * @covers \App\services\files\FileWriter::__construct
@@ -277,5 +236,46 @@ class FileWriterTest extends TestCase
         $method->invoke($this->fileWriter, $handle, $data);
 
         fclose($handle);
+    }
+
+    /**
+     * Sets up the test environment before each test.
+     *
+     * Creates a temporary directory for test files and initializes a FileWriter instance.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        // Ensure the parent setup runs if needed
+        parent::setUp();
+        // Run the setup for this class
+        $this->tempDir = sys_get_temp_dir() . '/FileWriterTest';
+        if (!is_dir($this->tempDir)) {
+            mkdir($this->tempDir);
+        }
+        $this->testFilePath = $this->tempDir . DIRECTORY_SEPARATOR . 'test_file.csv';
+        $this->fileWriter = new FileWriter('csv', $this->testFilePath, false);
+    }
+
+    /**
+     * Cleans up the test environment after each test.
+     *
+     * Removes temporary files and directories created during testing.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        // Run the teardown logic for this class
+        if (file_exists($this->testFilePath)) {
+            unlink($this->testFilePath);
+        }
+        if (is_dir($this->tempDir)) {
+            array_map('unlink', glob($this->tempDir . '/*'));
+            rmdir($this->tempDir);
+        }
+        // Ensure PHPUnit's teardown logic runs too
+        parent::tearDown();
     }
 }

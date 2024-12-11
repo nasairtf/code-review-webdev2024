@@ -28,40 +28,6 @@ class FileParserTest extends TestCase
     private $tempDir;
 
     /**
-     * Sets up the test environment.
-     *
-     * Prepares a temporary directory for test files.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        // Ensure the parent setup runs if needed
-        parent::setUp();
-        // Run the setup for this class
-        $this->tempDir = sys_get_temp_dir() . '/FileParserTest';
-        if (!is_dir($this->tempDir)) {
-            mkdir($this->tempDir);
-        }
-    }
-
-    /**
-     * Cleans up the test environment by removing temporary files.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        // Run the teardown logic for this class
-        if (is_dir($this->tempDir)) {
-            array_map('unlink', glob($this->tempDir . '/*'));
-            rmdir($this->tempDir);
-        }
-        // Ensure PHPUnit's teardown logic runs too
-        parent::tearDown();
-    }
-
-    /**
      * Tests the constructor and default configuration of the FileParser class.
      *
      * @covers \App\services\files\FileParser::__construct
@@ -193,5 +159,39 @@ class FileParserTest extends TestCase
         $filePath = "{$this->tempDir}/testfile.{$fileType}";
         file_put_contents($filePath, $content);
         return $filePath;
+    }
+
+    /**
+     * Sets up the test environment.
+     *
+     * Prepares a temporary directory for test files.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        // Ensure the parent setup runs if needed
+        parent::setUp();
+        // Run the setup for this class
+        $this->tempDir = sys_get_temp_dir() . '/FileParserTest';
+        if (!is_dir($this->tempDir)) {
+            mkdir($this->tempDir);
+        }
+    }
+
+    /**
+     * Cleans up the test environment by removing temporary files.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        // Run the teardown logic for this class
+        if (is_dir($this->tempDir)) {
+            array_map('unlink', glob($this->tempDir . '/*'));
+            rmdir($this->tempDir);
+        }
+        // Ensure PHPUnit's teardown logic runs too
+        parent::tearDown();
     }
 }
