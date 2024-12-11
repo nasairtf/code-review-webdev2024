@@ -5,19 +5,17 @@ declare(strict_types=1);
 namespace App\core\common;
 
 use Exception;
-use App\exceptions\DatabaseException as Database;
-use App\exceptions\EmailException as Email;
-use App\exceptions\ValidationException as Validation;
 use App\core\common\Config;
 
 /**
- * /home/webdev2024/classes/core/common/Debug.php
+ * Debug class.
  *
- * Provides utilities for debugging, error logging, and structured debug output.
+ * This class provides configurable debug modes, error logging, and structured debug output,
+ * including message coloring and variable output for improved debugging workflows.
  *
- * This class supports configurable debug modes, levels, and message coloring for
- * improved debugging workflows. It integrates with custom exception types for
- * more specific error handling.
+ * The Debug class is immutable and locked to ensure system stability.
+ *
+ * NOTE: For additional features or domain-specific behavior, extend this class (e.g., CustomDebug).
  *
  * Example usage:
  * ```php
@@ -25,11 +23,12 @@ use App\core\common\Config;
  * $debug->log('Database connection failed.');
  * ```
  *
- * @category Utilities
+ * @category Core Utilities
  * @package  IRTF
+ * @author   Miranda Hawarden-Ogata
  * @version  1.0.3
+ * @since    2024-12-10
  */
-
 class Debug
 {
     /**
@@ -40,7 +39,7 @@ class Debug
      *
      * @var bool
      */
-    private $debugMode;
+    protected $debugMode;
 
     /**
      * The verbosity level for logging.
@@ -50,7 +49,7 @@ class Debug
      *
      * @var int
      */
-    private $debugLevel;
+    protected $debugLevel;
 
     /**
      * The default color for debug messages.
@@ -59,7 +58,7 @@ class Debug
      *
      * @var string
      */
-    private $defaultColor;
+    protected $defaultColor;
 
     /**
      * Initializes the debug settings and assigns a default message color.
@@ -72,8 +71,8 @@ class Debug
      * @param string|null $context    [optional] The context or service type for debugging (e.g., 'schedule',
      *                                'database'). Defaults to null.
      * @param bool|null   $debugMode  [optional] Enable or disable debug mode. Defaults to false if not provided.
-     * @param int|null    $debugLevel [optional] Debug verbosity level (reserved for future use). Defaults to 0 if not
-     *                                provided.
+     * @param int|null    $debugLevel [optional] Debug verbosity level (reserved for future use).
+     *                                Defaults to 0 if not provided.
      */
     public function __construct(
         ?string $context = null,
@@ -133,67 +132,13 @@ class Debug
      *
      * @throws \Exception Always throws an exception with the specified message.
      */
-    public function fail(string $message, string $throwMsg = '', ?string $color = null): void
-    {
+    public function fail(
+        string $message,
+        string $throwMsg = '',
+        ?string $color = null
+    ): void {
         $throw = $this->handleFail($message, $throwMsg, $color);
         throw new \Exception($throw);
-    }
-
-    /**
-     * Logs a debug message and throws a validation exception.
-     *
-     * This method logs the provided message and throws a `ValidationException`
-     * with the specified message. It uses the specified color for logging,
-     * or defaults to the class-defined color.
-     *
-     * @param string      $message   The debug message to log.
-     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
-     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
-     *
-     * @throws \App\exceptions\ValidationException Always throws a validation exception.
-     */
-    public function failValidation(string $message, string $throwMsg = '', ?string $color = null): void
-    {
-        $throw = $this->handleFail($message, $throwMsg, $color);
-        throw new Validation($throw);
-    }
-
-    /**
-     * Logs a debug message and throws a database exception.
-     *
-     * This method logs the provided message and throws a `DatabaseException`
-     * with the specified message. It uses the specified color for logging,
-     * or defaults to the class-defined color.
-     *
-     * @param string      $message   The debug message to log.
-     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
-     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
-     *
-     * @throws \App\exceptions\DatabaseException Always throws a database exception.
-     */
-    public function failDatabase(string $message, string $throwMsg = '', ?string $color = null): void
-    {
-        $throw = $this->handleFail($message, $throwMsg, $color);
-        throw new Database($throw);
-    }
-
-    /**
-     * Logs a debug message and throws an email exception.
-     *
-     * This method logs the provided message and throws a `EmailException`
-     * with the specified message. It uses the specified color for logging,
-     * or defaults to the class-defined color.
-     *
-     * @param string      $message   The debug message to log.
-     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
-     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
-     *
-     * @throws \App\exceptions\EmailException Always throws a email exception.
-     */
-    public function failEmail(string $message, string $throwMsg = '', ?string $color = null): void
-    {
-        $throw = $this->handleFail($message, $throwMsg, $color);
-        throw new Email($throw);
     }
 
     /**
@@ -202,8 +147,10 @@ class Debug
      * @param string      $message The error message to log.
      * @param string|null $color   Optional custom color for this message. Defaults to the class default.
      */
-    public function log(string $message, ?string $color = null): void
-    {
+    public function log(
+        string $message,
+        ?string $color = null
+    ): void {
         if ($this->debugLevel > 0) {
             error_log($message);
         }
@@ -218,8 +165,10 @@ class Debug
      * @param string      $message The message to be output for debugging.
      * @param string|null $color   Optional custom color for this message. Defaults to the class default.
      */
-    public function debug(string $message, ?string $color = null): void
-    {
+    public function debug(
+        string $message,
+        ?string $color = null
+    ): void {
         if ($this->debugMode) {
             $color = $color ?? $this->defaultColor;
             echo "<p style='color: {$color};'>DEBUG: {$message}</p>\n";
@@ -237,8 +186,10 @@ class Debug
      *
      * @return string The formatted debug heading.
      */
-    public function debugHeading(string $classLabel, string $methodName): string
-    {
+    public function debugHeading(
+        string $classLabel,
+        string $methodName
+    ): string {
         $callingClass = '';
         if ($this->debugMode) {
             $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
@@ -257,8 +208,11 @@ class Debug
      * @param string      $label    An optional label to describe the variable.
      * @param string|null $color    Optional custom color for this message. Defaults to the class default.
      */
-    public function debugVariable($variable, string $label = 'Debug Variable', ?string $color = null): void
-    {
+    public function debugVariable(
+        $variable,
+        string $label = 'Debug Variable',
+        ?string $color = null
+    ): void {
         if ($this->debugMode) {
             $color = $color ?? $this->defaultColor;
             echo "<pre style='color: {$color};'>DEBUG ({$label}): " . print_r($variable, true) . "</pre>\n";
@@ -277,8 +231,11 @@ class Debug
      *
      * @return string The exception message to throw.
      */
-    private function handleFail(string $message, string $throwMsg = '', ?string $color = null): string
-    {
+    protected function handleFail(
+        string $message,
+        string $throwMsg = '',
+        ?string $color = null
+    ): string {
         $throw = $throwMsg !== '' ? $throwMsg : $message;
         $color = $color ?? $this->defaultColor;
         $this->log($message, $color);

@@ -7,6 +7,8 @@ namespace App\core\common;
 use Exception;
 
 /**
+ * Config class.
+ *
  * Lightweight configuration loader and manager.
  *
  * This class provides methods to load and retrieve application configuration
@@ -16,9 +18,16 @@ use Exception;
  * Environment-specific settings can be managed by referencing environment
  * constants defined in `bootstrap.php` (e.g., `APP_ENV`, `BASE_PATH`).
  *
- * @category Utilities
+ * The Config class is immutable and locked to ensure system stability.
+ *
+ * NOTE: For additional features or domain-specific behavior, extend this class
+ * (e.g., CustomConfig).
+ *
+ * @category Core Utilities
  * @package  IRTF
+ * @author   Miranda Hawarden-Ogata
  * @version  1.0.0
+ * @since    2024-12-10
  */
 class Config
 {
@@ -30,7 +39,7 @@ class Config
      *
      * @var array<string, array>
      */
-    private static $cache = [];
+    protected static $cache = [];
 
     /**
      * Retrieves the current application environment.
