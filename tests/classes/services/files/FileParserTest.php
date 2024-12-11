@@ -6,11 +6,15 @@ namespace Tests\classes\services\files;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use App\services\files\FileParser;
 use Tests\utilities\PrivatePropertyTrait;
+use App\services\files\FileParser;
 
 /**
  * Unit tests for the FileParser class.
+ *
+ * This test suite validates the behavior of the FileParser class, ensuring
+ * it handles file parsing correctly for various scenarios. It covers
+ * constructor behavior, file parsing logic, and exception handling.
  *
  * @covers \App\services\files\FileParser
  */
@@ -26,10 +30,15 @@ class FileParserTest extends TestCase
     /**
      * Sets up the test environment.
      *
+     * Prepares a temporary directory for test files.
+     *
      * @return void
      */
     protected function setUp(): void
     {
+        // Ensure the parent setup runs if needed
+        parent::setUp();
+        // Run the setup for this class
         $this->tempDir = sys_get_temp_dir() . '/FileParserTest';
         if (!is_dir($this->tempDir)) {
             mkdir($this->tempDir);
@@ -43,14 +52,19 @@ class FileParserTest extends TestCase
      */
     protected function tearDown(): void
     {
+        // Run the teardown logic for this class
         if (is_dir($this->tempDir)) {
             array_map('unlink', glob($this->tempDir . '/*'));
             rmdir($this->tempDir);
         }
+        // Ensure PHPUnit's teardown logic runs too
+        parent::tearDown();
     }
 
     /**
      * Tests the constructor and default configuration of the FileParser class.
+     *
+     * @covers \App\services\files\FileParser::__construct
      *
      * @return void
      */
@@ -63,6 +77,8 @@ class FileParserTest extends TestCase
 
     /**
      * Tests the configureParser method for different file types.
+     *
+     * @covers \App\services\files\FileParser::configureParser
      *
      * @return void
      */
@@ -82,7 +98,10 @@ class FileParserTest extends TestCase
     }
 
     /**
-     * Tests the parseFile method for a CSV file.
+     * Tests the parseFile, parseCSVFile methods for a CSV file.
+     *
+     * @covers \App\services\files\FileParser::parseFile
+     * @covers \App\services\files\FileParser::parseCSVFile
      *
      * @return void
      */
@@ -106,6 +125,8 @@ class FileParserTest extends TestCase
     /**
      * Tests the parseFile method when the file is missing.
      *
+     * @covers \App\services\files\FileParser::parseFile
+     *
      * @return void
      */
     public function testParseFileMissingFile(): void
@@ -117,6 +138,8 @@ class FileParserTest extends TestCase
 
     /**
      * Tests the parseFile method for an empty file.
+     *
+     * @covers \App\services\files\FileParser::parseFile
      *
      * @return void
      */
@@ -131,6 +154,9 @@ class FileParserTest extends TestCase
 
     /**
      * Tests the parseCSVFile method for a file with blank rows.
+     *
+     * @covers \App\services\files\FileParser::parseFile
+     * @covers \App\services\files\FileParser::parseCSVFile
      *
      * @return void
      */
@@ -154,8 +180,11 @@ class FileParserTest extends TestCase
     /**
      * Creates a temporary test file with the given content.
      *
+     * This helper method writes the specified content to a file with the provided
+     * extension in the temporary directory set up for testing.
+     *
      * @param string $content  The content to write to the file.
-     * @param string $fileType The file extension.
+     * @param string $fileType The file extension (e.g., 'csv').
      *
      * @return string The path to the created file.
      */

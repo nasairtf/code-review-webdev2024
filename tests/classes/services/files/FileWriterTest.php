@@ -6,11 +6,16 @@ namespace Tests\classes\services\files;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use App\services\files\FileWriter;
 use Tests\utilities\PrivatePropertyTrait;
+use App\services\files\FileWriter;
 
 /**
  * Unit tests for the FileWriter class.
+ *
+ * This test suite validates the behavior of the FileWriter class for different
+ * file types and scenarios, including successful file writes, error handling,
+ * and internal method behaviors. It covers methods for configuration,
+ * file writing, and exception handling.
  *
  * @covers \App\services\files\FileWriter
  */
@@ -36,10 +41,15 @@ class FileWriterTest extends TestCase
     /**
      * Sets up the test environment before each test.
      *
+     * Creates a temporary directory for test files and initializes a FileWriter instance.
+     *
      * @return void
      */
     protected function setUp(): void
     {
+        // Ensure the parent setup runs if needed
+        parent::setUp();
+        // Run the setup for this class
         $this->tempDir = sys_get_temp_dir() . '/FileWriterTest';
         if (!is_dir($this->tempDir)) {
             mkdir($this->tempDir);
@@ -51,10 +61,13 @@ class FileWriterTest extends TestCase
     /**
      * Cleans up the test environment after each test.
      *
+     * Removes temporary files and directories created during testing.
+     *
      * @return void
      */
     protected function tearDown(): void
     {
+        // Run the teardown logic for this class
         if (file_exists($this->testFilePath)) {
             unlink($this->testFilePath);
         }
@@ -62,10 +75,14 @@ class FileWriterTest extends TestCase
             array_map('unlink', glob($this->tempDir . '/*'));
             rmdir($this->tempDir);
         }
+        // Ensure PHPUnit's teardown logic runs too
+        parent::tearDown();
     }
 
     /**
      * Tests the constructor and default configuration of the FileWriter class.
+     *
+     * @covers \App\services\files\FileWriter::__construct
      *
      * @return void
      */
@@ -78,6 +95,8 @@ class FileWriterTest extends TestCase
 
     /**
      * Tests the configureWriter method for different file types.
+     *
+     * @covers \App\services\files\FileWriter::configureWriter
      *
      * @return void
      */
@@ -98,6 +117,9 @@ class FileWriterTest extends TestCase
 
     /**
      * Tests successful file writing with infile SQL data.
+     *
+     * @covers \App\services\files\FileWriter::writeFile
+     * @covers \App\services\files\FileWriter::writeCSV
      *
      * @return void
      */
@@ -125,6 +147,9 @@ class FileWriterTest extends TestCase
     /**
      * Tests successful file writing with CSV data.
      *
+     * @covers \App\services\files\FileWriter::writeFile
+     * @covers \App\services\files\FileWriter::writeCSV
+     *
      * @return void
      */
     public function testWriteFileWritesCsvSuccessfully(): void
@@ -150,6 +175,9 @@ class FileWriterTest extends TestCase
     /**
      * Tests writing a log file by delegating to the CSV writer.
      *
+     * @covers \App\services\files\FileWriter::writeFile
+     * @covers \App\services\files\FileWriter::writeLog
+     *
      * @return void
      */
     public function testWriteLogFileDelegatesToCsv(): void
@@ -174,6 +202,8 @@ class FileWriterTest extends TestCase
     /**
      * Tests the writeFile method when an invalid file path is provided.
      *
+     * @covers \App\services\files\FileWriter::writeFile
+     *
      * @return void
      */
     public function testWriteFileThrowsExceptionForInvalidPath(): void
@@ -187,6 +217,8 @@ class FileWriterTest extends TestCase
 
     /**
      * Tests the writeFile method when an invalid file handle is used.
+     *
+     * @covers \App\services\files\FileWriter::writeFile
      *
      * @return void
      */
@@ -203,6 +235,8 @@ class FileWriterTest extends TestCase
 
     /**
      * Tests the writeLines method with invalid data.
+     *
+     * @covers \App\services\files\FileWriter::writeLines
      *
      * @return void
      */
@@ -224,6 +258,8 @@ class FileWriterTest extends TestCase
 
     /**
      * Tests the writeCSV method with invalid data.
+     *
+     * @covers \App\services\files\FileWriter::writeCSV
      *
      * @return void
      */
