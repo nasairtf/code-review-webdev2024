@@ -23,18 +23,6 @@ class DbQueryUtilityTest extends TestCase
     use PrivatePropertyTrait;
 
     /**
-     * Cleans up after each test, closing Mockery expectations.
-     *
-     * Ensures Mockery expectations are met and prevents leaks between tests.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Mockery::close();
-    }
-
-    /**
      * Validates that executeSelectQueryWithDebug() successfully executes a SELECT query
      * and returns the expected results.
      *
@@ -44,9 +32,9 @@ class DbQueryUtilityTest extends TestCase
      */
     public function testExecuteSelectQueryWithDebug(): void
     {
-        // Mock the Debug and DB classes
+        // Mock the Debug and DBConnection classes
         $debug = Mockery::mock(\App\core\common\Debug::class);
-        $db = Mockery::mock(\App\services\database\DB::class);
+        $db = Mockery::mock(\App\services\database\DBConnection::class);
 
         // Define the test data
         $sql = 'SELECT * FROM users WHERE id = ?';
@@ -66,7 +54,7 @@ class DbQueryUtilityTest extends TestCase
             ->with($mockResults, 'Query [SELECT] Results')
             ->once();
 
-        // Mock the DB method(s) and expected return(s)
+        // Mock the DBConnection method(s) and expected return(s)
         $db->shouldReceive('executeQuery')
             ->with($sql, $params, $types, $resultType)
             ->andReturn($mockResults);
@@ -139,9 +127,9 @@ class DbQueryUtilityTest extends TestCase
      */
     public function testExecuteUpdateQueryWithDebug(): void
     {
-        // Mock the Debug and DB classes
+        // Mock the Debug and DBConnection classes
         $debug = Mockery::mock(\App\core\common\Debug::class);
-        $db = Mockery::mock(\App\services\database\DB::class);
+        $db = Mockery::mock(\App\services\database\DBConnection::class);
 
         // Define the test data
         $sql = 'UPDATE users SET name = ? WHERE id = ?';
@@ -160,7 +148,7 @@ class DbQueryUtilityTest extends TestCase
             ->with($mockAffectedRows, 'Query [INSERT|UPDATE|DELETE] Rows Affected')
             ->once();
 
-        // Mock the DB method(s) and expected return(s)
+        // Mock the DBConnection method(s) and expected return(s)
         $db->shouldReceive('executeQuery')
             ->with($sql, $params, $types)
             ->andReturn($mockAffectedRows);
@@ -276,5 +264,17 @@ class DbQueryUtilityTest extends TestCase
 
         // Assert the sort strings matches
         $this->assertSame('DESC', $result);
+    }
+
+    /**
+     * Cleans up after each test, closing Mockery expectations.
+     *
+     * Ensures Mockery expectations are met and prevents leaks between tests.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        Mockery::close();
     }
 }
