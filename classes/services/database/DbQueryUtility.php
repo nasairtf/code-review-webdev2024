@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\services\database;
 
-use App\core\common\Debug;
+use App\core\common\CustomDebug;
 
 /**
  * Utility class for executing and managing database queries.
@@ -29,7 +29,7 @@ class DbQueryUtility
      * Logs the SQL query and parameters, executes the query using the provided database
      * instance, and returns the result set. Useful for debugging read operations.
      *
-     * @param Debug        $debug      Instance of the Debug class for logging and debugging.
+     * @param CustomDebug  $debug      Instance of the CustomDebug class for logging and debugging.
      * @param DBConnection $db         Instance of the DBConnection class for executing queries.
      * @param string       $sql        SQL query string to execute.
      * @param array        $params     Parameters to bind to the query (optional).
@@ -39,7 +39,7 @@ class DbQueryUtility
      * @return array                   Array of query results.
      */
     public static function executeSelectQueryWithDebug(
-        Debug $debug,
+        CustomDebug $debug,
         DBConnection $db,
         string $sql,
         array $params,
@@ -59,19 +59,19 @@ class DbQueryUtility
      * Throws an exception if the result set is empty, ensuring the caller can handle
      * cases where no data is returned from a query.
      *
-     * @param Debug  $debug        Instance of the Debug class for error reporting.
-     * @param array  $data         The result set returned from the query.
-     * @param string $errorMessage Error message to log and throw if the result set is empty.
+     * @param CustomDebug $debug        Instance of the CustomDebug class for error reporting.
+     * @param array       $data         The result set returned from the query.
+     * @param string      $errorMessage Error message to log and throw if the result set is empty.
      *
-     * @throws \Exception          If the result set is empty.
+     * @throws \DatabaseException       If the result set is empty.
      */
     public static function ensureQueryResultsNotEmpty(
-        Debug $debug,
+        CustomDebug $debug,
         array $data,
         string $errorMessage
     ): void {
         if (empty($data)) {
-            $debug->fail($errorMessage);
+            $debug->failDatabase($errorMessage);
         }
     }
 
@@ -87,7 +87,7 @@ class DbQueryUtility
      * Logs the SQL query and parameters, executes the query using the provided database
      * instance, and returns the number of affected rows.
      *
-     * @param Debug        $debug        Instance of the Debug class for logging and debugging.
+     * @param CustomDebug  $debug        Instance of the CustomDebug class for logging and debugging.
      * @param DBConnection $db           Instance of the DBConnection class for executing queries.
      * @param string       $sql          SQL query string to execute.
      * @param array        $params       Parameters to bind to the query (optional).
@@ -96,7 +96,7 @@ class DbQueryUtility
      * @return int                       Number of rows affected by the query.
      */
     public static function executeUpdateQueryWithDebug(
-        Debug $debug,
+        CustomDebug $debug,
         DBConnection $db,
         string $sql,
         array $params = [],
@@ -115,7 +115,7 @@ class DbQueryUtility
      * If parameters are provided, executes a parameterized query. Otherwise, executes
      * a raw SQL query. Logs the query type and returns the number of affected rows.
      *
-     * @param Debug        $debug  Instance of the Debug class for logging and debugging.
+     * @param CustomDebug  $debug  Instance of the CustomDebug class for logging and debugging.
      * @param DBConnection $db     Instance of the DBConnection class for executing queries.
      * @param string       $sql    SQL query string to execute.
      * @param array        $params Parameters to bind to the query (optional).
@@ -124,7 +124,7 @@ class DbQueryUtility
      * @return int                 Number of rows affected by the query.
      */
     public static function executeQueryWithDebug(
-        Debug $debug,
+        CustomDebug $debug,
         DBConnection $db,
         string $sql,
         array $params = [],
@@ -148,24 +148,24 @@ class DbQueryUtility
      * Verifies that the affected row count matches the expected count. If not, logs
      * the error and throws an exception to notify the caller.
      *
-     * @param Debug  $debug        Instance of the Debug class for error reporting.
-     * @param int    $result       Number of rows affected by the query.
-     * @param int    $expected     Expected number of affected rows.
-     * @param string $errorMessage Error message to log and throw if the row count is invalid.
+     * @param CustomDebug $debug        Instance of the CustomDebug class for error reporting.
+     * @param int         $result       Number of rows affected by the query.
+     * @param int         $expected     Expected number of affected rows.
+     * @param string      $errorMessage Error message to log and throw if the row count is invalid.
      *
-     * @throws \Exception          If the row count is zero or does not match the expected count.
+     * @throws \DatabaseException       If the row count is zero or does not match the expected count.
      */
     public static function ensureRowUpdateResult(
-        Debug $debug,
+        CustomDebug $debug,
         int $result,
         int $expected,
         string $errorMessage
     ): void {
         if ($result === 0) {
-            $debug->fail($errorMessage . " No rows were affected.");
+            $debug->failDatabase($errorMessage . " No rows were affected.");
         }
         if ($result !== $expected) {
-            $debug->fail($errorMessage . " Unexpected number of affected rows.");
+            $debug->failDatabase($errorMessage . " Unexpected number of affected rows.");
         }
     }
 
@@ -175,14 +175,14 @@ class DbQueryUtility
      * Logs the SQL query, executes it using the provided database instance, and returns
      * the number of affected rows.
      *
-     * @param Debug        $debug Instance of the Debug class for logging and debugging.
+     * @param CustomDebug  $debug Instance of the CustomDebug class for logging and debugging.
      * @param DBConnection $db    Instance of the DBConnection class for executing queries.
      * @param string       $sql   Raw SQL query string to execute.
      *
-     * @return int          Number of rows affected by the query.
+     * @return int                Number of rows affected by the query.
      */
     public static function executeRawQueryWithDebug(
-        Debug $debug,
+        CustomDebug $debug,
         DBConnection $db,
         string $sql
     ): int {
