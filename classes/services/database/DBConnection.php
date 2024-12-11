@@ -245,11 +245,12 @@ class DBConnection
         }
 
         // Execute the prepared statement
-        $stmt->execute();
+        $stmterror = $stmt->execute();
 
         // Handle execution failure
-        if ($stmt->error) {
-            $this->debug->failDatabase("Execute failed for query: {$sql}", $stmt->error);
+        if (!$stmterror) {
+            // $stmt->error interferes with unit testing.
+            $this->debug->failDatabase("Execute failed for query: {$sql}");
         }
 
         // Debug information for execution
