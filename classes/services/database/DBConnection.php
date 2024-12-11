@@ -4,51 +4,70 @@ declare(strict_types=1);
 
 namespace App\services\database;
 
-use App\core\common\Debug;
+use App\core\common\Config;
+use App\core\common\CustomDebug;
+use App\exceptions\DatabaseException;
 
 /**
- * /home/webdev2024/classes/core/database/DBConnection.php
+ * DBConnection class provides a singleton connection pool for database interactions.
  *
- * DBConnection class provides a singleton connection pool allowing interaction with multiple
- * IRTF databases, supporting basic CRUD and transaction operations.
+ * This class supports CRUD operations, transactions, and singleton connection management.
+ * It uses `CustomDebug` for error reporting and `Config` for database configuration.
  *
  * @category Database
  * @package  IRTF
  * @author   Miranda Hawarden-Ogata
  * @version  1.2.4
+ * @since    2024-10-29
+ *
+ * @uses \App\core\common\Config
+ * @uses \App\core\common\CustomDebug
+ * @uses \App\exceptions\DatabaseException
  */
-
 class DBConnection
 {
-    /** @var Debug $debug Debug instance for logging and output. */
+    /**
+     * CustomDebug instance for logging and output.
+     *
+     * @var CustomDebug
+     */
     private $debug;
 
-    /** @var mysqli|null $connection Stores the MySQLi connection. */
+    /**
+     * MySQLi connection instance.
+     *
+     * @var \mysqli|null
+     */
     private $connection;
 
-    /** @var array $instances Singleton instance pool of the DBConnection class. */
+    /**
+     * Singleton instance pool of the DBConnection class.
+     *
+     * @var array
+     */
     private static $instances = [];
 
     /**
-     * Constructor for DBConnection class, initializes a database connection using provided credentials.
+     * Constructor for DBConnection class, initializes a database connection.
      *
-     * @param string $dbName Database name for configuration lookup.
-     * @param bool $debugMode Whether to enable debug mode.
-     * @throws Exception if the database configuration is missing or connection fails.
+     * @param string $dbName    Database name for configuration lookup.
+     * @param bool   $debugMode Whether to enable debug mode.
+     *
+     * @throws DatabaseException If the database configuration is missing or the connection fails.
      */
     private function __construct(
         string $dbName,
         ?bool $debugMode = null
     ) {
         // Only set debug mode once during instance creation
-        $this->debug = new Debug('db', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
+        $this->debug = new CustomDebug('db', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
 
-        // Load the config file for DBConnection credentials
-        $config = require CONFIG_PATH . 'db_config.php';
+        // Fetch the config for DBConnection credentials
+        $config = Config::get('db_config');
 
         // Check if the requested database exists in the config
         if (!isset($config[$dbName])) {
-            $this->debug->fail("Database configuration for '{$dbName}' not found.");
+            $this->debug->failDatabase("Database configuration for '{$dbName}' not found.");
         }
 
         // Get the credentials for the specified database
@@ -64,7 +83,7 @@ class DBConnection
 
         // Handle connection failure
         if ($this->connection->connect_error) {
-            $this->debug->fail("Database connection failed: " . $this->connection->connect_error);
+            $this->debug->failDatabase("Database connection failed: " . $this->connection->connect_error);
         }
 
         // Debug information for MySQLi connection
@@ -82,9 +101,13 @@ class DBConnection
     /**
      * Returns the singleton instance of the DBConnection class for a specific database.
      *
-     * @param string $dbName Database name.
-     * @param bool $debugMode Whether to enable debug mode.
+     * @param string $dbName    Database name.
+     * @param bool   $debugMode Whether to enable debug mode.
+     *
      * @return DBConnection Database connection instance.
+     *
+     * @uses \App\core\common\Config
+     * @uses \App\core\common\CustomDebug
      */
     public static function getInstance(
         string $dbName,
@@ -100,6 +123,8 @@ class DBConnection
      * Clears a specific database instance from the instance pool and closes the connection.
      *
      * @param string $dbName Name of the database connection to close.
+     *
+     * @return void
      */
     public static function clearInstance(string $dbName): void
     {
@@ -108,13 +133,16 @@ class DBConnection
             unset(self::$instances[$dbName]);
             // Debug information for MySQLi connection
             $this->debug->debug("Connection to database {$dbName} has been closed.");
+            //self::$instances[$dbName]->debug->debug("Connection to database {$dbName} has been closed.");
         }
     }
 
     /**
-     * Begins a transaction.
+     * Begins a database transaction.
      *
-     * @throws Exception If connection is not established.
+     * @throws DatabaseException If the connection is not established.
+     *
+     * @return void
      */
     public function beginTransaction(): void
     {
@@ -126,7 +154,9 @@ class DBConnection
     /**
      * Commits the current transaction.
      *
-     * @throws Exception If connection is not established.
+     * @throws DatabaseException If the connection is not established.
+     *
+     * @return void
      */
     public function commit(): void
     {
@@ -138,7 +168,9 @@ class DBConnection
     /**
      * Rolls back the current transaction.
      *
-     * @throws Exception If connection is not established.
+     * @throws DatabaseException If the connection is not established.
+     *
+     * @return void
      */
     public function rollback(): void
     {
@@ -149,6 +181,8 @@ class DBConnection
 
     /**
      * Closes the MySQLi database connection.
+     *
+     * @return void
      */
     public function closeConnection(): void
     {
@@ -162,12 +196,14 @@ class DBConnection
     /**
      * Executes a prepared SQL query with optional parameter binding.
      *
-     * @param string $sql SQL query to execute.
-     * @param array $params Parameters for the prepared statement.
-     * @param string $types Parameter types for the prepared statement.
-     * @param int $resultType Type of result array (MYSQLI_ASSOC, MYSQLI_NUM, MYSQLI_BOTH).
+     * @param string $sql        SQL query to execute.
+     * @param array  $params     Parameters for the prepared statement.
+     * @param string $types      Parameter types for the prepared statement (e.g., 'ssi').
+     * @param int    $resultType Type of result array (MYSQLI_ASSOC, MYSQLI_NUM, MYSQLI_BOTH).
+     *
      * @return array|int Array of results for SELECT queries or number of affected rows for non-SELECT queries.
-     * @throws Exception If query preparation or execution fails.
+     *
+     * @throws DatabaseException If query preparation or execution fails.
      */
     public function executeQuery(
         string $sql,
@@ -180,20 +216,11 @@ class DBConnection
 
         // Prepare the SQL query (prevents SQL injection)
         $stmt = $this->connection->prepare($sql);
-
-        // Debug information for query preparation
         $this->debug->debug("Preparing SQL: {$sql}");
-        if (!empty($params)) {
-            $this->debug->debug("Binding Params: " . print_r($params, true));
-            $this->debug->debug("Param Types: {$types}");
-        }
 
         // Handle query preparation failure
         if (!$stmt) {
-            $this->debug->fail(
-                "Prepare failed for query: {$sql} - " . $this->connection->error,
-                "Query preparation failed for: {$sql} with parameters: " . json_encode($params)
-            );
+            $this->debug->failDatabase("Prepare failed for query: {$sql}", $this->connection->error);
         }
 
         // If there are parameters to bind, bind them to the prepared statement
@@ -208,10 +235,7 @@ class DBConnection
 
         // Handle execution failure
         if ($stmt->error) {
-            $this->debug->fail(
-                "Execute failed for query: {$sql} - " . $stmt->error,
-                "Query execution failed for: {$sql}"
-            );
+            $this->debug->failDatabase("Execute failed for query: {$sql}", $stmt->error);
         }
 
         // Debug information for execution
@@ -240,8 +264,10 @@ class DBConnection
      * Executes a raw SQL query directly.
      *
      * @param string $sql Raw SQL query to execute.
+     *
      * @return array|int Array of results for SELECT queries or number of affected rows for non-SELECT queries.
-     * @throws Exception If query execution fails.
+     *
+     * @throws DatabaseException If query execution fails.
      */
     public function executeRawQuery(string $sql)
     {
@@ -256,10 +282,7 @@ class DBConnection
 
         // Handle execution failure
         if (!$result) {
-            $this->debug->fail(
-                "Query failed: {$sql} - " . $this->connection->error,
-                "Query execution failed for: {$sql}"
-            );
+            $this->debug->failDatabase("Query failed: {$sql}", $this->connection->error);
         }
 
         // Handle SELECT queries by returning the result set
@@ -302,12 +325,14 @@ class DBConnection
     /**
      * Ensures the database connection is valid.
      *
-     * @throws Exception If the connection is not valid.
+     * @throws DatabaseException If the connection is not valid.
+     *
+     * @return void
      */
     private function ensureConnection(): void
     {
         if ($this->connection === null) {
-            $this->debug->fail("Database connection is not established.");
+            $this->debug->failDatabase("Database connection is not established.");
         }
     }
 }
