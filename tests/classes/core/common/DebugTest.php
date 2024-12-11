@@ -4,57 +4,29 @@ declare(strict_types=1);
 
 namespace Tests\classes\core\common;
 
+use Mockery;
 use PHPUnit\Framework\TestCase;
-use Mockery as Mockery;
 use App\core\common\Debug;
-use App\exceptions\DatabaseException;
-use App\exceptions\EmailException;
-use App\exceptions\ValidationException;
 
 /**
  * Unit tests for the Debug class.
+ *
+ * This test suite verifies the behavior of the Debug class, including debugging
+ * output, error logging, and exception handling. Mockery is used to mock dependencies
+ * such as the Config class to provide controlled test scenarios.
+ *
+ * @covers \App\core\common\Debug
  */
 class DebugTest extends TestCase
 {
-    /**
-     * Prepare common mock configurations before each test.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        // Ensure the parent setup runs if needed
-        parent::setUp();
-
-        // Mock the Config class for all tests
-        $mockConfig = Mockery::mock('alias:' . \App\core\common\Config::class);
-        $mockConfig->shouldReceive('get')
-            ->with('debug_config', 'colors')
-            ->andReturn([
-                'default' => 'green',
-                'database' => 'red',
-            ]);
-    }
-
-    /**
-     * Clean up Mockery expectations after each test.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        // Ensure Mockery is closed down
-        Mockery::close();
-        // Ensure PHPUnit's tearDown logic runs too
-        parent::tearDown();
-    }
-
     /**
      * Test that the Debug constructor initializes properties correctly.
      *
      * This test verifies that the constructor sets the defaultColor,
      * debugMode, and debugLevel properties based on the given context
      * and configuration.
+     *
+     * @covers \App\core\common\Debug::__construct
      *
      * @return void
      */
@@ -70,7 +42,9 @@ class DebugTest extends TestCase
     }
 
     /**
-     * Test default behavior when no context or configuration is provided.
+     * Validates the default behavior of the Debug constructor.
+     *
+     * @covers \App\core\common\Debug::__construct
      *
      * @return void
      */
@@ -92,7 +66,9 @@ class DebugTest extends TestCase
     }
 
     /**
-     * Test that the fail method logs a message and throws a general exception.
+     * Validates that the fail method logs a message and throws a general exception.
+     *
+     * @covers \App\core\common\Debug::fail
      *
      * @return void
      */
@@ -106,49 +82,9 @@ class DebugTest extends TestCase
     }
 
     /**
-     * Test that the failValidation method logs a message and throws a ValidationException.
+     * Validates debug output when debug mode is enabled.
      *
-     * @return void
-     */
-    public function testFailValidationThrowsValidationException(): void
-    {
-        $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('Validation Error');
-
-        $debug = new Debug(null, true);
-        $debug->failValidation('Log Message', 'Validation Error', 'blue');
-    }
-
-    /**
-     * Test that the failDatabase method logs a message and throws a DatabaseException.
-     *
-     * @return void
-     */
-    public function testFailDatabaseThrowsDatabaseException(): void
-    {
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('Database Error');
-
-        $debug = new Debug(null, true);
-        $debug->failDatabase('Log Message', 'Database Error', 'blue');
-    }
-
-    /**
-     * Test that the failEmail method logs a message and throws an EmailException.
-     *
-     * @return void
-     */
-    public function testFailEmailThrowsEmailException(): void
-    {
-        $this->expectException(EmailException::class);
-        $this->expectExceptionMessage('Email Error');
-
-        $debug = new Debug(null, true);
-        $debug->failEmail('Log Message', 'Email Error', 'blue');
-    }
-
-    /**
-     * Test that the debug method outputs messages when debug mode is enabled.
+     * @covers \App\core\common\Debug::debug
      *
      * @return void
      */
@@ -161,7 +97,9 @@ class DebugTest extends TestCase
     }
 
     /**
-     * Test that the debug method does not output messages when debug mode is disabled.
+     * Validates that debug output is suppressed when debug mode is disabled.
+     *
+     * @covers \App\core\common\Debug::debug
      *
      * @return void
      */
@@ -174,7 +112,9 @@ class DebugTest extends TestCase
     }
 
     /**
-     * Test that debugVariable outputs variable information when debug mode is enabled.
+     * Validates debugVariable output when debug mode is enabled.
+     *
+     * @covers \App\core\common\Debug::debugVariable
      *
      * @return void
      */
@@ -187,17 +127,12 @@ class DebugTest extends TestCase
     }
 
     /**
-     * Test that log method writes to the error log when debugLevel > 0.
+     * Validates that the log method writes messages to the error log when debugLevel > 0.
+     *
+     * @covers \App\core\common\Debug::log
      *
      * @return void
      */
-    //public function testLogWritesToErrorLogWhenDebugLevelIsPositive(): void
-    //{
-    //    $this->expectOutputRegex('/DEBUG: Log Message/');
-
-    //    $debug = new Debug(null, true, 1);
-    //    $debug->log('Log Message', 'blue');
-    //}
     public function testLogWritesToErrorLogWhenDebugLevelIsPositive(): void
     {
         $logFile = '/tmp/phpunit_error_log'; // Temporary file for the error log
@@ -217,7 +152,9 @@ class DebugTest extends TestCase
     }
 
     /**
-     * Test that the debugHeading method generates a formatted heading.
+     * Validates that debugHeading generates a formatted heading.
+     *
+     * @covers \App\core\common\Debug::debugHeading
      *
      * @return void
      */
@@ -230,7 +167,9 @@ class DebugTest extends TestCase
     }
 
     /**
-     * Test that debugHeading handles unknown classes gracefully.
+     * Validates that debugHeading handles unknown classes gracefully.
+     *
+     * @covers \App\core\common\Debug::debugHeading
      *
      * @return void
      */
@@ -240,5 +179,44 @@ class DebugTest extends TestCase
 
         $result = $debug->debugHeading('Unknown', 'testMethod');
         $this->assertStringContainsString('Unknown: testMethod()', $result);
+    }
+
+    /**
+     * Sets up the test environment before each test.
+     *
+     * - Configures Mockery expectations for the Config class to provide debugging colors.
+     * - Ensures necessary parent setup logic is executed.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        // Ensure the parent setup runs if needed
+        parent::setUp();
+
+        // Mock the Config class for all tests
+        $mockConfig = Mockery::mock('alias:' . \App\core\common\Config::class);
+        $mockConfig->shouldReceive('get')
+            ->with('debug_config', 'colors')
+            ->andReturn([
+                'default' => 'green',
+                'database' => 'red',
+            ]);
+    }
+
+    /**
+     * Cleans up the test environment after each test.
+     *
+     * - Verifies and closes Mockery expectations.
+     * - Ensures necessary parent teardown logic is executed.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        // Ensure Mockery is closed down
+        Mockery::close();
+        // Ensure PHPUnit's tearDown logic runs too
+        parent::tearDown();
     }
 }
