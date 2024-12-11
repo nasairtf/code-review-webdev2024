@@ -6,6 +6,15 @@ namespace App\services\database;
 
 use App\core\common\Debug;
 
+/**
+ * Utility class for executing and managing database queries.
+ *
+ * This class provides static methods for executing SELECT, INSERT, UPDATE, and DELETE
+ * queries with optional parameter binding and debugging capabilities. It also includes
+ * helper methods for validating query results and managing SQL sort directions.
+ *
+ * @package App\services\database
+ */
 class DbQueryUtility
 {
     /**
@@ -15,16 +24,19 @@ class DbQueryUtility
      */
 
     /**
-     * Executes a SELECT query with optional parameter binding and returns the result set.
+     * Executes a SELECT query with optional parameter binding and debugging.
      *
-     * @param Debug  $debug        Debug instance.
-     * @param DB     $db           Database instance.
-     * @param string $sql          SQL query string.
-     * @param array  $params       Parameters to bind to the query.
-     * @param string $types        Parameter types (e.g., 's' for string, 'i' for integer).
-     * @param int    $resultType   The type of result array (e.g., MYSQLI_ASSOC).
+     * Logs the SQL query and parameters, executes the query using the provided database
+     * instance, and returns the result set. Useful for debugging read operations.
      *
-     * @return array               Results array.
+     * @param Debug  $debug      Instance of the Debug class for logging and debugging.
+     * @param DB     $db         Instance of the DB class for executing queries.
+     * @param string $sql        SQL query string to execute.
+     * @param array  $params     Parameters to bind to the query (optional).
+     * @param string $types      Parameter types (e.g., 's' for string, 'i' for integer).
+     * @param int    $resultType Type of result array (e.g., MYSQLI_ASSOC).
+     *
+     * @return array             Array of query results.
      */
     public static function executeSelectQueryWithDebug(
         Debug $debug,
@@ -42,13 +54,16 @@ class DbQueryUtility
     }
 
     /**
-     * Ensures that query results are not empty.
+     * Validates that a query's result set is not empty.
      *
-     * @param Debug  $debug        Debug instance.
-     * @param array  $data         The data returned from the query.
-     * @param string $errorMessage Error message to throw if data is empty.
+     * Throws an exception if the result set is empty, ensuring the caller can handle
+     * cases where no data is returned from a query.
      *
-     * @throws Exception
+     * @param Debug  $debug        Instance of the Debug class for error reporting.
+     * @param array  $data         The result set returned from the query.
+     * @param string $errorMessage Error message to log and throw if the result set is empty.
+     *
+     * @throws \Exception          If the result set is empty.
      */
     public static function ensureQueryResultsNotEmpty(
         Debug $debug,
@@ -67,15 +82,18 @@ class DbQueryUtility
      */
 
     /**
-     * Executes an INSERT, UPDATE, or DELETE query with optional parameter binding.
+     * Executes an INSERT, UPDATE, or DELETE query with optional parameter binding and debugging.
      *
-     * @param Debug  $debug        Debug instance.
-     * @param DB     $db           Database instance.
-     * @param string $sql          SQL query string.
-     * @param array  $params       Parameters to bind to the query.
+     * Logs the SQL query and parameters, executes the query using the provided database
+     * instance, and returns the number of affected rows.
+     *
+     * @param Debug  $debug        Instance of the Debug class for logging and debugging.
+     * @param DB     $db           Instance of the DB class for executing queries.
+     * @param string $sql          SQL query string to execute.
+     * @param array  $params       Parameters to bind to the query (optional).
      * @param string $types        Parameter types (e.g., 's' for string, 'i' for integer).
      *
-     * @return int                 Number of affected rows.
+     * @return int                 Number of rows affected by the query.
      */
     public static function executeUpdateQueryWithDebug(
         Debug $debug,
@@ -92,15 +110,18 @@ class DbQueryUtility
     }
 
     /**
-     * Executes a query with or without parameter binding.
+     * Executes a query with optional parameter binding and debugging.
      *
-     * @param Debug  $debug        Debug instance.
-     * @param DB     $db           Database instance.
-     * @param string $sql          SQL query string.
-     * @param array  $params       Parameters to bind (optional).
-     * @param string $types        Parameter types (optional).
+     * If parameters are provided, executes a parameterized query. Otherwise, executes
+     * a raw SQL query. Logs the query type and returns the number of affected rows.
      *
-     * @return int                 Number of affected rows.
+     * @param Debug  $debug Instance of the Debug class for logging and debugging.
+     * @param DB     $db    Instance of the DB class for executing queries.
+     * @param string $sql   SQL query string to execute.
+     * @param array  $params Parameters to bind to the query (optional).
+     * @param string $types  Parameter types (optional).
+     *
+     * @return int           Number of rows affected by the query.
      */
     public static function executeQueryWithDebug(
         Debug $debug,
@@ -122,14 +143,17 @@ class DbQueryUtility
     }
 
     /**
-     * Ensures that query rows affected are valid.
+     * Ensures that a query's affected row count meets expectations.
      *
-     * @param Debug  $debug        Debug instance.
-     * @param int    $affectedRows The row count returned from the query.
-     * @param int    $expectedRows The row count expected from the query.
-     * @param string $errorMessage Error message to throw if row count is invalid.
+     * Verifies that the affected row count matches the expected count. If not, logs
+     * the error and throws an exception to notify the caller.
      *
-     * @throws Exception
+     * @param Debug  $debug        Instance of the Debug class for error reporting.
+     * @param int    $result       Number of rows affected by the query.
+     * @param int    $expected     Expected number of affected rows.
+     * @param string $errorMessage Error message to log and throw if the row count is invalid.
+     *
+     * @throws \Exception          If the row count is zero or does not match the expected count.
      */
     public static function ensureRowUpdateResult(
         Debug $debug,
@@ -146,13 +170,16 @@ class DbQueryUtility
     }
 
     /**
-     * Executes a raw SQL query for DELETE or LOAD DATA INFILE operations.
+     * Executes a raw SQL query, typically for DELETE or LOAD DATA INFILE operations.
      *
-     * @param Debug  $debug        Debug instance.
-     * @param DB     $db           Database instance.
-     * @param string $sql          SQL query string.
+     * Logs the SQL query, executes it using the provided database instance, and returns
+     * the number of affected rows.
      *
-     * @return int                 Number of affected rows.
+     * @param Debug  $debug Instance of the Debug class for logging and debugging.
+     * @param DB     $db    Instance of the DB class for executing queries.
+     * @param string $sql   Raw SQL query string to execute.
+     *
+     * @return int          Number of rows affected by the query.
      */
     public static function executeRawQueryWithDebug(
         Debug $debug,
@@ -179,7 +206,11 @@ class DbQueryUtility
      */
 
     /**
-     * Helper for sorting SQL queries (ASC or DESC).
+     * Returns the SQL sort direction (ASC or DESC) based on the input.
+     *
+     * @param bool $sortAsc Whether to sort in ascending order (true) or descending (false).
+     *
+     * @return string       The SQL sort direction ('ASC' or 'DESC').
      */
     public static function getSortString(
         bool $sortAsc = true
