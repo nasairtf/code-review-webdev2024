@@ -7,8 +7,20 @@ namespace Tests\classes\exceptions;
 use PHPUnit\Framework\TestCase;
 use App\exceptions\EmailException;
 
+/**
+ * Unit tests for the EmailException class.
+ *
+ * @covers \App\exceptions\EmailException
+ */
 class EmailExceptionTest extends TestCase
 {
+    /**
+     * Tests the default message and empty errors array in EmailException.
+     *
+     * @covers \App\exceptions\EmailException::__construct
+     * @covers \App\exceptions\EmailException::getMessage
+     * @covers \App\exceptions\EmailException::getMessages
+     */
     public function testDefaultMessage(): void
     {
         $exception = new EmailException();
@@ -16,6 +28,13 @@ class EmailExceptionTest extends TestCase
         $this->assertEquals([], $exception->getMessages());
     }
 
+    /**
+     * Tests a custom message and error array in EmailException.
+     *
+     * @covers \App\exceptions\EmailException::__construct
+     * @covers \App\exceptions\EmailException::getMessage
+     * @covers \App\exceptions\EmailException::getMessages
+     */
     public function testCustomMessageAndErrors(): void
     {
         $errors = ['email' => 'Invalid email address.'];
