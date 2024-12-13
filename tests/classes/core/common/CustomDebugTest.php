@@ -6,6 +6,7 @@ namespace Tests\classes\core\common;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\ConfigMockTrait;
 use App\core\common\CustomDebug;
 use App\exceptions\DatabaseException;
 use App\exceptions\EmailException;
@@ -22,6 +23,8 @@ use App\exceptions\ValidationException;
  */
 class CustomDebugTest extends TestCase
 {
+    use ConfigMockTrait;
+
     /**
      * Validates that the failValidation method logs a message and throws a ValidationException.
      *
@@ -88,15 +91,17 @@ class CustomDebugTest extends TestCase
         parent::setUp();
 
         // Mock the Config class for all tests
-        $mockConfig = Mockery::mock('alias:' . \App\core\common\Config::class);
-        $mockConfig->shouldReceive('get')
-            ->with('debug_config', 'colors')
-            ->andReturn([
-                'default' => 'green',
-                'database' => 'yellow',
-                'email' => 'purple',
-                'validation' => 'pink',
-            ]);
+        $configData = [
+            'debug_config' => [
+                'colors' => [
+                    'default' => 'green',
+                    'database' => 'yellow',
+                    'email' => 'purple',
+                    'validation' => 'pink',
+                ],
+            ],
+        ];
+        $this->createConfigMock($configData);
     }
 
     /**
