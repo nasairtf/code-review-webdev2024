@@ -6,6 +6,7 @@ namespace Tests\classes\core\common;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\ConfigMockTrait;
 use App\core\common\Debug;
 
 /**
@@ -19,6 +20,8 @@ use App\core\common\Debug;
  */
 class DebugTest extends TestCase
 {
+    use ConfigMockTrait;
+
     /**
      * Test that the Debug constructor initializes properties correctly.
      *
@@ -51,10 +54,12 @@ class DebugTest extends TestCase
     public function testConstructorUsesDefaultValues(): void
     {
         // Override the default mock behavior
-        $mockConfig = Mockery::mock('alias:' . \App\core\common\Config::class);
-        $mockConfig->shouldReceive('get')
-            ->with('debug_config', 'colors')
-            ->andReturn([]); // Override: return an empty array
+        $configData = [
+            'debug_config' => [
+                'colors' => [], // Override: return an empty array
+            ],
+        ];
+        $this->createConfigMock($configData);
 
         // Instantiate Debug without parameters to test default values
         $debug = new Debug();
@@ -195,13 +200,15 @@ class DebugTest extends TestCase
         parent::setUp();
 
         // Mock the Config class for all tests
-        $mockConfig = Mockery::mock('alias:' . \App\core\common\Config::class);
-        $mockConfig->shouldReceive('get')
-            ->with('debug_config', 'colors')
-            ->andReturn([
-                'default' => 'green',
-                'database' => 'red',
-            ]);
+        $configData = [
+            'debug_config' => [
+                'colors' => [
+                    'default' => 'green',
+                    'database' => 'red',
+                ],
+            ],
+        ];
+        $this->createConfigMock($configData);
     }
 
     /**
