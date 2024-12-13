@@ -57,19 +57,21 @@ class DBConnection
     /**
      * Constructor for DBConnection class, initializes a database connection.
      *
-     * @param string      $dbName    Database name for configuration lookup.
-     * @param bool        $debugMode Whether to enable debug mode.
-     * @param mysqli|null $mysqli    Optional mysqli instance for testing.
+     * @param string           $dbName    Database name for configuration lookup.
+     * @param bool             $debugMode Whether to enable debug mode.
+     * @param mysqli|null      $mysqli    Optional mysqli instance for testing.
+     * @param CustomDebug|null $debug     Optional CustomDebug instance for testing.
      *
      * @throws DatabaseException If the database configuration is missing or the connection fails.
      */
     private function __construct(
         string $dbName,
         ?bool $debugMode = null,
-        ?mysqli $mysqli = null
+        ?mysqli $mysqli = null,
+        ?CustomDebug $debug = null
     ) {
         // Only set debug mode once during instance creation
-        $this->debug = new CustomDebug('db', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
+        $this->debug = $debug ?? new CustomDebug('db', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
 
         // Fetch the config for DBConnection credentials
         $config = Config::get('db_config');
