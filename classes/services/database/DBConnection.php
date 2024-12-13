@@ -112,9 +112,10 @@ class DBConnection
     /**
      * Returns the singleton instance of the DBConnection class for a specific database.
      *
-     * @param string      $dbName    Database name.
-     * @param bool        $debugMode Whether to enable debug mode.
-     * @param mysqli|null $mysqli    Optional mysqli instance for testing.
+     * @param string           $dbName    Database name.
+     * @param bool             $debugMode Whether to enable debug mode.
+     * @param mysqli|null      $mysqli    Optional mysqli instance for testing.
+     * @param CustomDebug|null $debug     Optional CustomDebug instance for testing.
      *
      * @return DBConnection Database connection instance.
      *
@@ -125,10 +126,11 @@ class DBConnection
     public static function getInstance(
         string $dbName,
         ?bool $debugMode = null,
-        ?mysqli $mysqli = null
+        ?mysqli $mysqli = null,
+        ?CustomDebug $debug = null
     ): DBConnection {
         if (!isset(self::$instances[$dbName])) {
-            self::$instances[$dbName] = new self($dbName, $debugMode ?? false, $mysqli); // base-level service class
+            self::$instances[$dbName] = new self($dbName, $debugMode ?? false, $mysqli, $debug); // base-level service class
         } elseif ($mysqli && self::$instances[$dbName]->connection !== $mysqli) {
             // Replace the existing connection with the provided $mysqli during testing
             self::$instances[$dbName]->connection = $mysqli;

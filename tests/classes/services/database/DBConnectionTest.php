@@ -6,9 +6,10 @@ namespace Tests\classes\services\database;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\ConfigMockTrait;
+use Tests\utilities\CustomDebugMockTrait;
 use Tests\utilities\PrivatePropertyTrait;
 use App\services\database\DBConnection;
-use App\core\common\Config;
 use App\exceptions\DatabaseException;
 
 /**
@@ -18,21 +19,14 @@ use App\exceptions\DatabaseException;
  */
 class DBConnectionTest extends TestCase
 {
-    use PrivatePropertyTrait;
+    use PrivatePropertyTrait, ConfigMockTrait, CustomDebugMockTrait;
 
     /**
-     * Mock instance of Debug.
+     * Mock instance of CustomDebug.
      *
      * @var Mockery\MockInterface
      */
     private $debugMock;
-
-    /**
-     * Mock instance of Config.
-     *
-     * @var Mockery\MockInterface
-     */
-    private $configMock;
 
     /**
      * Mock instance of MySQLi.
@@ -57,11 +51,19 @@ class DBConnectionTest extends TestCase
     {
         $dbName = 'test_db';
 
+        // Set up CustomDebug to receive the expected debug()
+        //$message = "Connected to database: {$dbName} at localhost";
+        //$this->mockDebug($this->debugMock, $message);
+
+        // Set up CustomDebug to receive the expected debug()
+        //$message = "Database connection closed.";
+        //$this->mockDebug($this->debugMock, $message);
+
         // Retrieve the singleton instance
-        $dbInstance1 = DBConnection::getInstance($dbName, true, $this->mysqliMock);
+        $dbInstance1 = DBConnection::getInstance($dbName, false, $this->mysqliMock, $this->debugMock);
 
         // Retrieve the same instance again
-        $dbInstance2 = DBConnection::getInstance($dbName, true, $this->mysqliMock);
+        $dbInstance2 = DBConnection::getInstance($dbName, false, $this->mysqliMock, $this->debugMock);
 
         // Assert the two instances are the same
         $this->assertSame($dbInstance1, $dbInstance2);
@@ -75,15 +77,27 @@ class DBConnectionTest extends TestCase
      */
     public function testThrowsExceptionForMissingConfiguration(): void
     {
-        // Mock Config to return an empty configuration
-        $this->configMock->shouldReceive('get')
-            ->with('db_config')
-            ->andReturn([]);
+        // Override Config mock to simulate missing database configuration
+        $configData = [
+            'db_config' => [] // No databases configured
+        ];
+        $this->createConfigMock($configData);
 
+        // Set up CustomDebug to throw the appropriate exception
+        $errorMsg = "Database configuration for 'invalid_db' not found.";
+        //$this->mockFail(
+        //    $this->debugMock,
+        //    'failDatabase',
+        //    $errorMsg,
+        //    new DatabaseException($errorMsg)
+        //);
+
+        // Assert that the correct exception is thrown
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("Database configuration for 'invalid_db' not found.");
+        $this->expectExceptionMessage($errorMsg);
 
-        DBConnection::getInstance('invalid_db', false, $this->mysqliMock);
+        // Attempt to get an instance for a non-existent database
+        DBConnection::getInstance('invalid_db', false, $this->mysqliMock, $this->debugMock);
     }
 
     /**
@@ -95,8 +109,16 @@ class DBConnectionTest extends TestCase
     {
         $dbName = 'test_db';
 
+        // Set up CustomDebug to receive the expected debug()
+        //$message = "Connected to database: {$dbName} at localhost";
+        //$this->mockDebug($this->debugMock, $message);
+
+        // Set up CustomDebug to receive the expected debug()
+        //$message = "Database connection closed.";
+        //$this->mockDebug($this->debugMock, $message);
+
         // Inject mocks
-        $db = DBConnection::getInstance($dbName, true, $this->mysqliMock);
+        $db = DBConnection::getInstance($dbName, false, $this->mysqliMock, $this->debugMock);
 
         // Assert connection is established and matches mysqliMock
         $this->assertSame($this->mysqliMock, $this->getPrivateProperty($db, 'connection'));
@@ -220,33 +242,54 @@ class DBConnectionTest extends TestCase
         // Ensure parent setup runs if necessary
         parent::setUp();
 
-        // Mock Config
-        $this->configMock = Mockery::mock('alias:' . Config::class);
-
-        // Mock db_config
-        $this->configMock->shouldReceive('get')
-            ->with('db_config')
-            ->andReturn([
+        // Set up Config Mock with default values
+        $configData = [
+            'db_config' => [
                 'test_db' => [
                     'host' => 'localhost',
                     'username' => 'root',
                     'password' => '',
                     'dbname' => 'test_db',
                 ],
-            ]);
+            ],
+            'debug_config' => [
+                'colors' => [
+                    'default' => 'green',
+                    'database' => 'red',
+                ],
+            ],
+        ];
+        $this->createConfigMock($configData);
 
-        // Mock debug_config for colors
-        $this->configMock->shouldReceive('get')
-            ->with('debug_config', 'colors')
-            ->andReturn([
-                'default' => 'green',
-                'database' => 'red',
-            ]);
+        // Set up CustomDebug Mock
+        $this->debugMock = $this->createCustomDebugMock('database', false, 0, 'red');
 
-        // Mock Debug
-        $this->debugMock = Mockery::mock(\App\core\common\CustomDebug::class);
+        // Set up CustomDebug to receive the expected debug()
+        $this->mockDebug($this->debugMock, "Connected to database: test_db at localhost");
+        $this->mockDebug($this->debugMock, "Starting transaction.");
+        $this->mockDebug($this->debugMock, "Preparing SQL: SELECT * FROM test_table");
+        $this->mockDebug($this->debugMock, "Executing Raw SQL: SELECT * FROM test_table");
+        $this->mockDebug($this->debugMock, "Executed query successfully.");
+        $this->mockDebug($this->debugMock, "Query returned 1 rows.");
+        $this->mockDebug($this->debugMock, "Database connection closed.");
 
-        // Mock MySQLi
+        // Set up CustomDebug to receive the expected fail()
+        $errorMsg = "Database configuration for 'invalid_db' not found.";
+        $this->mockFail(
+            $this->debugMock,
+            'failDatabase',
+            $errorMsg,
+            new DatabaseException($errorMsg)
+        );
+        $errorMsg = "Execute failed for query: SELECT * FROM test_table";
+        $this->mockFail(
+            $this->debugMock,
+            'failDatabase',
+            $errorMsg,
+            new DatabaseException($errorMsg)
+        );
+
+        // Set up MySQLi Mock
         $this->mysqliMock = Mockery::mock('mysqli');
         $this->mysqliMock->shouldReceive('connect_error')->andReturnNull();
         $this->mysqliMock->shouldReceive('close')->andReturnTrue();
@@ -254,7 +297,7 @@ class DBConnectionTest extends TestCase
         $this->mysqliMock->shouldReceive('commit')->andReturnTrue();
         $this->mysqliMock->shouldReceive('rollback')->andReturnTrue();
 
-        // Mock MySQLi Statement
+        // Set up MySQLi Statement Mock
         $this->mysqliStmtMock = Mockery::mock('mysqli_stmt');
     }
 
@@ -278,7 +321,9 @@ class DBConnectionTest extends TestCase
      */
     private function createMockedDB(): DBConnection
     {
-        // Ensure debugMode is false to avoid interference with testing.
-        return DBConnection::getInstance('test_db', false, $this->mysqliMock);
+        $dbName = 'test_db';
+
+        // Set up the DB
+        return DBConnection::getInstance($dbName, false, $this->mysqliMock, $this->debugMock);
     }
 }
