@@ -51,14 +51,6 @@ class DBConnectionTest extends TestCase
     {
         $dbName = 'test_db';
 
-        // Set up CustomDebug to receive the expected debug()
-        //$message = "Connected to database: {$dbName} at localhost";
-        //$this->mockDebug($this->debugMock, $message);
-
-        // Set up CustomDebug to receive the expected debug()
-        //$message = "Database connection closed.";
-        //$this->mockDebug($this->debugMock, $message);
-
         // Retrieve the singleton instance
         $dbInstance1 = DBConnection::getInstance($dbName, false, $this->mysqliMock, $this->debugMock);
 
@@ -77,27 +69,20 @@ class DBConnectionTest extends TestCase
      */
     public function testThrowsExceptionForMissingConfiguration(): void
     {
+        $dbName = 'invalid_db';
+
         // Override Config mock to simulate missing database configuration
         $configData = [
             'db_config' => [] // No databases configured
         ];
         $this->createConfigMock($configData);
 
-        // Set up CustomDebug to throw the appropriate exception
-        $errorMsg = "Database configuration for 'invalid_db' not found.";
-        //$this->mockFail(
-        //    $this->debugMock,
-        //    'failDatabase',
-        //    $errorMsg,
-        //    new DatabaseException($errorMsg)
-        //);
-
         // Assert that the correct exception is thrown
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage($errorMsg);
+        $this->expectExceptionMessage("Database configuration for '{$dbName}' not found.");
 
         // Attempt to get an instance for a non-existent database
-        DBConnection::getInstance('invalid_db', false, $this->mysqliMock, $this->debugMock);
+        DBConnection::getInstance($dbName, false, $this->mysqliMock, $this->debugMock);
     }
 
     /**
@@ -108,14 +93,6 @@ class DBConnectionTest extends TestCase
     public function testConnectionEstablishment(): void
     {
         $dbName = 'test_db';
-
-        // Set up CustomDebug to receive the expected debug()
-        //$message = "Connected to database: {$dbName} at localhost";
-        //$this->mockDebug($this->debugMock, $message);
-
-        // Set up CustomDebug to receive the expected debug()
-        //$message = "Database connection closed.";
-        //$this->mockDebug($this->debugMock, $message);
 
         // Inject mocks
         $db = DBConnection::getInstance($dbName, false, $this->mysqliMock, $this->debugMock);
