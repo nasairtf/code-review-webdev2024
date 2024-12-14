@@ -22,9 +22,11 @@ trait ConfigMockTrait
      */
     protected function createConfigMock(array $configData = []): Mockery\MockInterface
     {
-        $configMock = Mockery::mock('alias:' . \App\core\common\Config::class);
+        // Create the aliased mock
+        $myMock = Mockery::mock('alias:' . \App\core\common\Config::class);
 
-        $configMock->shouldReceive('load')
+        // Mock load() to mimic real behavior
+        $myMock->shouldReceive('load')
             ->andReturnUsing(function (string $name) use ($configData) {
                 if (!isset($configData[$name])) {
                     throw new \Exception("Configuration file '{$name}' not found.");
@@ -36,7 +38,8 @@ trait ConfigMockTrait
                 return $fileData;
             });
 
-        $configMock->shouldReceive('get')
+        // Mock get() to mimic real behavior
+        $myMock->shouldReceive('get')
             ->andReturnUsing(function (string $name, ?string $key = null) use ($configData) {
                 $fileData = $this->loadMockConfig($configData, $name);
                 if ($key === null) {
@@ -48,7 +51,7 @@ trait ConfigMockTrait
                 return $fileData[$key];
             });
 
-        return $configMock;
+        return $myMock;
     }
 
     /**
@@ -62,10 +65,12 @@ trait ConfigMockTrait
      */
     private function loadMockConfig(array $configData, string $name): array
     {
+        // Mock exception to mimic real behavior
         if (!isset($configData[$name])) {
             throw new \Exception("Configuration file '{$name}' not found.");
         }
         $fileData = $configData[$name];
+        // Mock exception to mimic real behavior
         if (!is_array($fileData)) {
             throw new \Exception("Configuration file '{$name}' must return an array.");
         }

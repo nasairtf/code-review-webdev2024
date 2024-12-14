@@ -29,65 +29,85 @@ trait CustomDebugMockTrait
         int $debugLevel = 0,
         string $defaultColor = 'green'
     ): Mockery\MockInterface {
-        $debugMock = Mockery::mock('alias:' . \App\core\common\CustomDebug::class);
+        // Create the aliased mock
+        $myMock = Mockery::mock('alias:' . \App\core\common\CustomDebug::class);
 
         // Mock the constructor behavior
-        $debugMock->shouldReceive('new')
+        $myMock->shouldReceive('new')
             ->with($context, $debugMode, $debugLevel)
             ->andReturnSelf();
 
         // Mock property getters
-        $debugMock->shouldReceive('isDebugMode')
+        $myMock->shouldReceive('isDebugMode')
             ->andReturn($debugMode);
 
-        $debugMock->shouldReceive('getDebugLevel')
+        $myMock->shouldReceive('getDebugLevel')
             ->andReturn($debugLevel);
 
-        $debugMock->shouldReceive('getDefaultColor')
+        $myMock->shouldReceive('getDefaultColor')
             ->andReturn($defaultColor);
 
-        // Mock logging and debugging methods
-        $debugMock->shouldReceive('log')
+        // Mock log(), debug(), and debugHeading() methods
+        $myMock->shouldReceive('log')
             ->with(Mockery::any(), Mockery::any())
             ->andReturnNull();
 
-        $debugMock->shouldReceive('debug')
+        $myMock->shouldReceive('debug')
             ->with(Mockery::any(), Mockery::any())
             ->andReturnNull();
 
-        $debugMock->shouldReceive('debugVariable')
+        $myMock->shouldReceive('debugVariable')
             ->with(Mockery::any(), Mockery::any(), Mockery::any())
             ->andReturnNull();
 
-        // Mock debugHeading to mimic real behavior
-        $debugMock->shouldReceive('debugHeading')
+        // Mock debugHeading() to mimic real behavior
+        $myMock->shouldReceive('debugHeading')
             ->with(Mockery::any(), Mockery::any())
             ->andReturnUsing(function ($classLabel, $methodName) {
                 return "{$classLabel}: {$methodName}()";
             });
 
-        return $debugMock;
+        return $myMock;
+    }
+
+    /**
+     * Sets up a specific expectation for the debug method.
+     *
+     * @param Mockery\MockInterface $myMock  The Debug mock instance.
+     * @param string                $message The expected debug message.
+     *
+     * @return void
+     */
+    protected function mockDebug(
+        Mockery\MockInterface $myMock,
+        string $message
+    ): void {
+        // Mock debug() to mimic real behavior
+        $myMock->shouldReceive('debug')
+            ->with($message) // this will break if debug() has more than 1 argument passed in
+            ->andReturnNull();
     }
 
     /**
      * Sets up a specific exception throw for failXXX methods.
      *
-     * @param Mockery\MockInterface $debugMock The CustomDebug mock instance.
+     * @param Mockery\MockInterface $myMock    The CustomDebug mock instance.
      * @param string                $method    The fail method to mock (e.g., 'failDatabase').
      * @param string                $message   The expected message for the exception.
      * @param \Exception|null       $exception The exception to throw (defaults to Exception).
      *
      * @return void
      */
-    protected function mockDebugFail(
-        Mockery\MockInterface $debugMock,
+    protected function mockFail(
+        Mockery\MockInterface $myMock,
         string $method,
         string $message,
         ?\Exception $exception = null
     ): void {
+        // Mock failXXX() to mimic real behavior
         $exception = $exception ?? new \Exception($message); // Default exception type
-        $debugMock->shouldReceive($method)
-            ->with($message, Mockery::any(), Mockery::any())
+        $myMock->shouldReceive($method)
+            ->with($message) // this will break if failXXX() has more than 1 argument passed in
             ->andThrow($exception);
     }
 }
