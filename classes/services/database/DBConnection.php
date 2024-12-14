@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\services\database;
 
-use mysqli;
 use App\core\common\Config;
 use App\core\common\CustomDebug;
 use App\exceptions\DatabaseException;
+use App\services\database\MySQLiWrapper;
 
 /**
  * DBConnection class provides a singleton connection pool for database interactions.
@@ -18,7 +18,7 @@ use App\exceptions\DatabaseException;
  * The DBConnection class is immutable and locked to ensure system stability.
  *
  * NOTE: For additional features or domain-specific behavior, extend this class
- * (e.g., CustomConfig).
+ * (e.g., CustomDBConnection).
  *
  * @category Database
  * @package  IRTF
@@ -26,10 +26,10 @@ use App\exceptions\DatabaseException;
  * @version  1.2.4
  * @since    2024-10-29
  *
- * @uses \mysqli
  * @uses \App\core\common\Config
  * @uses \App\core\common\CustomDebug
  * @uses \App\exceptions\DatabaseException
+ * @uses \App\services\database\MySQLiWrapper
  */
 class DBConnection
 {
@@ -57,17 +57,17 @@ class DBConnection
     /**
      * Constructor for DBConnection class, initializes a database connection.
      *
-     * @param string           $dbName    Database name for configuration lookup.
-     * @param bool             $debugMode Whether to enable debug mode.
-     * @param mysqli|null      $mysqli    Optional mysqli instance for testing.
-     * @param CustomDebug|null $debug     Optional CustomDebug instance for testing.
+     * @param string             $dbName        Database name for configuration lookup.
+     * @param bool               $debugMode     Whether to enable debug mode.
+     * @param MySQLiWrapper|null $mysqliWrapper Optional MySQLiWrapper instance for testing.
+     * @param CustomDebug|null   $debug         Optional CustomDebug instance for testing.
      *
      * @throws DatabaseException If the database configuration is missing or the connection fails.
      */
     private function __construct(
         string $dbName,
         ?bool $debugMode = null,
-        ?mysqli $mysqli = null,
+        ?MySQLiWrapper $mysqliWrapper = null,
         ?CustomDebug $debug = null
     ) {
         // Only set debug mode once during instance creation
@@ -85,19 +85,23 @@ class DBConnection
         $dbConfig = $config[$dbName];
 
         // Establish the MySQLi connection
-        $this->connection =  $mysqli ?: new \mysqli(
+        $mysqliWrapper = $mysqliWrapper ?: new MySQLiWrapper(new \mysqli(
             $dbConfig['host'],
             $dbConfig['username'],
             $dbConfig['password'],
             $dbConfig['dbname']
-        );
+        ));
 
         // Handle connection failure
-        if ($this->connection->connect_error) {
-            $this->debug->failDatabase("Database connection failed: " . $this->connection->connect_error);
+        $connectError = $mysqliWrapper->getConnectError();
+        if ($connectError) {
+            $this->debug->failDatabase('Database connection failed.');
         }
 
-        // Debug information for MySQLi connection
+        // Assign the MySQLiWrapper as the connection
+        $this->connection = $mysqliWrapper;
+
+        // Log successful connection
         $this->debug->debug("Connected to database: {$dbConfig['dbname']} at {$dbConfig['host']}");
     }
 
@@ -126,14 +130,14 @@ class DBConnection
     public static function getInstance(
         string $dbName,
         ?bool $debugMode = null,
-        ?mysqli $mysqli = null,
+        ?MySQLiWrapper $mysqliWrapper = null,
         ?CustomDebug $debug = null
     ): DBConnection {
         if (!isset(self::$instances[$dbName])) {
-            self::$instances[$dbName] = new self($dbName, $debugMode ?? false, $mysqli, $debug); // base-level service class
-        } elseif ($mysqli && self::$instances[$dbName]->connection !== $mysqli) {
-            // Replace the existing connection with the provided $mysqli during testing
-            self::$instances[$dbName]->connection = $mysqli;
+            self::$instances[$dbName] = new self($dbName, $debugMode ?? false, $mysqliWrapper, $debug); // base-level service class
+        } elseif ($mysqliWrapper && self::$instances[$dbName]->connection !== $mysqliWrapper) {
+            // Replace the existing connection with the provided $mysqliWrapper during testing
+            self::$instances[$dbName]->connection = $mysqliWrapper;
         }
         return self::$instances[$dbName];
     }
@@ -245,7 +249,12 @@ class DBConnection
         if (!empty($params)) {
             // 'bind_param' binds the parameters to the SQL query
             // Spread operator to pass array elements as individual arguments
-            $stmt->bind_param($types, ...$params);
+            // The bind_param call has been replaced by the bindParams wrapper method
+            //  to simplify unit testing.
+            //$stmt->bind_param($types, ...$params);
+            if (!$this->connection->bindParams($stmt, $types, $params)) {
+                $this->debug->failDatabase("Failed to bind parameters for query: {$sql}");
+            }
         }
 
         // Execute the prepared statement
@@ -273,7 +282,8 @@ class DBConnection
         }
 
         // Handle non-SELECT queries by returning the number of affected rows
-        $affectedRows = $stmt->affected_rows;
+        //$affectedRows = $stmt->affected_rows;
+        $affectedRows = $this->connection->getAffectedRows();
         $this->debug->debug("Query affected {$affectedRows} rows.");
         $stmt->close();
         return $affectedRows;
@@ -316,7 +326,8 @@ class DBConnection
         }
 
         // Handle non-SELECT queries by returning the number of affected rows
-        $affectedRows = $this->connection->affected_rows;
+        //$affectedRows = $this->connection->affected_rows;
+        $affectedRows = $this->connection->getAffectedRows();
         $this->debug->debug("Query affected {$affectedRows} rows.");
         return $affectedRows;
     }
@@ -328,7 +339,12 @@ class DBConnection
      */
     public function getAffectedRows(): int
     {
-        return $this->connection->affected_rows;
+        // Verify connection is still valid
+        $this->ensureConnection();
+
+        // Return the affected rows
+        //return $this->connection->affected_rows;
+        return $this->connection->getAffectedRows();
     }
 
     /**
@@ -338,7 +354,12 @@ class DBConnection
      */
     public function getLastInsertId(): int
     {
-        return $this->connection->insert_id;
+        // Verify connection is still valid
+        $this->ensureConnection();
+
+        // Return the last inserted ID
+        //return $this->connection->insert_id;
+        return $this->connection->getLastInsertId();
     }
 
     /**
