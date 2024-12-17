@@ -20,32 +20,40 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * testExecuteSelectQueryWithDebugReturnsResults
- * testExecuteSelectQueryWithDebugLogsSqlAndParams
- * testExecuteSelectQueryWithDebugLogsResults
- * testEnsureQueryResultsNotEmptyThrowsExceptionOnEmptyData
- * testEnsureQueryResultsNotEmptyPassesWithNonEmptyData
- * testExecuteUpdateQueryWithDebugReturnsAffectedRows
- * testExecuteUpdateQueryWithDebugLogsSqlAndParams
- * testExecuteUpdateQueryWithDebugLogsAffectedRows
- * testExecuteQueryWithDebugExecutesParameterizedQuery
- * testExecuteQueryWithDebugExecutesRawQuery
- * testExecuteQueryWithDebugLogsParameterizedQuery
- * testExecuteQueryWithDebugLogsRawQuery
- * testEnsureRowUpdateResultThrowsExceptionOnZeroAffectedRows
- * testEnsureRowUpdateResultThrowsExceptionOnUnexpectedAffectedRows
- * testEnsureRowUpdateResultPassesWithExpectedAffectedRows
- * testExecuteRawQueryWithDebugReturnsAffectedRowsForNonSelectQuery
- * testExecuteRawQueryWithDebugReturnsRowCountForSelectQuery
- * testExecuteRawQueryWithDebugLogsSqlAndAffectedRows
- * testGetSortStringReturnsAscForTrueInput
- * testGetSortStringReturnsDescForFalseInput
+ * testExecuteSelectQueryWithDebugReturnsResults [DONE]
+ * testExecuteSelectQueryWithDebugLogsSqlAndParams [INDIRECTLY TESTED]
+ * testExecuteSelectQueryWithDebugLogsResults [INDIRECTLY TESTED]
+ * testEnsureQueryResultsNotEmptyThrowsExceptionOnEmptyData [DONE]
+ * testEnsureQueryResultsNotEmptyPassesWithNonEmptyData [DONE]
+ * testExecuteUpdateQueryWithDebugReturnsAffectedRows [DONE]
+ * testExecuteUpdateQueryWithDebugLogsSqlAndParams [INDIRECTLY TESTED]
+ * testExecuteUpdateQueryWithDebugLogsAffectedRows [INDIRECTLY TESTED]
+ * testExecuteQueryWithDebugExecutesParameterizedQuery [DONE]
+ * testExecuteQueryWithDebugExecutesRawQuery [DONE]
+ * testExecuteQueryWithDebugLogsParameterizedQuery [INDIRECTLY TESTED]
+ * testExecuteQueryWithDebugLogsRawQuery [INDIRECTLY TESTED]
+ * testEnsureRowUpdateResultThrowsExceptionOnZeroAffectedRows [DONE]
+ * testEnsureRowUpdateResultThrowsExceptionOnUnexpectedAffectedRows [DONE]
+ * testEnsureRowUpdateResultPassesWithExpectedAffectedRows [DONE]
+ * testExecuteRawQueryWithDebugReturnsAffectedRowsForNonSelectQuery [DONE]
+ * testExecuteRawQueryWithDebugReturnsRowCountForSelectQuery [DONE]
+ * testExecuteRawQueryWithDebugLogsSqlAndAffectedRows [INDIRECTLY TESTED]
+ * testGetSortStringReturnsAscForTrueInput [DONE]
+ * testGetSortStringReturnsDescForFalseInput [DONE]
  *
  * @covers \App\services\database\DbQueryUtility
  */
 class DbQueryUtilityTest extends TestCase
 {
     use CustomDebugMockTrait, DBConnectionMockTrait;
+
+    /**
+     * TEST METHOD 1: executeSelectQueryWithDebug
+     *
+     * These tests are unneeded due to CustomDebug testing via its own unit tests:
+     * - testExecuteSelectQueryWithDebugLogsSqlAndParams
+     * - testExecuteSelectQueryWithDebugLogsResults
+     */
 
     /**
      * Validates that executeSelectQueryWithDebug() successfully executes a SELECT query
@@ -55,7 +63,7 @@ class DbQueryUtilityTest extends TestCase
      *
      * @return void
      */
-    public function testExecuteSelectQueryWithDebug(): void
+    public function testExecuteSelectQueryWithDebugReturnsResults(): void
     {
         // Mock the Debug and DBConnection classes
         $debugMock = $this->createCustomDebugMock();
@@ -81,13 +89,17 @@ class DbQueryUtilityTest extends TestCase
     }
 
     /**
+     * TEST METHOD 2: ensureQueryResultsNotEmpty
+     */
+
+    /**
      * Validates that ensureQueryResultsNotEmpty() throws an exception for an empty result set.
      *
      * @covers \App\services\database\DbQueryUtility::ensureQueryResultsNotEmpty
      *
      * @return void
      */
-    public function testEnsureQueryResultsNotEmptyThrowsException(): void
+    public function testEnsureQueryResultsNotEmptyThrowsExceptionOnEmptyData(): void
     {
         // Mock the Debug class
         $debugMock = $this->createCustomDebugMock();
@@ -113,7 +125,7 @@ class DbQueryUtilityTest extends TestCase
      *
      * @return void
      */
-    public function testEnsureQueryResultsNotEmptyPasses(): void
+    public function testEnsureQueryResultsNotEmptyPassesWithNonEmptyData(): void
     {
         // Mock the Debug class
         $debugMock = $this->createCustomDebugMock();
@@ -132,6 +144,14 @@ class DbQueryUtilityTest extends TestCase
     }
 
     /**
+     * TEST METHOD 3: executeUpdateQueryWithDebug
+     *
+     * These tests are unneeded due to CustomDebug testing via its own unit tests:
+     * - testExecuteUpdateQueryWithDebugLogsSqlAndParams
+     * - testExecuteUpdateQueryWithDebugLogsAffectedRows
+     */
+
+    /**
      * Validates that executeUpdateQueryWithDebug() successfully executes an UPDATE query
      * and returns the correct number of affected rows.
      *
@@ -139,7 +159,7 @@ class DbQueryUtilityTest extends TestCase
      *
      * @return void
      */
-    public function testExecuteUpdateQueryWithDebug(): void
+    public function testExecuteUpdateQueryWithDebugReturnsAffectedRows(): void
     {
         // Mock the Debug and DBConnection classes
         $debugMock = $this->createCustomDebugMock();
@@ -165,13 +185,90 @@ class DbQueryUtilityTest extends TestCase
     }
 
     /**
+     * TEST METHOD 4: executeQueryWithDebug
+     *
+     * These tests are unneeded due to CustomDebug testing via its own unit tests:
+     * - testExecuteQueryWithDebugLogsParameterizedQuery
+     * - testExecuteQueryWithDebugLogsRawQuery
+     */
+
+    /**
+     * Validates that executeQueryWithDebug() executes a parameterized query when parameters are provided.
+     *
+     * @covers \App\services\database\DbQueryUtility::executeQueryWithDebug
+     */
+    public function testExecuteQueryWithDebugExecutesParameterizedQuery(): void
+    {
+        // Mock the Debug and DBConnection classes
+        $debugMock = $this->createCustomDebugMock();
+        $dbMock = $this->createDBConnectionMock();
+
+        // Define the test data
+        $sql = 'UPDATE users SET name = ? WHERE id = ?';
+        $params = ['Jane Doe', 1];
+        $types = 'si';
+        $affectedRows = 3;
+
+        // Mock the Debug methods
+        $debugMock->shouldReceive('debug')->with("Executing Param Bound SQL: {$sql}")->once();
+        $debugMock->shouldReceive('debugVariable')->with($params, "Params")->once();
+
+        // Mock the DBConnection::executeQuery
+        $dbMock->shouldReceive('executeQuery')
+            ->with($sql, $params, $types)
+            ->once()
+            ->andReturn($affectedRows);
+
+        // Call the method under test
+        $result = DbQueryUtility::executeQueryWithDebug($debugMock, $dbMock, $sql, $params, $types);
+
+        // Assert that the correct result is returned
+        $this->assertSame($affectedRows, $result);
+    }
+
+    /**
+     * Validates that executeQueryWithDebug() executes a raw query when no parameters are provided.
+     *
+     * @covers \App\services\database\DbQueryUtility::executeQueryWithDebug
+     */
+    public function testExecuteQueryWithDebugExecutesRawQuery(): void
+    {
+        // Mock the Debug and DBConnection classes
+        $debugMock = $this->createCustomDebugMock();
+        $dbMock = $this->createDBConnectionMock();
+
+        // Define the test data
+        $sql = 'DELETE FROM users WHERE active = 0';
+        $affectedRows = 5;
+
+        // Mock the Debug methods
+        $debugMock->shouldReceive('debug')->with("Executing Raw SQL: {$sql}")->once();
+
+        // Mock the DBConnection::executeRawQuery
+        $dbMock->shouldReceive('executeRawQuery')
+            ->with($sql)
+            ->once()
+            ->andReturn($affectedRows);
+
+        // Call the method under test
+        $result = DbQueryUtility::executeQueryWithDebug($debugMock, $dbMock, $sql);
+
+        // Assert that the correct result is returned
+        $this->assertSame($affectedRows, $result);
+    }
+
+    /**
+     * TEST METHOD 5: ensureRowUpdateResult
+     */
+
+    /**
      * Validates that ensureRowUpdateResult() throws an exception when no rows are affected.
      *
      * @covers \App\services\database\DbQueryUtility::ensureRowUpdateResult
      *
      * @return void
      */
-    public function testEnsureRowUpdateResultThrowsExceptionOnZeroRows(): void
+    public function testEnsureRowUpdateResultThrowsExceptionOnZeroAffectedRows(): void
     {
         // Mock the Debug class
         $debugMock = $this->createCustomDebugMock();
@@ -187,7 +284,7 @@ class DbQueryUtilityTest extends TestCase
             ->andThrow(new DatabaseException('Error: No rows were affected.'));
 
         // Call the method under test
-        DbQueryUtility::ensureQueryResultsNotEmpty($debugMock, [], 'Error: No rows were affected.');
+        DbQueryUtility::ensureRowUpdateResult($debugMock, [], 'Error: No rows were affected.');
     }
 
     /**
@@ -197,7 +294,7 @@ class DbQueryUtilityTest extends TestCase
      *
      * @return void
      */
-    public function testEnsureRowUpdateResultThrowsExceptionOnUnexpectedRows(): void
+    public function testEnsureRowUpdateResultThrowsExceptionOnUnexpectedAffectedRows(): void
     {
         // Mock the Debug class
         $debugMock = $this->createCustomDebugMock();
@@ -223,7 +320,7 @@ class DbQueryUtilityTest extends TestCase
      *
      * @return void
      */
-    public function testEnsureRowUpdateResultPasses(): void
+    public function testEnsureRowUpdateResultPassesWithExpectedAffectedRows(): void
     {
         // Mock the Debug class
         $debugMock = $this->createCustomDebugMock();
@@ -239,11 +336,18 @@ class DbQueryUtilityTest extends TestCase
     }
 
     /**
+     * TEST METHOD 6: executeRawQueryWithDebug
+     *
+     * This test is unneeded due to CustomDebug testing via its own unit tests:
+     * - testExecuteRawQueryWithDebugLogsSqlAndAffectedRows
+     */
+
+    /**
      * Tests executeRawQueryWithDebug() successfully executes a raw SQL query.
      *
      * @covers \App\services\database\DbQueryUtility::executeRawQueryWithDebug
      */
-    public function testExecuteRawQueryWithDebugReturnsAffectedRows(): void
+    public function testExecuteRawQueryWithDebugReturnsAffectedRowsForNonSelectQuery(): void
     {
         // Mock the Debug and DBConnection classes
         $debugMock = $this->createCustomDebugMock();
@@ -272,7 +376,7 @@ class DbQueryUtilityTest extends TestCase
      *
      * @covers \App\services\database\DbQueryUtility::executeRawQueryWithDebug
      */
-    public function testExecuteRawQueryWithDebugReturnsRowCountForSelect(): void
+    public function testExecuteRawQueryWithDebugReturnsRowCountForSelectQuery(): void
     {
         // Mock the Debug and DBConnection classes
         $debugMock = $this->createCustomDebugMock();
@@ -300,13 +404,17 @@ class DbQueryUtilityTest extends TestCase
     }
 
     /**
+     * TEST METHOD 7: executeRawQueryWithDebug
+     */
+
+    /**
      * Tests getSortString() for ascending order.
      *
      * @covers \App\services\database\DbQueryUtility::getSortString
      *
      * @return void
      */
-    public function testGetSortStringReturnsAsc(): void
+    public function testGetSortStringReturnsAscForTrueInput(): void
     {
         // Assert the sort strings matches
         $this->assertSame('ASC', DbQueryUtility::getSortString(true));
@@ -319,11 +427,15 @@ class DbQueryUtilityTest extends TestCase
      *
      * @return void
      */
-    public function testGetSortStringReturnsDesc(): void
+    public function testGetSortStringReturnsDescForFalseInput(): void
     {
         // Assert the sort strings matches
         $this->assertSame('DESC', DbQueryUtility::getSortString(false));
     }
+
+    /**
+     * HELPER METHODS -- TEST SETUP AND/OR CLEANUP
+     */
 
     /**
      * Cleans up after each test, closing Mockery expectations.
