@@ -173,13 +173,13 @@ class DbQueryUtility
      * Executes a raw SQL query, typically for DELETE or LOAD DATA INFILE operations.
      *
      * Logs the SQL query, executes it using the provided database instance, and returns
-     * the number of affected rows.
+     * the number of affected rows for non-SELECT queries.
      *
      * @param CustomDebug  $debug Instance of the CustomDebug class for logging and debugging.
      * @param DBConnection $db    Instance of the DBConnection class for executing queries.
      * @param string       $sql   Raw SQL query string to execute.
      *
-     * @return int                Number of rows affected by the query.
+     * @return int                Number of rows affected by the query (or rows returned for SELECT).
      */
     public static function executeRawQueryWithDebug(
         CustomDebug $debug,
@@ -192,8 +192,16 @@ class DbQueryUtility
         // Execute the query directly
         $result = $db->executeRawQuery($sql);
 
+        // Determine the affected rows based on the result type
+        if (is_array($result)) {
+            // SELECT query: count the rows returned
+            $affectedRows = count($result);
+        } else {
+            // Non-SELECT query: $result is the number of affected rows
+            $affectedRows = (int) $result;
+        }
+
         // Debug the result
-        $affectedRows = $result['affected_rows'] ?? 0;
         $debug->debugVariable($affectedRows, "Query [RAW SQL] Rows Affected");
 
         return $affectedRows;
