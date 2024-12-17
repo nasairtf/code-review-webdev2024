@@ -16,6 +16,34 @@ use App\exceptions\DatabaseException;
 /**
  * Unit tests for the DBConnection class.
  *
+ * List of method tests:
+ *
+ * testGetInstanceReturnsSingletonInstance
+ * testGetInstanceReplacesConnectionDuringTesting
+ * testGetInstanceThrowsExceptionOnMissingConfig
+ * testGetInstanceHandlesConnectionFailure
+ * testClearInstanceClosesConnectionAndRemovesInstance
+ * testClearInstanceDoesNothingIfInstanceDoesNotExist
+ * testBeginTransactionStartsTransactionSuccessfully
+ * testBeginTransactionThrowsExceptionOnInvalidConnection
+ * testCommitCommitsTransactionSuccessfully
+ * testCommitThrowsExceptionOnInvalidConnection
+ * testRollbackRollsBackTransactionSuccessfully
+ * testRollbackThrowsExceptionOnInvalidConnection
+ * testCloseConnectionClosesConnectionSuccessfully
+ * testCloseConnectionDoesNothingIfConnectionIsNull
+ * testExecuteQueryReturnsResultForSelectQuery
+ * testExecuteQueryReturnsAffectedRowsForNonSelectQuery
+ * testExecuteQueryThrowsExceptionOnPrepareFailure
+ * testExecuteQueryThrowsExceptionOnBindParamsFailure
+ * testExecuteQueryThrowsExceptionOnExecuteFailure
+ * testExecuteRawQueryReturnsResultForSelectQuery
+ * testExecuteRawQueryReturnsAffectedRowsForNonSelectQuery
+ * testExecuteRawQueryThrowsExceptionOnExecutionFailure
+ * testGetAffectedRowsReturnsCorrectRowCount
+ * testGetLastInsertIdReturnsCorrectInsertId
+ * testEnsureConnectionThrowsExceptionWhenConnectionIsInvalid
+ *
  * @covers \App\services\database\DBConnection
  */
 class DBConnectionTest extends TestCase
