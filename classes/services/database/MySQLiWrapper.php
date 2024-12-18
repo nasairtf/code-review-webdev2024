@@ -56,6 +56,16 @@ class MySQLiWrapper
     }
 
     /**
+     * Retrieves the last error message for the current connection.
+     *
+     * @return string|null The error message, or null if no error occurred.
+     */
+    public function getError(): ?string
+    {
+        return $this->mysqli->error;
+    }
+
+    /**
      * Retrieves the number of rows affected by the last operation.
      *
      * Returns the number of rows affected by the last INSERT, UPDATE, DELETE, or
