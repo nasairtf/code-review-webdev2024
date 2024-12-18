@@ -449,6 +449,43 @@ class DBConnectionTest extends TestCase
     }
 
     /**
+     * Test executeQuery method throws an exception when parameter binding fails.
+     *
+     * This test ensures that the `executeQuery` method correctly handles
+     * a failure during parameter binding by throwing a `DatabaseException`.
+     *
+     * @covers \App\services\database\DBConnection::executeQuery
+     *
+     * @return void
+     * @throws \App\exceptions\DatabaseException If the parameter binding fails.
+     */
+    public function testExecuteQueryThrowsExceptionOnBindParamsFailure(): void
+    {
+        $db = $this->createMockedDB();
+
+        // Expect exception
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Failed to bind parameters for query: SELECT * FROM test_table');
+
+        // Mock MySQLi statement object
+        $this->mysqliStatementMock->shouldReceive('bind_param')
+            ->andReturn(false); // Simulate failure in bind_param
+
+        // Mock MySQLi connection
+        $this->mysqliWrapperMock->shouldReceive('prepare')
+            ->with('SELECT * FROM test_table')
+            ->andReturn($this->mysqliStatementMock);
+
+        // Mock the bindParams method in the wrapper
+        $this->mysqliWrapperMock->shouldReceive('bindParams')
+            ->with($this->mysqliStatementMock, 'i', [1])
+            ->andReturn(false); // Simulate binding failure
+
+        // Execute a query
+        $db->executeQuery('SELECT * FROM test_table', [1], 'i');
+    }
+
+    /**
      * Test executeQuery method throws an exception when query execution fails.
      *
      * This test ensures that the `executeQuery` method correctly handles
