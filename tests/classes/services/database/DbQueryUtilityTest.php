@@ -284,7 +284,7 @@ class DbQueryUtilityTest extends TestCase
             ->andThrow(new DatabaseException('Error: No rows were affected.'));
 
         // Call the method under test
-        DbQueryUtility::ensureRowUpdateResult($debugMock, [], 'Error: No rows were affected.');
+        DbQueryUtility::ensureRowUpdateResult($debugMock, 0, 0, 'Error:');
     }
 
     /**
