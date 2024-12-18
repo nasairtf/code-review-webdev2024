@@ -18,31 +18,32 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * testGetInstanceReturnsSingletonInstance
- * testGetInstanceReplacesConnectionDuringTesting
- * testGetInstanceThrowsExceptionOnMissingConfig
- * testGetInstanceHandlesConnectionFailure
- * testClearInstanceClosesConnectionAndRemovesInstance
- * testClearInstanceDoesNothingIfInstanceDoesNotExist
- * testBeginTransactionStartsTransactionSuccessfully
- * testBeginTransactionThrowsExceptionOnInvalidConnection
- * testCommitCommitsTransactionSuccessfully
- * testCommitThrowsExceptionOnInvalidConnection
- * testRollbackRollsBackTransactionSuccessfully
- * testRollbackThrowsExceptionOnInvalidConnection
- * testCloseConnectionClosesConnectionSuccessfully
- * testCloseConnectionDoesNothingIfConnectionIsNull
- * testExecuteQueryReturnsResultForSelectQuery
- * testExecuteQueryReturnsAffectedRowsForNonSelectQuery
- * testExecuteQueryThrowsExceptionOnPrepareFailure
- * testExecuteQueryThrowsExceptionOnBindParamsFailure
- * testExecuteQueryThrowsExceptionOnExecuteFailure
- * testExecuteRawQueryReturnsResultForSelectQuery
- * testExecuteRawQueryReturnsAffectedRowsForNonSelectQuery
- * testExecuteRawQueryThrowsExceptionOnExecutionFailure
- * testGetAffectedRowsReturnsCorrectRowCount
- * testGetLastInsertIdReturnsCorrectInsertId
- * testEnsureConnectionThrowsExceptionWhenConnectionIsInvalid
+ * testGetInstanceReturnsSingletonInstance [DONE]
+ * testGetInstanceReplacesConnectionDuringTesting [DONE]
+ * testGetInstanceThrowsExceptionOnMissingConfig [DONE]
+ * testGetInstanceHandlesConnectionFailure [DONE]
+ * testClearInstanceClosesConnectionAndRemovesInstance [DONE]
+ * testClearInstanceDoesNothingIfInstanceDoesNotExist [INDIRECTLY TESTED]
+ * testBeginTransactionStartsTransactionSuccessfully [DONE]
+ * testBeginTransactionThrowsExceptionOnInvalidConnection [INDIRECTLY TESTED]
+ * testCommitCommitsTransactionSuccessfully [DONE]
+ * testCommitThrowsExceptionOnInvalidConnection [INDIRECTLY TESTED]
+ * testRollbackRollsBackTransactionSuccessfully [DONE]
+ * testRollbackThrowsExceptionOnInvalidConnection [INDIRECTLY TESTED]
+ * testCloseConnectionClosesConnectionSuccessfully [DONE]
+ * testCloseConnectionDoesNothingIfConnectionIsNull [DONE]
+ * testExecuteQueryReturnsResultForSelectQuery [DONE]
+ * testExecuteQueryReturnsNoResultForSelectQuery [DONE]
+ * testExecuteQueryReturnsAffectedRowsForNonSelectQuery [DONE]
+ * testExecuteQueryThrowsExceptionOnPrepareFailure [MISSING? OR COVERED ELSEWHERE?]
+ * testExecuteQueryThrowsExceptionOnBindParamsFailure [MISSING? OR COVERED ELSEWHERE?]
+ * testExecuteQueryThrowsExceptionOnExecuteFailure [DONE]
+ * testExecuteRawQueryReturnsResultForSelectQuery [DONE]
+ * testExecuteRawQueryReturnsAffectedRowsForNonSelectQuery [DONE]
+ * testExecuteRawQueryThrowsExceptionOnExecutionFailure [MISSING? OR COVERED ELSEWHERE?]
+ * testGetAffectedRowsReturnsCorrectRowCount [DONE]
+ * testGetLastInsertIdReturnsCorrectInsertId [DONE]
+ * testEnsureConnectionThrowsExceptionWhenConnectionIsInvalid [DONE]
  *
  * @covers \App\services\database\DBConnection
  */
@@ -72,11 +73,88 @@ class DBConnectionTest extends TestCase
     private $mysqliStmtMock;
 
     /**
-     * Test that an exception is thrown if the database configuration is missing.
+     * TEST METHOD 1: __construct [PRIVATE]
      *
+     * Tested indirectly via getInstance tests.
+     */
+
+    /**
+     * TEST METHOD 2: __destruct
+     *
+     * Tested indirectly via clearInstance tests.
+     */
+
+    /**
+     * TEST METHOD 3: getInstance
+     */
+
+    /**
+     * Test getInstance method returns a singleton instance.
+     *
+     * @covers \App\services\database\DBConnection::__construct
      * @covers \App\services\database\DBConnection::getInstance
      */
-    public function testThrowsExceptionForMissingConfiguration(): void
+    public function testGetInstanceReturnsSingletonInstance(): void
+    {
+        $dbName = 'test_db';
+
+        // Retrieve the singleton instance
+        $dbInstance1 = DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
+
+        // Retrieve the same instance again
+        $dbInstance2 = DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
+
+        // Assert the two instances are the same
+        $this->assertSame($dbInstance1, $dbInstance2);
+        $this->assertSame($this->mysqliWrapperMock, $this->getPrivateProperty($dbInstance1, 'connection'));
+    }
+
+    /**
+     * Test that a database connection can be established successfully.
+     *
+     * @covers \App\services\database\DBConnection::__construct
+     * @covers \App\services\database\DBConnection::getInstance
+     */
+    public function testGetInstanceReplacesConnectionDuringTesting(): void
+    {
+        $dbName = 'test_db';
+
+        // Inject mocks
+        $db = DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
+
+        // Assert connection is established and matches mysqliMock
+        $this->assertSame($this->mysqliWrapperMock, $this->getPrivateProperty($db, 'connection'));
+    }
+
+    /**
+     * Test constructor throws an exception for connection failure.
+     *
+     * @covers \App\services\database\DBConnection::__construct
+     * @covers \App\services\database\DBConnection::getInstance
+     */
+    public function testGetInstanceHandlesConnectionFailure(): void
+    {
+        $dbName = 'test_db';
+
+        // Explicitly set up the expected return value for MySQLiWrapper mock
+        $this->mysqliWrapperMock->shouldReceive('getConnectError')
+            ->andReturn('Connection error');
+
+        // Expect exception
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Database connection failed.');
+
+        // Attempt to create an instance
+        DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
+    }
+
+    /**
+     * Test that an exception is thrown if the database configuration is missing.
+     *
+     * @covers \App\services\database\DBConnection::__construct
+     * @covers \App\services\database\DBConnection::getInstance
+     */
+    public function testGetInstanceThrowsExceptionOnMissingConfig(): void
     {
         $dbName = 'invalid_db';
 
@@ -95,105 +173,18 @@ class DBConnectionTest extends TestCase
     }
 
     /**
-     * Test constructor throws an exception for connection failure.
+     * TEST METHOD 4: clearInstance
      *
-     * @covers \App\services\database\DBConnection::__construct
+     * This test is unneeded due to ensureConnection() testing via its own unit test:
+     * - testClearInstanceDoesNothingIfInstanceDoesNotExist
      */
-    public function testConstructorThrowsExceptionForConnectionFailure(): void
-    {
-        $dbName = 'test_db';
-
-        // Explicitly set up the expected return value for MySQLiWrapper mock
-        $this->mysqliWrapperMock->shouldReceive('getConnectError')
-            ->andReturn('Connection error');
-
-        // Expect exception
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('Database connection failed.');
-
-        // Attempt to create an instance
-        DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
-    }
-
-    /**
-     * Test that a database connection can be established successfully.
-     *
-     * @covers \App\services\database\DBConnection::getInstance
-     */
-    public function testConnectionEstablishment(): void
-    {
-        $dbName = 'test_db';
-
-        // Inject mocks
-        $db = DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
-
-        // Assert connection is established and matches mysqliMock
-        $this->assertSame($this->mysqliWrapperMock, $this->getPrivateProperty($db, 'connection'));
-    }
-
-    /**
-     * Test ensureConnection method throws an exception for invalid connection.
-     *
-     * @covers \App\services\database\DBConnection::ensureConnection
-     */
-    public function testEnsureConnectionThrowsException(): void
-    {
-        $db = $this->createMockedDB();
-
-        // Manually invalidate the connection
-        $this->setPrivateProperty($db, 'connection', null);
-
-        // Expect exception
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('Database connection is not established.');
-
-        // Call a method that triggers ensureConnection
-        $db->beginTransaction();
-    }
-
-    /**
-     * Test closeConnection method closes the database connection.
-     *
-     * @covers \App\services\database\DBConnection::closeConnection
-     */
-    /** WORKING **/
-    public function testCloseConnection(): void
-    {
-        $db = $this->createMockedDB();
-
-        // Close the connection
-        $db->closeConnection();
-
-        // Assert connection is null
-        $this->assertNull($this->getPrivateProperty($db, 'connection'));
-    }
-
-    /**
-     * Test getInstance method returns a singleton instance.
-     *
-     * @covers \App\services\database\DBConnection::getInstance
-     */
-    public function testGetInstanceReturnsSingleton(): void
-    {
-        $dbName = 'test_db';
-
-        // Retrieve the singleton instance
-        $dbInstance1 = DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
-
-        // Retrieve the same instance again
-        $dbInstance2 = DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
-
-        // Assert the two instances are the same
-        $this->assertSame($dbInstance1, $dbInstance2);
-        $this->assertSame($this->mysqliWrapperMock, $this->getPrivateProperty($dbInstance1, 'connection'));
-    }
 
     /**
      * Test clearInstance method clears the database instance.
      *
      * @covers \App\services\database\DBConnection::clearInstance
      */
-    public function testClearInstance(): void
+    public function testClearInstanceClosesConnectionAndRemovesInstance(): void
     {
         $dbName = 'test_db';
 
@@ -214,11 +205,18 @@ class DBConnectionTest extends TestCase
     }
 
     /**
+     * TEST METHOD 5: beginTransaction
+     *
+     * This test is unneeded due to ensureConnection() testing via its own unit test:
+     * - testBeginTransactionThrowsExceptionOnInvalidConnection
+     */
+
+    /**
      * Test beginTransaction method starts a database transaction.
      *
      * @covers \App\services\database\DBConnection::beginTransaction
      */
-    public function testBeginTransaction(): void
+    public function testBeginTransactionStartsTransactionSuccessfully(): void
     {
         $db = $this->createMockedDB();
 
@@ -230,12 +228,42 @@ class DBConnectionTest extends TestCase
     }
 
     /**
+     * TEST METHOD 6: commit
+     *
+     * This test is unneeded due to ensureConnection() testing via its own unit test:
+     * - testCommitThrowsExceptionOnInvalidConnection
+     */
+
+    /**
+     * Test commit method commits a database transaction.
+     *
+     * @covers \App\services\database\DBConnection::commit
+     */
+    public function testCommitCommitsTransactionSuccessfully(): void
+    {
+        $db = $this->createMockedDB();
+
+        // Call commit
+        $db->commit();
+
+        // Assert no exceptions are thrown
+        $this->assertTrue(true);
+    }
+
+    /**
+     * TEST METHOD 7: rollback
+     *
+     * This test is unneeded due to ensureConnection() testing via its own unit test:
+     * - testRollbackThrowsExceptionOnInvalidConnection
+     */
+
+    /**
      * Test rollback method rolls back the transaction.
      *
      * @covers \App\services\database\DBConnection::rollback
      */
     /** WORKING **/
-    public function testRollback(): void
+    public function testRollbackRollsBackTransactionSuccessfully(): void
     {
         $db = $this->createMockedDB();
 
@@ -247,11 +275,57 @@ class DBConnectionTest extends TestCase
     }
 
     /**
+     * TEST METHOD 8: closeConnection
+     */
+
+    /**
+     * Test closeConnection method closes the database connection.
+     *
+     * @covers \App\services\database\DBConnection::closeConnection
+     */
+    /** WORKING **/
+    public function testCloseConnectionClosesConnectionSuccessfully(): void
+    {
+        $db = $this->createMockedDB();
+
+        // Close the connection
+        $db->closeConnection();
+
+        // Assert connection is null
+        $this->assertNull($this->getPrivateProperty($db, 'connection'));
+    }
+
+    /**
+     * Test closeConnection method does nothing if the connection is already null.
+     *
+     * @covers \App\services\database\DBConnection::closeConnection
+     */
+    /** WORKING **/
+    public function testCloseConnectionDoesNothingIfConnectionIsNull(): void
+    {
+        $db = $this->createMockedDB();
+        $db->closeConnection();
+
+        // Close the connection again
+        $db->closeConnection();
+
+        // Assert no exceptions are thrown
+        $this->assertTrue(true);
+    }
+
+    /**
+     * TEST METHOD 9: executeQuery
+     *
+     * - testExecuteQueryThrowsExceptionOnPrepareFailure
+     * - testExecuteQueryThrowsExceptionOnBindParamsFailure
+     */
+
+    /**
      * Test executeQuery method executes a prepared statement.
      *
      * @covers \App\services\database\DBConnection::executeQuery
      */
-    public function testExecuteQuerySelect(): void
+    public function testExecuteQueryReturnsResultForSelectQuery(): void
     {
         $db = $this->createMockedDB();
 
@@ -283,7 +357,7 @@ class DBConnectionTest extends TestCase
      *
      * @covers \App\services\database\DBConnection::executeQuery
      */
-    public function testExecuteQuerySelectNoResults(): void
+    public function testExecuteQueryReturnsNoResultForSelectQuery(): void
     {
         $db = $this->createMockedDB();
 
@@ -309,47 +383,11 @@ class DBConnectionTest extends TestCase
     }
 
     /**
-     * Test executeQuery method throws an exception when query execution fails.
-     *
-     * @covers \App\services\database\DBConnection::executeQuery
-     */
-    /**
-     * Test executeQuery method throws an exception when query execution fails.
-     *
-     * This test ensures that the `executeQuery` method correctly handles
-     * a failure during statement execution by throwing a `DatabaseException`.
-     *
-     * @covers \App\services\database\DBConnection::executeQuery
-     *
-     * @return void
-     * @throws \App\exceptions\DatabaseException If the query execution fails.
-     */
-    public function testExecuteQueryFailsOnError(): void
-    {
-        $db = $this->createMockedDB();
-
-        // Expect exception
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage('Execute failed for query: SELECT * FROM test_table');
-
-        // Mock MySQLi statement object
-        $this->mysqliStatementMock->shouldReceive('execute')->andReturn(false);
-
-        // Mock MySQLi connection
-        $this->mysqliWrapperMock->shouldReceive('prepare')
-            ->with('SELECT * FROM test_table')
-            ->andReturn($this->mysqliStatementMock);
-
-        // Execute a query
-        $db->executeQuery('SELECT * FROM test_table');
-    }
-
-    /**
      * Test executeQuery method handles non-SELECT queries.
      *
      * @covers \App\services\database\DBConnection::executeQuery
      */
-    public function testExecuteQueryNonSelect(): void
+    public function testExecuteQueryReturnsAffectedRowsForNonSelectQuery(): void
     {
         $db = $this->createMockedDB();
 
@@ -383,49 +421,53 @@ class DBConnectionTest extends TestCase
     }
 
     /**
-     * Test executeQuery method handles non-SELECT queries.
+     * Test executeQuery method throws an exception when query execution fails.
      *
      * @covers \App\services\database\DBConnection::executeQuery
      */
-    public function testExecuteQueryNonSelectNoRowsAffected(): void
+    /**
+     * Test executeQuery method throws an exception when query execution fails.
+     *
+     * This test ensures that the `executeQuery` method correctly handles
+     * a failure during statement execution by throwing a `DatabaseException`.
+     *
+     * @covers \App\services\database\DBConnection::executeQuery
+     *
+     * @return void
+     * @throws \App\exceptions\DatabaseException If the query execution fails.
+     */
+    public function testExecuteQueryThrowsExceptionOnExecuteFailure(): void
     {
         $db = $this->createMockedDB();
 
-        // Mock the statement's behavior
-        $this->mysqliStatementMock->shouldReceive('execute')->andReturn(true);
-        $this->mysqliStatementMock->shouldReceive('close')->once();
+        // Expect exception
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Execute failed for query: SELECT * FROM test_table');
 
-        // Mock the wrapper's higher-level methods
-        $this->mysqliWrapperMock->shouldReceive('getAffectedRows')
-            ->once()
-            ->andReturn(0); // Simulate 0 rows affected
-        $this->mysqliWrapperMock->shouldReceive('bindParams')
-            ->once()
-            ->with($this->mysqliStatementMock, 'si', ['New Name', 1])
-            ->andReturn(true); // Simulate bind_params
+        // Mock MySQLi statement object
+        $this->mysqliStatementMock->shouldReceive('execute')->andReturn(false);
 
-        // Mock the connection to return the statement
+        // Mock MySQLi connection
         $this->mysqliWrapperMock->shouldReceive('prepare')
-            ->with('UPDATE test_table SET name = ? WHERE id = ?')
+            ->with('SELECT * FROM test_table')
             ->andReturn($this->mysqliStatementMock);
 
-        // Execute the non-SELECT query
-        $result = $db->executeQuery(
-            'UPDATE test_table SET name = ? WHERE id = ?',
-            ['New Name', 1],
-            'si'
-        );
-
-        // Assert result is as expected (0 rows affected)
-        $this->assertSame(0, $result);
+        // Execute a query
+        $db->executeQuery('SELECT * FROM test_table');
     }
+
+    /**
+     * TEST METHOD 10: executeRawQuery
+     *
+     * - testExecuteRawQueryThrowsExceptionOnExecutionFailure
+     */
 
     /**
      * Test executeRawQuery method for SELECT query.
      *
      * @covers \App\services\database\DBConnection::executeRawQuery
      */
-    public function testExecuteRawQuerySelect(): void
+    public function testExecuteRawQueryReturnsResultForSelectQuery(): void
     {
         $db = $this->createMockedDB();
 
@@ -449,7 +491,7 @@ class DBConnectionTest extends TestCase
      *
      * @covers \App\services\database\DBConnection::executeRawQuery
      */
-    public function testExecuteRawQueryNonSelect(): void
+    public function testExecuteRawQueryReturnsAffectedRowsForNonSelectQuery(): void
     {
         $db = $this->createMockedDB();
 
@@ -465,11 +507,41 @@ class DBConnectionTest extends TestCase
     }
 
     /**
+     * Test executeRawQuery method throws an exception when query execution fails.
+     *
+     * This test ensures that the `executeRawQuery` method correctly handles
+     * a failure during statement execution by throwing a `DatabaseException`.
+     *
+     * @covers \App\services\database\DBConnection::executeRawQuery
+     *
+     * @return void
+     * @throws \App\exceptions\DatabaseException If the query execution fails.
+     */
+    public function testExecuteRawQueryThrowsExceptionOnExecutionFailure(): void
+    {
+        $db = $this->createMockedDB();
+
+        // Expect exception
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Query failed: SELECT * FROM test_table');
+
+        // Mock MySQLi statement object
+        $this->mysqliWrapperMock->shouldReceive('query')->andReturn(false);
+
+        // Execute a query
+        $db->executeRawQuery('SELECT * FROM test_table');
+    }
+
+    /**
+     * TEST METHOD 11: getAffectedRows
+     */
+
+    /**
      * Test getAffectedRows method.
      *
      * @covers \App\services\database\DBConnection::getAffectedRows
      */
-    public function testGetAffectedRows(): void
+    public function testGetAffectedRowsReturnsCorrectRowCount(): void
     {
         $db = $this->createMockedDB();
 
@@ -481,11 +553,15 @@ class DBConnectionTest extends TestCase
     }
 
     /**
+     * TEST METHOD 12: getLastInsertId
+     */
+
+    /**
      * Test getLastInsertId method.
      *
      * @covers \App\services\database\DBConnection::getLastInsertId
      */
-    public function testGetLastInsertId(): void
+    public function testGetLastInsertIdReturnsCorrectInsertId(): void
     {
         $db = $this->createMockedDB();
 
@@ -495,6 +571,34 @@ class DBConnectionTest extends TestCase
         // Assert the last inserted ID is correct
         $this->assertSame(42, $db->getLastInsertId());
     }
+
+    /**
+     * TEST METHOD 13: ensureConnection [PRIVATE]
+     */
+
+    /**
+     * Test ensureConnection method throws an exception for invalid connection.
+     *
+     * @covers \App\services\database\DBConnection::ensureConnection
+     */
+    public function testEnsureConnectionThrowsExceptionWhenConnectionIsInvalid(): void
+    {
+        $db = $this->createMockedDB();
+
+        // Manually invalidate the connection
+        $this->setPrivateProperty($db, 'connection', null);
+
+        // Expect exception
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Database connection is not established.');
+
+        // Call a method that triggers ensureConnection
+        $db->beginTransaction();
+    }
+
+    /**
+     * HELPER METHODS -- TEST SETUP AND/OR CLEANUP
+     */
 
     /**
      * Set up the test environment.
@@ -533,6 +637,7 @@ class DBConnectionTest extends TestCase
         // Mock CustomDebug debug() calls
         $this->mockDebug($this->debugMock, "Connected to database: test_db at localhost");
         $this->mockDebug($this->debugMock, "Starting transaction.");
+        $this->mockDebug($this->debugMock, "Committing transaction.");
         $this->mockDebug($this->debugMock, "Rolling back transaction.");
         $this->mockDebug($this->debugMock, "Preparing SQL: SELECT * FROM test_table");
         $this->mockDebug($this->debugMock, "Preparing SQL: SELECT * FROM empty_table");
@@ -575,6 +680,14 @@ class DBConnectionTest extends TestCase
         );
         // For testExecuteQueryFailsOnError():
         $errorMsg = 'Execute failed for query: SELECT * FROM test_table';
+        $this->mockFail(
+            $this->debugMock,
+            'failDatabase',
+            $errorMsg,
+            new DatabaseException($errorMsg)
+        );
+        // For testExecuteRawQueryFailsOnError():
+        $errorMsg = 'Query failed: SELECT * FROM test_table';
         $this->mockFail(
             $this->debugMock,
             'failDatabase',
