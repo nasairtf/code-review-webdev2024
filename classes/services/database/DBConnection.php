@@ -242,7 +242,7 @@ class DBConnection
 
         // Handle query preparation failure
         if (!$stmt) {
-            $this->debug->failDatabase("Prepare failed for query: {$sql}", $this->connection->error);
+            $this->debug->failDatabase("Prepare failed for query: {$sql}", $this->connection->getError());
         }
 
         // If there are parameters to bind, bind them to the prepared statement
@@ -282,7 +282,6 @@ class DBConnection
         }
 
         // Handle non-SELECT queries by returning the number of affected rows
-        //$affectedRows = $stmt->affected_rows;
         $affectedRows = $this->connection->getAffectedRows();
         $this->debug->debug("Query affected {$affectedRows} rows.");
         $stmt->close();
@@ -311,7 +310,7 @@ class DBConnection
 
         // Handle execution failure
         if (!$result) {
-            $this->debug->failDatabase("Query failed: {$sql}", $this->connection->error);
+            $this->debug->failDatabase("Query failed: {$sql}", $this->connection->getError());
         }
 
         // Handle SELECT queries by returning the result set
@@ -326,7 +325,6 @@ class DBConnection
         }
 
         // Handle non-SELECT queries by returning the number of affected rows
-        //$affectedRows = $this->connection->affected_rows;
         $affectedRows = $this->connection->getAffectedRows();
         $this->debug->debug("Query affected {$affectedRows} rows.");
         return $affectedRows;
@@ -343,7 +341,6 @@ class DBConnection
         $this->ensureConnection();
 
         // Return the affected rows
-        //return $this->connection->affected_rows;
         return $this->connection->getAffectedRows();
     }
 
@@ -358,7 +355,6 @@ class DBConnection
         $this->ensureConnection();
 
         // Return the last inserted ID
-        //return $this->connection->insert_id;
         return $this->connection->getLastInsertId();
     }
 
