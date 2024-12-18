@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\services\database;
 
-
 /**
  * MySQLiWrapper class provides an abstraction layer over PHP's MySQLi extension.
  *

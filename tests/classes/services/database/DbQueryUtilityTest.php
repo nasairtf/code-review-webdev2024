@@ -45,7 +45,8 @@ use App\exceptions\DatabaseException;
  */
 class DbQueryUtilityTest extends TestCase
 {
-    use CustomDebugMockTrait, DBConnectionMockTrait;
+    use CustomDebugMockTrait;
+    use DBConnectionMockTrait;
 
     /**
      * TEST METHOD 1: executeSelectQueryWithDebug
@@ -79,7 +80,9 @@ class DbQueryUtilityTest extends TestCase
         // Set Debug expectations
         $debugMock->shouldReceive('debug')->with("SQL: {$sql}")->once();
         $debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
-        $debugMock->shouldReceive('debugVariable')->with([['id' => 1, 'name' => 'John Doe']], 'Query [SELECT] Results')->once();
+        $debugMock->shouldReceive('debugVariable')
+            ->with([['id' => 1, 'name' => 'John Doe']], 'Query [SELECT] Results')
+            ->once();
 
         // Call the method under test
         $results = DbQueryUtility::executeSelectQueryWithDebug($debugMock, $dbMock, $sql, $params, $types);

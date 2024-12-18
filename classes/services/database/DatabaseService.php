@@ -28,7 +28,7 @@ class DatabaseService
         ?DBConnection $db = null,
         ?CustomDebug $debug = null
     ) {
-        $this->debug = $debug ?? new CustomDebug('database', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
+        $this->debug = $debug ?? new CustomDebug('database', $debugMode ?? false, $debugMode ? 1 : 0);
         $this->db = $db ?? DBConnection::getInstance($dbName, $debugMode ?? false);
     }
 

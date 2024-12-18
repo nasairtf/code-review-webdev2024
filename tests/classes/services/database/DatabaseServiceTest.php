@@ -52,7 +52,9 @@ use App\exceptions\DatabaseException;
  */
 class DatabaseServiceTest extends TestCase
 {
-    use PrivatePropertyTrait, CustomDebugMockTrait, DBConnectionMockTrait;
+    use PrivatePropertyTrait;
+    use CustomDebugMockTrait;
+    use DBConnectionMockTrait;
 
     /**
      * Mock instance of CustomDebug.

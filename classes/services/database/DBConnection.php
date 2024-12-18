@@ -71,7 +71,7 @@ class DBConnection
         ?CustomDebug $debug = null
     ) {
         // Only set debug mode once during instance creation
-        $this->debug = $debug ?? new CustomDebug('db', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
+        $this->debug = $debug ?? new CustomDebug('db', $debugMode ?? false, $debugMode ? 1 : 0);
 
         // Fetch the config for DBConnection credentials
         $config = Config::get('db_config');
@@ -134,7 +134,7 @@ class DBConnection
         ?CustomDebug $debug = null
     ): DBConnection {
         if (!isset(self::$instances[$dbName])) {
-            self::$instances[$dbName] = new self($dbName, $debugMode ?? false, $mysqliWrapper, $debug); // base-level service class
+            self::$instances[$dbName] = new self($dbName, $debugMode ?? false, $mysqliWrapper, $debug);
         } elseif ($mysqliWrapper && self::$instances[$dbName]->connection !== $mysqliWrapper) {
             // Replace the existing connection with the provided $mysqliWrapper during testing
             self::$instances[$dbName]->connection = $mysqliWrapper;

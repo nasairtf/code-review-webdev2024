@@ -99,8 +99,13 @@ class TestDatabaseService extends BaseService
      * @return int                 The number of affected rows.
      * @throws Exception           If the query fails or affects an unexpected number of rows.
      */
-    public function modifyDataWithQueryProxy(string $sql, array $params, string $types, int $rowsExpected, string $errorMessage): int
-    {
+    public function modifyDataWithQueryProxy(
+        string $sql,
+        array $params,
+        string $types,
+        int $rowsExpected,
+        string $errorMessage
+    ): int {
         return $this->modifyDataWithQuery($sql, $params, $types, $rowsExpected, $errorMessage);
     }
 

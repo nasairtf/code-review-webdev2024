@@ -49,7 +49,10 @@ use App\exceptions\DatabaseException;
  */
 class DBConnectionTest extends TestCase
 {
-    use PrivatePropertyTrait, ConfigMockTrait, CustomDebugMockTrait, MySQLiWrapperMockTrait;
+    use PrivatePropertyTrait;
+    use ConfigMockTrait;
+    use CustomDebugMockTrait;
+    use MySQLiWrapperMockTrait;
 
     /**
      * Mock instance of CustomDebug.
