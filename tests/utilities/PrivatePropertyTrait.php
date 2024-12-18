@@ -44,4 +44,19 @@ trait PrivatePropertyTrait
         $prop->setAccessible(true);
         $prop->setValue($object, $value);
     }
+
+    /**
+     * Helper method to assert a mocked dependency is correctly set as a private property.
+     *
+     * @param mixed  $expected  The expected mock object.
+     * @param string $property  The private property name to check.
+     * @param object $instance  The instance containing the private property.
+     *
+     * @return void
+     */
+    public function assertDependency($expected, string $property, $instance): void
+    {
+        $actual = $this->getPrivateProperty($instance, $property);
+        $this->assertSame($expected, $actual, "Failed asserting that '{$property}' is correctly set.");
+    }
 }
