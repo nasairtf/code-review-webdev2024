@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\services\database;
 
-use Exception;
-use App\core\common\Debug;
+use App\exceptions\DatabaseException;
+use App\services\database\DBConnection;
+use App\core\common\CustomDebug;
 
 /**
  * DatabaseService class that provides core functionality for all database services.
@@ -23,10 +24,12 @@ class DatabaseService
 
     public function __construct(
         string $dbName,
-        ?bool $debugMode = null
+        ?bool $debugMode = null,
+        ?DBConnection $db = null,
+        ?CustomDebug $debug = null
     ) {
-        $this->debug = new Debug('database', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
-        $this->db = DB::getInstance($dbName, $debugMode ?? false);
+        $this->debug = $debug ?? new CustomDebug('database', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
+        $this->db = $db ?? DBConnection::getInstance($dbName, $debugMode ?? false);
     }
 
     /**
@@ -132,8 +135,8 @@ class DatabaseService
                 $types,
                 $resultType
             );
-        } catch (Exception $e) {
-            $this->debug->fail("Error executing SELECT query: " . $e->getMessage());
+        } catch (DatabaseException $e) {
+            $this->debug->failDatabase("Error executing SELECT query: " . $e->getMessage());
         }
     }
 
@@ -155,8 +158,8 @@ class DatabaseService
                 $data,
                 $errorMessage
             );
-        } catch (Exception $e) {
-            $this->debug->fail("Empty result error: " . $e->getMessage());
+        } catch (DatabaseException $e) {
+            $this->debug->failDatabase("Empty result error: " . $e->getMessage());
         }
     }
 
@@ -213,8 +216,8 @@ class DatabaseService
                 $params,
                 $types
             );
-        } catch (Exception $e) {
-            $this->debug->fail("Error executing INSERT/UPDATE/DELETE query: " . $e->getMessage());
+        } catch (DatabaseException $e) {
+            $this->debug->failDatabase("Error executing INSERT/UPDATE/DELETE query: " . $e->getMessage());
         }
     }
 
@@ -239,8 +242,8 @@ class DatabaseService
                 $rowsExpected,
                 $errorMessage
             );
-        } catch (Exception $e) {
-            $this->debug->fail("Unexpected row-count error: " . $e->getMessage());
+        } catch (DatabaseException $e) {
+            $this->debug->failDatabase("Unexpected row-count error: " . $e->getMessage());
         }
     }
 
