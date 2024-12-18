@@ -32,6 +32,7 @@ trait MySQLiWrapperMockTrait
 
         // Default behaviors unless specifically overridden in a given test
         $myMock->shouldReceive('getConnectError')->andReturnNull()->byDefault();
+        $myMock->shouldReceive('getError')->andReturnNull()->byDefault();
 
         return $myMock;
     }
