@@ -242,7 +242,7 @@ class DBConnection
 
         // Handle query preparation failure
         if (!$stmt) {
-            $this->debug->failDatabase("Prepare failed for query: {$sql}", $this->connection->getError());
+            $this->debug->failDatabase("Prepare failed for query: {$sql}");
         }
 
         // If there are parameters to bind, bind them to the prepared statement
