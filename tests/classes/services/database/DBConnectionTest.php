@@ -109,7 +109,7 @@ class DBConnectionTest extends TestCase
 
         // Assert the two instances are the same
         $this->assertSame($dbInstance1, $dbInstance2);
-        $this->assertSame($this->mysqliWrapperMock, $this->getPrivateProperty($dbInstance1, 'connection'));
+        $this->assertDependency($this->mysqliWrapperMock, 'connection', $dbInstance1);
     }
 
     /**
@@ -126,7 +126,7 @@ class DBConnectionTest extends TestCase
         $db = DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
 
         // Assert connection is established and matches mysqliMock
-        $this->assertSame($this->mysqliWrapperMock, $this->getPrivateProperty($db, 'connection'));
+        $this->assertDependency($this->mysqliWrapperMock, 'connection', $db);
     }
 
     /**

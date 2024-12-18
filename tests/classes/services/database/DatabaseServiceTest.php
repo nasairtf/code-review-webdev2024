@@ -99,8 +99,8 @@ class DatabaseServiceTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(TestDatabaseService::class, $service);
-        $this->assertSame($dbMock, $this->getPrivateProperty($service, 'db'));
-        $this->assertSame($debugMock, $this->getPrivateProperty($service, 'debug'));
+        $this->assertDependency($dbMock, 'db', $service);
+        $this->assertDependency($debugMock, 'debug', $service);
     }
 
     /**
