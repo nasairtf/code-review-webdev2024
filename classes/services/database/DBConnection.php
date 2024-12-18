@@ -310,7 +310,7 @@ class DBConnection
 
         // Handle execution failure
         if (!$result) {
-            $this->debug->failDatabase("Query failed: {$sql}", $this->connection->getError());
+            $this->debug->failDatabase("Query failed: {$sql}");
         }
 
         // Handle SELECT queries by returning the result set
