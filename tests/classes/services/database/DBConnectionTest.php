@@ -40,7 +40,7 @@ use App\exceptions\DatabaseException;
  * testExecuteQueryThrowsExceptionOnExecuteFailure [DONE]
  * testExecuteRawQueryReturnsResultForSelectQuery [DONE]
  * testExecuteRawQueryReturnsAffectedRowsForNonSelectQuery [DONE]
- * testExecuteRawQueryThrowsExceptionOnExecutionFailure [MISSING? OR COVERED ELSEWHERE?]
+ * testExecuteRawQueryThrowsExceptionOnExecutionFailure [DONE]
  * testGetAffectedRowsReturnsCorrectRowCount [DONE]
  * testGetLastInsertIdReturnsCorrectInsertId [DONE]
  * testEnsureConnectionThrowsExceptionWhenConnectionIsInvalid [DONE]
@@ -421,10 +421,33 @@ class DBConnectionTest extends TestCase
     }
 
     /**
-     * Test executeQuery method throws an exception when query execution fails.
+     * Test executeQuery method throws an exception when query preparation fails.
+     *
+     * This test ensures that the `executeQuery` method correctly handles
+     * a failure during statement preparation by throwing a `DatabaseException`.
      *
      * @covers \App\services\database\DBConnection::executeQuery
+     *
+     * @return void
+     * @throws \App\exceptions\DatabaseException If the query preparation fails.
      */
+    public function testExecuteQueryThrowsExceptionOnPrepareFailure(): void
+    {
+        $db = $this->createMockedDB();
+
+        // Expect exception
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage('Prepare failed for query: SELECT * FROM test_table');
+
+        // Mock MySQLi connection to simulate preparation failure
+        $this->mysqliWrapperMock->shouldReceive('prepare')
+            ->with('SELECT * FROM test_table')
+            ->andReturn(false);
+
+        // Execute a query
+        $db->executeQuery('SELECT * FROM test_table');
+    }
+
     /**
      * Test executeQuery method throws an exception when query execution fails.
      *
@@ -458,8 +481,6 @@ class DBConnectionTest extends TestCase
 
     /**
      * TEST METHOD 10: executeRawQuery
-     *
-     * - testExecuteRawQueryThrowsExceptionOnExecutionFailure
      */
 
     /**
@@ -642,6 +663,7 @@ class DBConnectionTest extends TestCase
         $this->mockDebug($this->debugMock, "Preparing SQL: SELECT * FROM test_table");
         $this->mockDebug($this->debugMock, "Preparing SQL: SELECT * FROM empty_table");
         $this->mockDebug($this->debugMock, "Preparing SQL: UPDATE test_table SET name = ? WHERE id = ?");
+        $this->mockDebug($this->debugMock, "Prepare failed for query: SELECT * FROM test_table");
         $this->mockDebug($this->debugMock, "Executing Raw SQL: SELECT * FROM test_table");
         $this->mockDebug($this->debugMock, "Executing Raw SQL: DELETE FROM test_table");
         $this->mockDebug($this->debugMock, "Executed query successfully.");
@@ -654,7 +676,7 @@ class DBConnectionTest extends TestCase
         $this->mockDebug($this->debugMock, "Connection to database test_db has been closed.");
 
         // Mock CustomDebug fail() calls and exception throws
-        // For testThrowsExceptionForMissingConfiguration():
+        // For testGetInstanceThrowsExceptionOnMissingConfig():
         $errorMsg = "Database configuration for 'invalid_db' not found.";
         $this->mockFail(
             $this->debugMock,
@@ -662,7 +684,7 @@ class DBConnectionTest extends TestCase
             $errorMsg,
             new DatabaseException($errorMsg)
         );
-        // For testConstructorThrowsExceptionForConnectionFailure():
+        // For testGetInstanceHandlesConnectionFailure():
         $errorMsg = 'Database connection failed.';
         $this->mockFail(
             $this->debugMock,
@@ -670,7 +692,7 @@ class DBConnectionTest extends TestCase
             $errorMsg,
             new DatabaseException($errorMsg)
         );
-        // For testEnsureConnectionThrowsException():
+        // For testEnsureConnectionThrowsExceptionWhenConnectionIsInvalid():
         $errorMsg = 'Database connection is not established.';
         $this->mockFail(
             $this->debugMock,
@@ -678,7 +700,7 @@ class DBConnectionTest extends TestCase
             $errorMsg,
             new DatabaseException($errorMsg)
         );
-        // For testExecuteQueryFailsOnError():
+        // For testExecuteQueryThrowsExceptionOnExecuteFailure():
         $errorMsg = 'Execute failed for query: SELECT * FROM test_table';
         $this->mockFail(
             $this->debugMock,
@@ -686,8 +708,24 @@ class DBConnectionTest extends TestCase
             $errorMsg,
             new DatabaseException($errorMsg)
         );
-        // For testExecuteRawQueryFailsOnError():
+        // For testExecuteRawQueryThrowsExceptionOnExecutionFailure():
         $errorMsg = 'Query failed: SELECT * FROM test_table';
+        $this->mockFail(
+            $this->debugMock,
+            'failDatabase',
+            $errorMsg,
+            new DatabaseException($errorMsg)
+        );
+        // For testExecuteQueryThrowsExceptionOnPrepareFailure():
+        $errorMsg = 'Prepare failed for query: SELECT * FROM test_table';
+        $this->mockFail(
+            $this->debugMock,
+            'failDatabase',
+            $errorMsg,
+            new DatabaseException($errorMsg)
+        );
+        // For testExecuteQueryThrowsExceptionOnBindParamsFailure():
+        $errorMsg = 'Failed to bind parameters for query: SELECT * FROM test_table';
         $this->mockFail(
             $this->debugMock,
             'failDatabase',
