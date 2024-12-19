@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\services\database\feedback;
 
-use Exception;
+use App\exceptions\DatabaseException;
+use App\services\database\DBConnection;
+use App\core\common\CustomDebug;
 use App\services\database\DatabaseService as BaseService;
 use App\services\database\feedback\write\FeedbackService as   FeedbackServiceWrite;
 use App\services\database\feedback\write\InstrumentService as InstrumentServiceWrite;
@@ -32,9 +34,11 @@ class FeedbackService extends BaseService
         ?FeedbackServiceWrite $feedbackWrite = null,
         ?InstrumentServiceWrite $instrumentWrite = null,
         ?OperatorServiceWrite $operatorWrite = null,
-        ?SupportServiceWrite $supportWrite = null
+        ?SupportServiceWrite $supportWrite = null,
+        ?DBConnection $db = null,
+        ?CustomDebug $debug = null
     ) {
-        parent::__construct('feedback', $debugMode);
+        parent::__construct('feedback', $debugMode, $db, $debug);
         $this->feedbackWrite = $feedbackWrite;
         $this->instrumentWrite = $instrumentWrite;
         $this->operatorWrite = $operatorWrite;
@@ -52,7 +56,7 @@ class FeedbackService extends BaseService
         try {
             // Ensure main feedback service is present
             if (!$this->feedbackWrite) {
-                $this->debug->fail("FeedbackServiceWrite is required for insert operations.");
+                $this->debug->failDatabase('FeedbackServiceWrite is required for insert operations.');
             }
 
             // Insert main feedback record
@@ -81,10 +85,10 @@ class FeedbackService extends BaseService
             // Commit if all inserts succeed
             $this->db->commit();
             return true;
-        } catch (Exception $e) {
+        } catch (DatabaseException $e) {
             // Rollback on any failure
             $this->db->rollback();
-            $this->debug->fail("Transaction failed: " . $e->getMessage());
+            $this->debug->failDatabase("Transaction failed: " . $e->getMessage());
             return false;
         }
     }

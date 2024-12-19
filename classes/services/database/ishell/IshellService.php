@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\services\database\ishell;
 
+use App\exceptions\DatabaseException;
+use App\services\database\DBConnection;
+use App\core\common\CustomDebug;
 use App\services\database\DatabaseService as BaseService;
 
 /**
@@ -17,8 +20,11 @@ use App\services\database\DatabaseService as BaseService;
 
 class IshellService extends BaseService
 {
-    public function __construct(bool $debugMode = false)
-    {
-        parent::__construct('ishell', $debugMode);
+    public function __construct(
+        bool $debugMode = false,
+        ?DBConnection $db = null,
+        ?CustomDebug $debug = null
+    ) {
+        parent::__construct('ishell', $debugMode, $db, $debug);
     }
 }
