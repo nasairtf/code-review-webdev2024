@@ -29,10 +29,10 @@ use App\exceptions\DatabaseException;
  * Method Tests:
  * - testInsertFeedbackWithDependenciesSucceeds [DONE]
  * - testInsertFeedbackWithDependenciesFailsWithoutFeedbackWrite [DONE]
- * - testInsertFeedbackWithDependenciesHandlesFeedbackInsertFailure
- * - testInsertFeedbackWithDependenciesHandlesInstrumentInsertFailure
- * - testInsertFeedbackWithDependenciesHandlesOperatorInsertFailure
- * - testInsertFeedbackWithDependenciesHandlesSupportInsertFailure
+ * - testInsertFeedbackWithDependenciesHandlesFeedbackInsertFailure [DONE]
+ * - testInsertFeedbackWithDependenciesHandlesInstrumentInsertFailure [DONE]
+ * - testInsertFeedbackWithDependenciesHandlesOperatorInsertFailure [DONE]
+ * - testInsertFeedbackWithDependenciesHandlesSupportInsertFailure [DONE]
  * - testInsertFeedbackWithDependenciesHandlesEmptyDependencyArrays [DONE]
  *
  * @covers \App\services\database\feedback\FeedbackService
@@ -137,10 +137,6 @@ class FeedbackServiceTest extends TestCase
 
     /**
      * TEST METHOD 2: insertFeedbackWithDependencies
-     * - testInsertFeedbackWithDependenciesHandlesFeedbackInsertFailure
-     * - testInsertFeedbackWithDependenciesHandlesInstrumentInsertFailure
-     * - testInsertFeedbackWithDependenciesHandlesOperatorInsertFailure
-     * - testInsertFeedbackWithDependenciesHandlesSupportInsertFailure
      */
 
     /**
@@ -283,25 +279,9 @@ class FeedbackServiceTest extends TestCase
         // Mock the expected *ServiceWrite behavior
         $this->arrangeMockBehavior($expectations);
 
-        // Mock the CustomDebug method(s) and expected return(s)
+        // Mock the expected CustomDebug/DatabaseException behavior
         $error = 'FeedbackServiceWrite is required for insert operations.';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $error,
-            new DatabaseException($error)
-        );
-        $errorMsg = "Transaction failed: {$error}";
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-
-        // Expect exception
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage($errorMsg);
+        $this->arrangeFailureExpectations($error);
 
         // Act
         $service = new FeedbackService(
@@ -335,33 +315,417 @@ class FeedbackServiceTest extends TestCase
     }
 
     /**
-     * Mock feedbackWriteMock->insertFeedbackRecord to throw an exception.
-     * Assert that the transaction rolls back and the method returns false.
+     * Tests that insertFeedbackWithDependencies correctly handles a failure during
+     * the feedback record insertion process.
+     *
+     * This test ensures that if the `insertFeedbackRecord` method throws a
+     * `DatabaseException`, the transaction is rolled back, and the method
+     * returns the failure result. Additionally, the exception message is
+     * validated to confirm the appropriate error formatting.
+     *
+     * Mock behavior:
+     * - `insertFeedbackRecord` throws a `DatabaseException`.
+     * - No subsequent insert operations (e.g., instruments, operators, support) are executed.
+     * - The transaction is rolled back, and no commit is attempted.
+     *
+     * Assertions:
+     * - The result matches the expected failure result.
+     * - All expected mocks are called/not called as per the expectations.
+     * - Transactional behavior is verified (rollback triggered, no commit).
+     *
+     * @covers \App\services\database\feedback\FeedbackService::insertFeedbackWithDependencies
+     *
+     * @return void
      */
     public function testInsertFeedbackWithDependenciesHandlesFeedbackInsertFailure(): void
     {
+        // Define the test data
+        $data = $this->createTestData();
+
+        // Define the mock expectation data
+        $expectations = [
+            'receive'   => [],
+            'shouldnot' => [
+                ['mock' => $this->instrumentWriteMock, 'method' => 'insertInstrumentRecord'],
+                ['mock' => $this->operatorWriteMock, 'method' => 'insertOperatorRecord'],
+                ['mock' => $this->supportWriteMock, 'method' => 'insertSupportAstronomerRecord'],
+            ],
+        ];
+
+        // Arrange
+
+        // Mock the DBConnection method(s) and expected return(s)
+        $this->arrangeTransactions($this->dbMock, $data['failureResult']);
+
+        // Mock the FeedbackServiceWrite to throw an exception
+        $insertError = 'Feedback insert failed.';
+        $this->feedbackWriteMock->shouldReceive('insertFeedbackRecord')
+            ->with($data['feedback'])
+            ->andThrow(new DatabaseException($insertError))
+            ->once();
+
+        // Mock the expected *ServiceWrite behavior
+        $this->arrangeMockBehavior($expectations);
+
+        // Mock the expected CustomDebug/DatabaseException behavior
+        $this->arrangeFailureExpectations($insertError);
+
+        // Act
+        $service = new FeedbackService(
+            false,
+            $this->feedbackWriteMock,
+            $this->instrumentWriteMock,
+            $this->operatorWriteMock,
+            $this->supportWriteMock,
+            $this->dbMock,
+            $this->debugMock
+        );
+
+        // Call the method under test
+        $result = $service->insertFeedbackWithDependencies(
+            $data['feedback'],
+            $data['instruments'],
+            $data['operators'],
+            $data['support']
+        );
+
+        // Assertions
+
+        // Assert the failure results match
+        $this->assertSame($data['failureResult'], $result);
+
+        // Verify *ServiceWrite behavior
+        $this->assertMockBehavior($expectations);
+
+        // Verify transaction behavior
+        $this->assertTransactions($this->dbMock, $data['failureResult']);
     }
 
     /**
-     * Mock one of the instrumentWriteMock->insertInstrumentRecord calls to throw an exception.
-     * Assert that the transaction rolls back and the method returns false.
+     * Tests that insertFeedbackWithDependencies correctly handles a failure during
+     * the instrument record insertion process.
+     *
+     * This test ensures that if the `insertInstrumentRecord` method throws a
+     * `DatabaseException`, the transaction is rolled back, and the method
+     * returns the failure result. Additionally, the exception message is
+     * validated to confirm the appropriate error formatting.
+     *
+     * Mock behavior:
+     * - `insertFeedbackRecord` and `returnFeedbackRecordId` execute successfully.
+     * - The first call to `insertInstrumentRecord` throws a `DatabaseException`.
+     * - No subsequent insert operations (e.g., operators, support) are executed.
+     * - The transaction is rolled back, and no commit is attempted.
+     *
+     * Assertions:
+     * - The result matches the expected failure result.
+     * - All expected mocks are called/not called as per the expectations.
+     * - Transactional behavior is verified (rollback triggered, no commit).
+     *
+     * @covers \App\services\database\feedback\FeedbackService::insertFeedbackWithDependencies
+     *
+     * @return void
      */
     public function testInsertFeedbackWithDependenciesHandlesInstrumentInsertFailure(): void
     {
+        // Define the test data
+        $data = $this->createTestData();
+
+        // Define the mock expectation data
+        $expectations = [
+            'receive'   => [
+                [
+                    'mock' => $this->feedbackWriteMock,
+                    'method' => 'insertFeedbackRecord',
+                    'args' => [$data['feedback']],
+                    'return' => $data['affectedRows'],
+                ],
+                [
+                    'mock' => $this->feedbackWriteMock,
+                    'method' => 'returnFeedbackRecordId',
+                    'args' => [],
+                    'return' => $data['feedbackId'],
+                ],
+            ],
+            'shouldnot' => [
+                ['mock' => $this->operatorWriteMock, 'method' => 'insertOperatorRecord'],
+                ['mock' => $this->supportWriteMock, 'method' => 'insertSupportAstronomerRecord'],
+            ],
+        ];
+
+        // Arrange
+
+        // Mock the DBConnection method(s) and expected return(s)
+        $this->arrangeTransactions($this->dbMock, $data['failureResult']);
+
+        // Mock the InstrumentServiceWrite to throw an exception
+        $insertError = 'Instrument insert failed.';
+        $this->instrumentWriteMock->shouldReceive('insertInstrumentRecord')
+            ->with($data['feedbackId'], $data['instruments'][0])
+            ->andThrow(new DatabaseException($insertError))
+            ->once();
+
+        // Mock the expected *ServiceWrite behavior
+        $this->arrangeMockBehavior($expectations);
+
+        // Mock the expected CustomDebug/DatabaseException behavior
+        $this->arrangeFailureExpectations($insertError);
+
+        // Act
+        $service = new FeedbackService(
+            false,
+            $this->feedbackWriteMock,
+            $this->instrumentWriteMock,
+            $this->operatorWriteMock,
+            $this->supportWriteMock,
+            $this->dbMock,
+            $this->debugMock
+        );
+
+        // Call the method under test
+        $result = $service->insertFeedbackWithDependencies(
+            $data['feedback'],
+            $data['instruments'],
+            $data['operators'],
+            $data['support']
+        );
+
+        // Assertions
+
+        // Assert the failure results match
+        $this->assertSame($data['failureResult'], $result);
+
+        // Verify *ServiceWrite behavior
+        $this->assertMockBehavior($expectations);
+
+        // Verify transaction behavior
+        $this->assertTransactions($this->dbMock, $data['failureResult']);
     }
 
     /**
-     * Same pattern as the instrument test, but for operatorWriteMock.
+     * Tests that insertFeedbackWithDependencies correctly handles a failure during
+     * the operator record insertion process.
+     *
+     * This test ensures that if the `insertOperatorRecord` method throws a
+     * `DatabaseException`, the transaction is rolled back, and the method
+     * returns the failure result. Additionally, the exception message is
+     * validated to confirm the appropriate error formatting.
+     *
+     * Mock behavior:
+     * - `insertFeedbackRecord` and `returnFeedbackRecordId` execute successfully.
+     * - All `insertInstrumentRecord` calls execute successfully.
+     * - The first call to `insertOperatorRecord` throws a `DatabaseException`.
+     * - No subsequent insert operations (e.g., support) are executed.
+     * - The transaction is rolled back, and no commit is attempted.
+     *
+     * Assertions:
+     * - The result matches the expected failure result.
+     * - All expected mocks are called/not called as per the expectations.
+     * - Transactional behavior is verified (rollback triggered, no commit).
+     *
+     * @covers \App\services\database\feedback\FeedbackService::insertFeedbackWithDependencies
+     *
+     * @return void
      */
     public function testInsertFeedbackWithDependenciesHandlesOperatorInsertFailure(): void
     {
+        // Define the test data
+        $data = $this->createTestData();
+
+        // Define the mock expectation data
+        $expectations = [
+            'receive'   => [
+                [
+                    'mock' => $this->feedbackWriteMock,
+                    'method' => 'insertFeedbackRecord',
+                    'args' => [$data['feedback']],
+                    'return' => $data['affectedRows'],
+                ],
+                [
+                    'mock' => $this->feedbackWriteMock,
+                    'method' => 'returnFeedbackRecordId',
+                    'args' => [],
+                    'return' => $data['feedbackId'],
+                ],
+            ],
+            'shouldnot' => [
+                ['mock' => $this->supportWriteMock, 'method' => 'insertSupportAstronomerRecord'],
+            ],
+        ];
+        // Add dynamic expectations for instruments
+        foreach ($data['instruments'] as $hardwareID) {
+            $expectations['receive'][] = [
+                'mock' => $this->instrumentWriteMock,
+                'method' => 'insertInstrumentRecord',
+                'args' => [$data['feedbackId'], $hardwareID],
+                'return' => $data['affectedRows'],
+                'invocations' => count($data['instruments']),
+            ];
+        }
+
+        // Arrange
+
+        // Mock the DBConnection method(s) and expected return(s)
+        $this->arrangeTransactions($this->dbMock, $data['failureResult']);
+
+        // Mock the InstrumentServiceWrite to throw an exception
+        $insertError = 'Telescope operator insert failed.';
+        $this->operatorWriteMock->shouldReceive('insertOperatorRecord')
+            ->with($data['feedbackId'], $data['operators'][0])
+            ->andThrow(new DatabaseException($insertError))
+            ->once();
+
+        // Mock the expected *ServiceWrite behavior
+        $this->arrangeMockBehavior($expectations);
+
+        // Mock the expected CustomDebug/DatabaseException behavior
+        $this->arrangeFailureExpectations($insertError);
+
+        // Act
+        $service = new FeedbackService(
+            false,
+            $this->feedbackWriteMock,
+            $this->instrumentWriteMock,
+            $this->operatorWriteMock,
+            $this->supportWriteMock,
+            $this->dbMock,
+            $this->debugMock
+        );
+
+        // Call the method under test
+        $result = $service->insertFeedbackWithDependencies(
+            $data['feedback'],
+            $data['instruments'],
+            $data['operators'],
+            $data['support']
+        );
+
+        // Assertions
+
+        // Assert the failure results match
+        $this->assertSame($data['failureResult'], $result);
+
+        // Verify *ServiceWrite behavior
+        $this->assertMockBehavior($expectations);
+
+        // Verify transaction behavior
+        $this->assertTransactions($this->dbMock, $data['failureResult']);
     }
 
     /**
-     * Same pattern, but mock supportWriteMock.
+     * Tests that insertFeedbackWithDependencies correctly handles a failure during
+     * the support record insertion process.
+     *
+     * This test ensures that if the `insertSupportAstronomerRecord` method throws a
+     * `DatabaseException`, the transaction is rolled back, and the method
+     * returns the failure result. Additionally, the exception message is
+     * validated to confirm the appropriate error formatting.
+     *
+     * Mock behavior:
+     * - `insertFeedbackRecord` and `returnFeedbackRecordId` execute successfully.
+     * - All `insertInstrumentRecord` and `insertOperatorRecord` calls execute successfully.
+     * - The first call to `insertSupportAstronomerRecord` throws a `DatabaseException`.
+     * - The transaction is rolled back, and no commit is attempted.
+     *
+     * Assertions:
+     * - The result matches the expected failure result.
+     * - All expected mocks are called/not called as per the expectations.
+     * - Transactional behavior is verified (rollback triggered, no commit).
+     *
+     * @covers \App\services\database\feedback\FeedbackService::insertFeedbackWithDependencies
+     *
+     * @return void
      */
     public function testInsertFeedbackWithDependenciesHandlesSupportInsertFailure(): void
     {
+        // Define the test data
+        $data = $this->createTestData();
+
+        // Define the mock expectation data
+        $expectations = [
+            'receive'   => [
+                [
+                    'mock' => $this->feedbackWriteMock,
+                    'method' => 'insertFeedbackRecord',
+                    'args' => [$data['feedback']],
+                    'return' => $data['affectedRows'],
+                ],
+                [
+                    'mock' => $this->feedbackWriteMock,
+                    'method' => 'returnFeedbackRecordId',
+                    'args' => [],
+                    'return' => $data['feedbackId'],
+                ],
+            ],
+            'shouldnot' => [],
+        ];
+        // Add dynamic expectations for instruments
+        foreach ($data['instruments'] as $hardwareID) {
+            $expectations['receive'][] = [
+                'mock' => $this->instrumentWriteMock,
+                'method' => 'insertInstrumentRecord',
+                'args' => [$data['feedbackId'], $hardwareID],
+                'return' => $data['affectedRows'],
+                'invocations' => count($data['instruments']),
+            ];
+        }
+        // Add dynamic expectations for operators
+        foreach ($data['operators'] as $operatorID) {
+            $expectations['receive'][] = [
+                'mock' => $this->operatorWriteMock,
+                'method' => 'insertOperatorRecord',
+                'args' => [$data['feedbackId'], $operatorID],
+                'return' => $data['affectedRows'],
+                'invocations' => count($data['operators']),
+            ];
+        }
+
+        // Arrange
+
+        // Mock the DBConnection method(s) and expected return(s)
+        $this->arrangeTransactions($this->dbMock, $data['failureResult']);
+
+        // Mock the InstrumentServiceWrite to throw an exception
+        $insertError = 'Support astronomer insert failed.';
+        $this->supportWriteMock->shouldReceive('insertSupportAstronomerRecord')
+            ->with($data['feedbackId'], $data['support'][0])
+            ->andThrow(new DatabaseException($insertError))
+            ->once();
+
+        // Mock the expected *ServiceWrite behavior
+        $this->arrangeMockBehavior($expectations);
+
+        // Mock the expected CustomDebug/DatabaseException behavior
+        $this->arrangeFailureExpectations($insertError);
+
+        // Act
+        $service = new FeedbackService(
+            false,
+            $this->feedbackWriteMock,
+            $this->instrumentWriteMock,
+            $this->operatorWriteMock,
+            $this->supportWriteMock,
+            $this->dbMock,
+            $this->debugMock
+        );
+
+        // Call the method under test
+        $result = $service->insertFeedbackWithDependencies(
+            $data['feedback'],
+            $data['instruments'],
+            $data['operators'],
+            $data['support']
+        );
+
+        // Assertions
+
+        // Assert the failure results match
+        $this->assertSame($data['failureResult'], $result);
+
+        // Verify *ServiceWrite behavior
+        $this->assertMockBehavior($expectations);
+
+        // Verify transaction behavior
+        $this->assertTransactions($this->dbMock, $data['failureResult']);
     }
 
     /**
@@ -529,5 +893,47 @@ class FeedbackServiceTest extends TestCase
             'successResult' => true,  // Expected result for successful record insertion
             'failureResult' => false, // Expected result for record insertion failure
         ];
+    }
+
+    /**
+     * Sets up mock expectations for handling failure scenarios within transactional workflows.
+     *
+     * This helper method configures the `debugMock` to simulate and validate the behavior
+     * of the system when an error occurs during a transactional operation. It ensures that:
+     * - Two calls to `failDatabase` are mocked:
+     *   - The first call handles the original error message.
+     *   - The second call handles the formatted transaction error message.
+     * - A `DatabaseException` with the formatted transaction error message is expected.
+     *
+     * Example behavior:
+     * - When a failure occurs in any of the insert operations, this method ensures
+     *   that both the original and transaction error messages are logged.
+     * - The test then asserts that the transaction is rolled back and the correct
+     *   `DatabaseException` is thrown.
+     *
+     * @param string $error The error message associated with the failure.
+     *
+     * @return void
+     */
+    private function arrangeFailureExpectations(string $error): void
+    {
+        // Mock the CustomDebug method(s) and expected return(s)
+        $transactionError = "Transaction failed: {$error}";
+        $this->mockFail(
+            $this->debugMock,
+            'failDatabase',
+            $error,
+            new DatabaseException($error)
+        );
+        $this->mockFail(
+            $this->debugMock,
+            'failDatabase',
+            $transactionError,
+            new DatabaseException($transactionError)
+        );
+
+        // Expect exception
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage($transactionError);
     }
 }
