@@ -40,6 +40,7 @@ use Mockery;
  *                     'method' => 'someMethod',
  *                     'args' => ['arg1', 'arg2'],
  *                     'return' => 'result',
+ *                     'invocations' => someMethodInvocationsCount,
  *                 ],
  *             ],
  *             'shouldnot' => [
@@ -105,8 +106,6 @@ trait MockBehaviorTrait
      */
     private function arrangeMockBehavior(array $expectations): void
     {
-        // receive:   ['mock' => '', 'method' => '', 'args' => [], 'return' => null],
-        // shouldnot: ['mock' => '', 'method' => ''],
         foreach ($expectations['receive'] as $expectation) {
             $mock   = $expectation['mock'];
             $method = $expectation['method'];
@@ -138,6 +137,7 @@ trait MockBehaviorTrait
      *   Each element in the array is an associative array with the following keys:
      *     - `mock`: The mock object on which the method was expected to be called.
      *     - `method`: The name of the method that should have been called.
+     *     - `invocations`: The number of times the method should have been called.
      *
      * - `shouldnot`: An array of expectations for methods that should not have been called on mocks.
      *   Each element in the array is an associative array with the following keys:
@@ -151,6 +151,7 @@ trait MockBehaviorTrait
      *         [
      *             'mock' => $mockObject,
      *             'method' => 'someMethod',
+     *             'invocations' => someMethodInvocationsCount,
      *         ],
      *     ],
      *     'shouldnot' => [
@@ -170,9 +171,10 @@ trait MockBehaviorTrait
     private function assertMockBehavior(array $expectations): void
     {
         foreach ($expectations['receive'] as $expectation) {
-            $mock   = $expectation['mock'];
+            $mock = $expectation['mock'];
             $method = $expectation['method'];
-            $mock->shouldHaveReceived($method)->once();
+            $invocations = $expectation['invocations'] ?? 1;
+            $mock->shouldHaveReceived($method)->times($invocations);
         }
         foreach ($expectations['shouldnot'] as $expectation) {
             $mock   = $expectation['mock'];
