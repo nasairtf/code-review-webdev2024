@@ -47,17 +47,19 @@ trait DebugMockTrait
         $myMock->shouldReceive('getDefaultColor')
             ->andReturn($defaultColor);
 
-        // Mock log(), debug(), and debugHeading() methods
+        // Mock log() method; use custom mock for including color
         $myMock->shouldReceive('log')
-            ->with(Mockery::any(), Mockery::any())
+            ->with(Mockery::any())
             ->andReturnNull();
 
+        // Mock debug() method; use custom mock for including color
         $myMock->shouldReceive('debug')
-            ->with(Mockery::any(), Mockery::any())
+            ->with(Mockery::any())
             ->andReturnNull();
 
+        // Mock debugVariable() method; use custom mock for including color
         $myMock->shouldReceive('debugVariable')
-            ->with(Mockery::any(), Mockery::any(), Mockery::any())
+            ->with(Mockery::any(), Mockery::any())
             ->andReturnNull();
 
         // Mock debugHeading() to mimic real behavior
