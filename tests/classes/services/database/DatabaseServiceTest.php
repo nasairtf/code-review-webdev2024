@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Tests\utilities\CustomDebugMockTrait;
 use Tests\utilities\DBConnectionMockTrait;
 use Tests\utilities\PrivatePropertyTrait;
+use Tests\classes\services\database\TestDatabaseService;
 use App\services\database\DatabaseService;
 use App\exceptions\DatabaseException;
 
