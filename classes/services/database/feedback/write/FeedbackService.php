@@ -44,7 +44,7 @@ class FeedbackService extends BaseService
      * Helper methods to return the query strings
      */
 
-    private function getFeedbackInsertQuery(): string
+    protected function getFeedbackInsertQuery(): string
     {
         return "INSERT INTO feedback
             (
@@ -61,7 +61,7 @@ class FeedbackService extends BaseService
      * Helper methods to return the params arrays
      */
 
-    private function getFeedbackInsertParams(array $data): array
+    protected function getFeedbackInsertParams(array $data): array
     {
         return [
             $data['start_date'], $data['end_date'], $data['technical_rating'],
@@ -76,7 +76,7 @@ class FeedbackService extends BaseService
      * Helper methods to return the types strings
      */
 
-    private function getFeedbackInsertTypes(): string
+    protected function getFeedbackInsertTypes(): string
     {
         return 'iiisiiisssssiis';
     }

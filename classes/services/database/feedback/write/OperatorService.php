@@ -36,7 +36,7 @@ class OperatorService extends BaseService
      * Helper methods to return the query strings
      */
 
-    private function getOperatorInsertQuery(): string
+    protected function getOperatorInsertQuery(): string
     {
         return "INSERT INTO operator (feedback_id, operatorID) VALUES (?, ?)";
     }

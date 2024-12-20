@@ -64,7 +64,7 @@ class FeedbackService extends BaseService
      * getProposalListingFormDataQuery - return proposal data select SQL string
      */
 
-    private function getProposalListingFormDataQuery(bool $semester = true): string
+    protected function getProposalListingFormDataQuery(bool $semester = true): string
     {
         $query = [];
         $query[] = "SELECT ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate";
@@ -84,7 +84,7 @@ class FeedbackService extends BaseService
      *
      * @return string The SQL query string.
      */
-    private function getProposalProgramDataQuery(): string
+    protected function getProposalProgramDataQuery(): string
     {
         $fields = 'ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate';
         return "SELECT {$fields} FROM ObsApp WHERE semesterYear = ? AND semesterCode = ? AND ProgramNumber = ?;";

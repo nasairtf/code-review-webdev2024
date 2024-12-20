@@ -36,7 +36,7 @@ class InstrumentService extends BaseService
      * Helper methods to return the query strings
      */
 
-    private function getInstrumentInsertQuery(): string
+    protected function getInstrumentInsertQuery(): string
     {
         return "INSERT INTO instrument (feedback_id, hardwareID) VALUES (?, ?)";
     }

@@ -36,7 +36,7 @@ class SupportService extends BaseService
      * Helper methods to return the query strings
      */
 
-    private function getSupportAstronomerInsertQuery(): string
+    protected function getSupportAstronomerInsertQuery(): string
     {
         return "INSERT INTO support (feedback_id, supportID) VALUES (?, ?)";
     }
