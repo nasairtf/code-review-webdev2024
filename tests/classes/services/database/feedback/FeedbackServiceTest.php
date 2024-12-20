@@ -832,9 +832,7 @@ class FeedbackServiceTest extends TestCase
         $this->dbMock = $this->createDBConnectionMock();
 
         // Mock the DBConnection getInstance method
-        $this->dbMock->shouldReceive('getInstance')
-            ->with('feedback', false)
-            ->andReturn($this->dbMock);
+        $this->mockGetInstance($this->dbMock, 'feedback');
 
         // Mock the database table write classes
         $this->feedbackWriteMock = Mockery::mock(\App\services\database\feedback\write\FeedbackService::class);
