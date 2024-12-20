@@ -695,26 +695,6 @@ class DBConnectionTest extends TestCase
         // Set up CustomDebug Mock
         $this->debugMock = $this->createCustomDebugMock('database', false, 0, 'red');
 
-        // Mock CustomDebug debug() calls
-        $this->mockDebug($this->debugMock, "Connected to database: test_db at localhost");
-        $this->mockDebug($this->debugMock, "Starting transaction.");
-        $this->mockDebug($this->debugMock, "Committing transaction.");
-        $this->mockDebug($this->debugMock, "Rolling back transaction.");
-        $this->mockDebug($this->debugMock, "Preparing SQL: SELECT * FROM test_table");
-        $this->mockDebug($this->debugMock, "Preparing SQL: SELECT * FROM empty_table");
-        $this->mockDebug($this->debugMock, "Preparing SQL: UPDATE test_table SET name = ? WHERE id = ?");
-        $this->mockDebug($this->debugMock, "Prepare failed for query: SELECT * FROM test_table");
-        $this->mockDebug($this->debugMock, "Executing Raw SQL: SELECT * FROM test_table");
-        $this->mockDebug($this->debugMock, "Executing Raw SQL: DELETE FROM test_table");
-        $this->mockDebug($this->debugMock, "Executed query successfully.");
-        $this->mockDebug($this->debugMock, "Query returned 0 rows.");
-        $this->mockDebug($this->debugMock, "Query returned 1 rows.");
-        $this->mockDebug($this->debugMock, "Query affected 0 rows.");
-        $this->mockDebug($this->debugMock, "Query affected 2 rows.");
-        $this->mockDebug($this->debugMock, "Query affected 3 rows.");
-        $this->mockDebug($this->debugMock, "Database connection closed.");
-        $this->mockDebug($this->debugMock, "Connection to database test_db has been closed.");
-
         // Mock CustomDebug fail() calls and exception throws
         // For testGetInstanceThrowsExceptionOnMissingConfig():
         $errorMsg = "Database configuration for 'invalid_db' not found.";

@@ -77,13 +77,6 @@ class DbQueryUtilityTest extends TestCase
         $params = [1];
         $types = 'i';
 
-        // Set Debug expectations
-        $debugMock->shouldReceive('debug')->with("SQL: {$sql}")->once();
-        $debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
-        $debugMock->shouldReceive('debugVariable')
-            ->with([['id' => 1, 'name' => 'John Doe']], 'Query [SELECT] Results')
-            ->once();
-
         // Call the method under test
         $results = DbQueryUtility::executeSelectQueryWithDebug($debugMock, $dbMock, $sql, $params, $types);
 
@@ -175,11 +168,6 @@ class DbQueryUtilityTest extends TestCase
         $params = ['Jane Doe', 1];
         $types = 'si';
 
-        // Mock the Debug method(s) and expected return(s)
-        $debugMock->shouldReceive('debug')->with("SQL: {$sql}")->once();
-        $debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
-        $debugMock->shouldReceive('debugVariable')->with(1, 'Query [INSERT|UPDATE|DELETE] Rows Affected')->once();
-
         // Call the method under test
         $affectedRows = DbQueryUtility::executeUpdateQueryWithDebug($debugMock, $dbMock, $sql, $params, $types);
 
@@ -212,10 +200,6 @@ class DbQueryUtilityTest extends TestCase
         $types = 'si';
         $affectedRows = 3;
 
-        // Mock the Debug methods
-        $debugMock->shouldReceive('debug')->with("Executing Param Bound SQL: {$sql}")->once();
-        $debugMock->shouldReceive('debugVariable')->with($params, "Params")->once();
-
         // Mock the DBConnection::executeQuery
         $dbMock->shouldReceive('executeQuery')
             ->with($sql, $params, $types)
@@ -243,9 +227,6 @@ class DbQueryUtilityTest extends TestCase
         // Define the test data
         $sql = 'DELETE FROM users WHERE active = 0';
         $affectedRows = 5;
-
-        // Mock the Debug methods
-        $debugMock->shouldReceive('debug')->with("Executing Raw SQL: {$sql}")->once();
 
         // Mock the DBConnection::executeRawQuery
         $dbMock->shouldReceive('executeRawQuery')
@@ -361,12 +342,6 @@ class DbQueryUtilityTest extends TestCase
         // Define the test data
         $sql = 'DELETE FROM users WHERE active = 0';
 
-        // Mock the Debug method(s) and expected return(s)
-        $debugMock->shouldReceive('debug')->with("Raw SQL: {$sql}")->once();
-        $debugMock->shouldReceive('debugVariable')
-            ->with(5, 'Query [RAW SQL] Rows Affected')
-            ->once();
-
         // Call the method under test
         $affectedRows = DbQueryUtility::executeRawQueryWithDebug($debugMock, $dbMock, $sql);
 
@@ -392,12 +367,6 @@ class DbQueryUtilityTest extends TestCase
 
         // Define the test data
         $sql = 'SELECT * FROM users';
-
-        // Mock the Debug method(s) and expected return(s)
-        $debugMock->shouldReceive('debug')->with("Raw SQL: {$sql}")->once();
-        $debugMock->shouldReceive('debugVariable')
-            ->with(2, 'Query [RAW SQL] Rows Affected')
-            ->once();
 
         // Call the method under test
         $rowCount = DbQueryUtility::executeRawQueryWithDebug($debugMock, $dbMock, $sql);

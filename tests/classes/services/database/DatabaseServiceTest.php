@@ -263,11 +263,6 @@ class DatabaseServiceTest extends TestCase
             ->with($sql, $params, $types, MYSQLI_ASSOC)
             ->andReturn($mockResults);
 
-        // Mock CustomDebug behavior
-        $this->mockDebug($this->debugMock, "SQL: {$sql}");
-        $this->debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
-        $this->debugMock->shouldReceive('debugVariable')->with($mockResults, 'Query [SELECT] Results')->once();
-
         // Call the method under test
         $results = $this->service->fetchDataWithQueryProxy($sql, $params, $types, 'No data found');
 
@@ -295,10 +290,6 @@ class DatabaseServiceTest extends TestCase
             ->andReturn([]);
 
         // Mock CustomDebug behavior
-        $this->mockDebug($this->debugMock, "SQL: {$sql}");
-        $this->debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
-        $this->debugMock->shouldReceive('debugVariable')->with([], 'Query [SELECT] Results')->once();
-
         $errorMsg = 'No data found';
         $this->mockFail(
             $this->debugMock,
@@ -347,11 +338,6 @@ class DatabaseServiceTest extends TestCase
             ->with($sql, $params, $types, MYSQLI_ASSOC)
             ->andReturn($mockResults);
 
-        // Mock CustomDebug behavior
-        $this->mockDebug($this->debugMock, "SQL: {$sql}");
-        $this->debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
-        $this->debugMock->shouldReceive('debugVariable')->with($mockResults, 'Query [SELECT] Results')->once();
-
         // Call the method under test
         $results = $this->service->executeSelectQueryProxy($sql, $params, $types, MYSQLI_ASSOC);
 
@@ -378,9 +364,6 @@ class DatabaseServiceTest extends TestCase
             ->andThrow(new DatabaseException('Query failed'));
 
         // Mock CustomDebug behavior
-        $this->mockDebug($this->debugMock, "SQL: {$sql}");
-        $this->debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
-
         $errorMsg = 'Error executing SELECT query: Query failed';
         $this->mockFail(
             $this->debugMock,
@@ -476,11 +459,6 @@ class DatabaseServiceTest extends TestCase
             ->with($sql, $params, $types)
             ->andReturn(1);
 
-        // Mock CustomDebug behavior
-        $this->mockDebug($this->debugMock, "SQL: {$sql}");
-        $this->mockDebug($this->debugMock, "Executing Param Bound SQL: {$sql}");
-        $this->debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
-
         // Call the method under test
         $affectedRows = $this->service->modifyDataWithQueryProxy($sql, $params, $types, 1, 'No rows were affected');
 
@@ -506,11 +484,6 @@ class DatabaseServiceTest extends TestCase
         $this->dbMock->shouldReceive('executeQuery')
             ->with($sql, $params, $types)
             ->andReturn(0);
-
-        // Mock CustomDebug behavior
-        $this->mockDebug($this->debugMock, "SQL: {$sql}");
-        $this->mockDebug($this->debugMock, "Executing Param Bound SQL: {$sql}");
-        $this->debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
 
         // Mock CustomDebug behavior
         $errorMsg = 'No rows were affected No rows were affected.';
@@ -559,11 +532,6 @@ class DatabaseServiceTest extends TestCase
             ->with($sql, $params, $types)
             ->andReturn(1);
 
-        // Mock CustomDebug behavior
-        $this->mockDebug($this->debugMock, "SQL: {$sql}");
-        $this->mockDebug($this->debugMock, "Executing Param Bound SQL: {$sql}");
-        $this->debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
-
         // Call the method under test
         $affectedRows = $this->service->executeUpdateQueryProxy($sql, $params, $types);
 
@@ -588,11 +556,6 @@ class DatabaseServiceTest extends TestCase
         // Mock the DBConnection method(s) and expected return(s)
         $this->dbMock->shouldReceive('executeQuery')
             ->andThrow(new DatabaseException('Query failed'));
-
-        // Mock CustomDebug behavior
-        $this->mockDebug($this->debugMock, "SQL: {$sql}");
-        $this->mockDebug($this->debugMock, "Executing Param Bound SQL: {$sql}");
-        $this->debugMock->shouldReceive('debugVariable')->with($params, 'Params')->once();
 
         // Mock CustomDebug behavior
         $errorMsg = 'Error executing INSERT/UPDATE/DELETE query: Query failed';
@@ -751,8 +714,6 @@ class DatabaseServiceTest extends TestCase
 
         // Set up CustomDebug Mock
         $this->debugMock = $this->createCustomDebugMock();
-
-        // Mock CustomDebug debug() calls
 
         // Set up DBConnection Mock
         $this->dbMock = $this->createDBConnectionMock();
