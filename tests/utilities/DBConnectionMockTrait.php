@@ -38,15 +38,20 @@ trait DBConnectionMockTrait
     }
 
     /**
-     * Mocks `DBConnection::getInstance` to return a mocked instance.
+     * Sets up a mock expectation for the `getInstance` method.
      *
-     * @param Mockery\MockInterface $mockInstance The mocked DBConnection instance to return.
+     * @param Mockery\MockInterface $dbMock The mocked DB connection.
+     * @param string                $dbName Database name.
+     *
      * @return void
      */
-    protected function mockDBConnectionGetInstance(Mockery\MockInterface $mockInstance): void
+    protected function mockGetInstance(
+        Mockery\MockInterface $dbMock,
+        string $dbName
+    ): void
     {
-        Mockery::mock('alias:' . \App\services\database\DBConnection::class)
-            ->shouldReceive('getInstance')
-            ->andReturn($mockInstance);
+        $dbMock->shouldReceive('getInstance')
+            ->with($dbName, false)
+            ->andReturn($dbMock);
     }
 }
