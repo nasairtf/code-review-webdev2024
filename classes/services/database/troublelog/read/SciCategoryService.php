@@ -63,7 +63,7 @@ class SciCategoryService extends BaseService
      * getScientificCategoryNameQuery                  - return a scientific category name select SQL string
      */
 
-    private function getScientificCategoryListQuery(bool $sortAsc = true): string
+    protected function getScientificCategoryListQuery(bool $sortAsc = true): string
     {
         /** NOTE: fix field names once table is refactored */
         return "SELECT SciCategory, SciCategoryText "
@@ -71,7 +71,7 @@ class SciCategoryService extends BaseService
             . "ORDER BY SciCategory " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getScientificCategoryIdQuery(): string
+    protected function getScientificCategoryIdQuery(): string
     {
         /** NOTE: fix field names once table is refactored */
         return "SELECT SciCategory "
@@ -79,7 +79,7 @@ class SciCategoryService extends BaseService
             . "WHERE SciCategoryText = ?";
     }
 
-    private function getScientificCategoryNameQuery(): string
+    protected function getScientificCategoryNameQuery(): string
     {
         /** NOTE: fix field names once table is refactored */
         return "SELECT SciCategoryText "

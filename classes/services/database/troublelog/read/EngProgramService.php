@@ -49,7 +49,7 @@ class EngProgramService extends BaseService
      *
      * @return string The SQL query string.
      */
-    private function getProposalEngProgramDataQuery(): string
+    protected function getProposalEngProgramDataQuery(): string
     {
         $fields = 'semesterID, programID, projectPI';
         return "SELECT {$fields} "

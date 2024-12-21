@@ -39,7 +39,7 @@ class ProgramService extends BaseService
      * getProgramInfoListQuery - return a semester's program list select SQL string
      */
 
-    private function getProgramInfoListQuery(bool $sortAsc = true): string
+    protected function getProgramInfoListQuery(bool $sortAsc = true): string
     {
         // Filter: 'programID' < 900 indicates non-engineering programs
         return "SELECT programID, projectPI "

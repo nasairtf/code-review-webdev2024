@@ -101,7 +101,7 @@ class HardwareService extends BaseService
      * getAllActiveVisitorInstrumentListQuery          - return the active visitor instrument list select SQL string
      */
 
-    private function getAllInstrumentsListQuery(bool $sortAsc = true): string
+    protected function getAllInstrumentsListQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
         #-- mode = "all" returns the instrument list with all the entries in the Hardware table;
@@ -111,7 +111,7 @@ class HardwareService extends BaseService
             . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getActiveSecondaryInstrumentsListQuery(bool $sortAsc = true): string
+    protected function getActiveSecondaryInstrumentsListQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
         #-- mode = "secon" returns the instrument list with all the active secondary entries
@@ -124,7 +124,7 @@ class HardwareService extends BaseService
             . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getAllActiveFacilityInstrumentsListByIndexQuery(bool $sortAsc = true): string
+    protected function getAllActiveFacilityInstrumentsListByIndexQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
         #-- mode = "instru+vis" returns the instrument list with all the active instrument entries
@@ -140,7 +140,7 @@ class HardwareService extends BaseService
             . "ORDER BY pulldownIndex " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getAllActiveInstrumentsListByIndexQuery(bool $sortAsc = true): string
+    protected function getAllActiveInstrumentsListByIndexQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
         #-- mode = "active-instru" returns the instrument list with all the active instruments entries
@@ -154,7 +154,7 @@ class HardwareService extends BaseService
             . "ORDER BY pulldownIndex " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getAllActiveInstrumentsListByNameQuery(bool $sortAsc = true): string
+    protected function getAllActiveInstrumentsListByNameQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
         #-- mode = "trouble" returns the instrument list with all the active instruments entries
@@ -168,7 +168,7 @@ class HardwareService extends BaseService
             . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getAllNotObsoleteInstrumentsListByNameQuery(bool $sortAsc = true): string
+    protected function getAllNotObsoleteInstrumentsListByNameQuery(bool $sortAsc = true): string
     {
         // Filter: 'notes' <> 'obsolete' indicates active instrument, including 'ic', 'unk', etc
         return "SELECT * "
@@ -177,7 +177,7 @@ class HardwareService extends BaseService
             . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getAllActiveVisitorInstrumentListQuery(bool $sortAsc = true): string
+    protected function getAllActiveVisitorInstrumentListQuery(bool $sortAsc = true): string
     {
         // Filter: 'notes' = 'visitor' indicates active visitor instrument
         // Filter: 'type' = 'instr' indicates instrument

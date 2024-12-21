@@ -63,7 +63,7 @@ class OperatorService extends BaseService
      * getObservatoryAssistantsListQuery               - return the observatory assistant list select SQL string
      */
 
-    private function getAllOperatorsListQuery(bool $sortAsc = true): string
+    protected function getAllOperatorsListQuery(bool $sortAsc = true): string
     {
         // Filter: 'nightAttend' = -1 indicates non-active operators
         return "SELECT * "
@@ -71,7 +71,7 @@ class OperatorService extends BaseService
             . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getTelescopeOperatorsListQuery(bool $sortAsc = true): string
+    protected function getTelescopeOperatorsListQuery(bool $sortAsc = true): string
     {
         // Filter: 'nightAttend' = 0 indicates active operators
         return "SELECT * "
@@ -80,7 +80,7 @@ class OperatorService extends BaseService
             . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getObservatoryAssistantsListQuery(bool $sortAsc = true): string
+    protected function getObservatoryAssistantsListQuery(bool $sortAsc = true): string
     {
         // Filter: 'nightAttend' = 1 indicates active assistants
         return "SELECT * "

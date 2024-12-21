@@ -51,7 +51,7 @@ class SupportAstronomerService extends BaseService
      * getSupportAstronomerListQuery                   - return the support astronomer list select SQL string
      */
 
-    private function getAllSupportAstronomersListQuery(bool $sortAsc = true): string
+    protected function getAllSupportAstronomersListQuery(bool $sortAsc = true): string
     {
         // Filter: 'status' = 0 indicates non-active support astronomers
         return "SELECT * "
@@ -59,7 +59,7 @@ class SupportAstronomerService extends BaseService
             . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 
-    private function getSupportAstronomerListQuery(bool $sortAsc = true): string
+    protected function getSupportAstronomerListQuery(bool $sortAsc = true): string
     {
         // Filter: 'status' = 1 indicates active support astronomers
         return "SELECT * "

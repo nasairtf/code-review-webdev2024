@@ -40,7 +40,7 @@ class ObsAppService extends BaseService
      * getUpdateProposalCreationDateQuery - return proposal date update SQL string
      */
 
-    private function getUpdateProposalCreationDateQuery(): string
+    protected function getUpdateProposalCreationDateQuery(): string
     {
         return "UPDATE ObsApp SET creationDate = ? WHERE ObsApp_id = ?;";
     }

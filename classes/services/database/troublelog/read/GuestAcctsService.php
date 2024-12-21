@@ -58,14 +58,14 @@ class GuestAcctsService extends BaseService
      * getProgramInfoListQuery - return a semester's program list select SQL string
      */
 
-    private function getSingleProgramSessionQuery(): string
+    protected function getSingleProgramSessionQuery(): string
     {
         return "SELECT username as program, defaultpwd as session "
             . "FROM GuestAccts "
             . "WHERE username = ? AND defaultpwd LIKE BINARY ?;";
     }
 
-    private function getValidateProgramQuery(): string
+    protected function getValidateProgramQuery(): string
     {
         return "SELECT COUNT(*) AS count "
             . "FROM GuestAccts "
