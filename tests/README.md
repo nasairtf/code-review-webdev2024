@@ -35,23 +35,23 @@
     - There is a collection of assorted Traits in [`tests/utilities`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities).
     - The Traits contain code used to standardize Mocking of certain oft-used classes.
     - Here is a non-inclusive list of the key traits and mocks:
-        - [`ConfigMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/ConfigMockTrait.php) -- Mocks the core Config class.
+        - [`ConfigMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/ConfigMockTrait.php) -- Mocks the core [`Config`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Config.php) class.
             - createConfigMock()
             - loadMockConfig()
-        - [`DebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DebugMockTrait.php) -- Mocks the core Debug class.
+        - [`DebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DebugMockTrait.php) -- Mocks the core [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) class.
             - createDebugMock()
             - mockDebug()
             - mockFail()
-        - [`CustomDebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/CustomDebugMockTrait.php) -- Mocks the core CustomDebug class.
+        - [`CustomDebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/CustomDebugMockTrait.php) -- Mocks the core [`CustomDebug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/CustomDebug.php) class.
             - createCustomDebugMock()
             - mockDebug()
             - mockFail()
-        - [`MySQLiWrapperMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MySQLiWrapperMockTrait.php) -- Mocks the MySQLiWrapper class used by DBConnection.
+        - [`MySQLiWrapperMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MySQLiWrapperMockTrait.php) -- Mocks the [`MySQLiWrapper`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/MySQLiWrapper.php) class used by [`DBConnection`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/DBConnection.php).
             - createMySQLiWrapperMock()
-        - [`DBConnectionMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DBConnectionMockTrait.php) -- Mocks the core database interface DBConnection class.
+        - [`DBConnectionMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DBConnectionMockTrait.php) -- Mocks the core database interface [`DBConnection`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/DBConnection.php) class.
             - createDBConnectionMock()
             - mockGetInstance()
-        - [`DatabaseServiceMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DatabaseServiceMockTrait.php) -- Partially mocks the core database ancestor DatabaseService class.
+        - [`DatabaseServiceMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DatabaseServiceMockTrait.php) -- Partially mocks the core database ancestor [`DatabaseService`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/DatabaseService.php) class.
             - createPartialDatabaseServiceMock()
             - mockFetchDataWithQuery()
             - mockModifyDataWithQuery()
