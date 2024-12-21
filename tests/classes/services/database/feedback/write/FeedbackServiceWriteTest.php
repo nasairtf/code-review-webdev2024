@@ -173,6 +173,9 @@ class FeedbackServiceWriteTest extends TestCase
      */
     public function testGetFeedbackInsertQuery(): void
     {
+        // Define the test data
+        $data = $this->createTestData();
+
         // Arrange
         $service = new TestFeedbackService(false, null, null, null, null, $this->dbMock, $this->debugMock);
 
@@ -180,7 +183,7 @@ class FeedbackServiceWriteTest extends TestCase
         $result = $service->getFeedbackInsertQueryProxy();
 
         // Assert
-        $expect = $this->createTestQueryParts('sql');
+        $expect = $data['query']['sql'];
         $this->assertSame($expect, $result);
     }
 
@@ -205,7 +208,7 @@ class FeedbackServiceWriteTest extends TestCase
         $result = $service->getFeedbackInsertParamsProxy($data['feedback']);
 
         // Assert
-        $expect = $this->createTestQueryParts('params', $data['feedback']);
+        $expect = $data['query']['params'];
         $this->assertSame($expect, $result);
     }
 
@@ -220,6 +223,9 @@ class FeedbackServiceWriteTest extends TestCase
      */
     public function testGetFeedbackInsertTypes(): void
     {
+        // Define the test data
+        $data = $this->createTestData();
+
         // Arrange
         $service = new TestFeedbackService(false, null, null, null, null, $this->dbMock, $this->debugMock);
 
@@ -227,7 +233,7 @@ class FeedbackServiceWriteTest extends TestCase
         $result = $service->getFeedbackInsertTypesProxy();
 
         // Assert
-        $expect = $this->createTestQueryParts('types');
+        $expect = $data['query']['types'];
         $this->assertSame($expect, $result);
     }
 
@@ -277,7 +283,7 @@ class FeedbackServiceWriteTest extends TestCase
     private function createTestData(): array
     {
         // Set up the test data
-        return [
+        $data = [
             // test inputs (data arrays for testing)
             'feedback' => [
                 'start_date' => 1732528800,
@@ -305,13 +311,17 @@ class FeedbackServiceWriteTest extends TestCase
             'successResult' => true,  // Expected result for successful record insertion
             'failureResult' => false, // Expected result for record insertion failure
         ];
+        $data['query'] = $this->createTestQueryParts($data['feedback']); // Expect result for each query part
+        return $data;
     }
 
-    private function createTestQueryParts(string $request = 'sql', ?array $data = null)
+    private function createTestQueryParts(array $data): array
     {
-        // Return SQL query string
-        if ($request === 'sql') {
-            return "INSERT INTO feedback "
+        return [
+            // Return SQL types string
+            'types' => 'iiisiiisssssiis',
+            // Return SQL query string
+            'sql' => "INSERT INTO feedback "
                 . "("
                 .    "start_date, end_date, technical_rating, "
                 .    "technical_comments, scientific_staff_rating, "
@@ -319,21 +329,15 @@ class FeedbackServiceWriteTest extends TestCase
                 .    "scientific_results, suggestions, "
                 .    "name, email, location, programID, semesterID"
                 . ") "
-                . "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        }
-        // Return SQL params array
-        if ($request === 'params' && $data) {
-            return [
+                . "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            // Return SQL params array
+            'params' => [
                 $data['start_date'], $data['end_date'], $data['technical_rating'],
                 $data['technical_comments'], $data['scientific_staff_rating'],
                 $data['TO_rating'], $data['daycrew_rating'], $data['personnel_comment'],
                 $data['scientific_results'], $data['suggestions'],
                 $data['name'], $data['email'], $data['location'], $data['programID'], $data['semesterID']
-            ];
-        }
-        // Return SQL types string
-        if ($request === 'types') {
-            return 'iiisiiisssssiis';
-        }
+            ],
+        ];
     }
 }
