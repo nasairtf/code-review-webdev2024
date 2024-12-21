@@ -11,7 +11,7 @@
         - [`DBConnectionMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DBConnectionMockTrait.php), [`MySQLiWrapperMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MySQLiWrapperMockTrait.php)
         - [`DatabaseServiceMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DatabaseServiceMockTrait.php)
         - [`MockBehaviorTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MockBehaviorTrait.php), [`PrivatePropertyTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/PrivatePropertyTrait.php)
-    - Note: use [`DebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DebugMockTrait.php) or `CustomDebugMockTrait` depending on the version of the `Debug` class used in the class under test. `CustomDebug` extends `Debug` with additional exception types and `fail*()` methods.
+    - Note: use [`DebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DebugMockTrait.php) or [`CustomDebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/CustomDebugMockTrait.php) depending on the version of the [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) class used in the class under test. [`CustomDebug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/CustomDebug.php) extends [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) with additional exception types and `fail*()` methods.
 
 2. **Test Methodology**:
     - Ensure protected methods are tested via derived class proxy method exposure.
@@ -22,17 +22,17 @@
 
 3. **Debug Class**:
     - Ensure the [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) class instances' `debugMode` is set to false.
-    - If debugMode cannot be set to false, ensure `debugLevel` is set to 0.
+    - If `debugMode` cannot be set to false, ensure `debugLevel` is set to 0.
     - [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) throws `Exceptions` in `fail()`.
     - [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) writes to `error_log` in `log()` if `debugLevel` is >0.
     - [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) echos output if `debugMode` is true.
     - Ensure unit tests take this into consideration.
-    - Mocking [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) or disabling `debugMode`/`debugLevel` ensures no test interference.
+    - Mocking [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) or disabling `debugMode`, `debugLevel` ensures no test interference.
     - [`CustomDebug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/CustomDebug.php) extends [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) with additional custom exception types and methods to throw these exceptions.
     - See [`classes/exceptions`](https://github.com/ifauh/webdev2024/tree/main/classes/exceptions) for more informaton on the exceptions available.
 
 4. **Traits**:
-    - There is a collection of assorted Traits in [tests/utilities](https://github.com/ifauh/webdev2024/tree/main/tests/utilities).
+    - There is a collection of assorted Traits in [`tests/utilities`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities).
     - The Traits contain code used to standardize Mocking of certain oft-used classes.
     - Here is a non-inclusive list of the key traits and mocks:
         - [`ConfigMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/ConfigMockTrait.php) -- Mocks the core Config class.
