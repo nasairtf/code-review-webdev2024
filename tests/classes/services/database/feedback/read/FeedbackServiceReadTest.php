@@ -243,7 +243,7 @@ class FeedbackServiceReadTest extends TestCase
         $query = $service->getProposalListingFormDataQueryProxy(true);
 
         // Assert
-        $expect = $this->createSemesterQuery(true);
+        $expect = $this->createTestQuery(true);
         $this->assertSame($expect, $query);
     }
 
@@ -271,7 +271,7 @@ class FeedbackServiceReadTest extends TestCase
         $query = $service->getProposalProgramDataQueryProxy();
 
         // Assert
-        $expect = $this->createSemesterQuery(false);
+        $expect = $this->createTestQuery(false);
         $this->assertSame($expect, $query);
     }
 
@@ -311,25 +311,6 @@ class FeedbackServiceReadTest extends TestCase
     }
 
     /**
-     * Generates a SQL query string for fetching semester or program data.
-     *
-     * This method returns a SQL query string for retrieving data from the ObsApp
-     * table. It supports generating queries for either semester-based data or
-     * program-specific data, depending on the $semester parameter.
-     *
-     * @param bool $semester True to generate a query for semester-based data.
-     *                       False to generate a query for program-specific data.
-     *
-     * @return string The generated SQL query string.
-     */
-    private function createSemesterQuery(bool $semester): string
-    {
-        return "SELECT ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate"
-            . " FROM ObsApp WHERE semesterYear = ? AND semesterCode = ?"
-            . ($semester ? " ORDER BY creationDate ASC;" : " AND ProgramNumber = ?;");
-    }
-
-    /**
      * Creates an array containing the standard test data for this test unit suite.
      * Can be overridden locally in individual tests.
      *
@@ -343,8 +324,8 @@ class FeedbackServiceReadTest extends TestCase
             'year' => 2024,
             'semester' => 'A',
             'program' => 31,
-            'sqlsemester' => $this->createSemesterQuery(true),
-            'sqlproposal' => $this->createSemesterQuery(false),
+            'sqlsemester' => $this->createTestQuery(true),
+            'sqlproposal' => $this->createTestQuery(false),
             // test outputs (method return values, etc)
             'successResult' => [ // Expected result for successful record retrieval
                 [
@@ -368,5 +349,24 @@ class FeedbackServiceReadTest extends TestCase
             ],
             'failureResult' => [], // Expected result for record retrieval failure
         ];
+    }
+
+    /**
+     * Generates a SQL query string for fetching semester or program data.
+     *
+     * This method returns a SQL query string for retrieving data from the ObsApp
+     * table. It supports generating queries for either semester-based data or
+     * program-specific data, depending on the $semester parameter.
+     *
+     * @param bool $semester True to generate a query for semester-based data.
+     *                       False to generate a query for program-specific data.
+     *
+     * @return string The generated SQL query string.
+     */
+    private function createTestQueryParts(bool $semester): string
+    {
+        return "SELECT ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate"
+            . " FROM ObsApp WHERE semesterYear = ? AND semesterCode = ?"
+            . ($semester ? " ORDER BY creationDate ASC;" : " AND ProgramNumber = ?;");
     }
 }
