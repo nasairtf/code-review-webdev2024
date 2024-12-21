@@ -15,7 +15,7 @@ class TestFeedbackService extends BaseService
      *
      * @return string        The SQL query string.
      */
-    public function getProposalListingFormDataQueryProxy(string $semester): string
+    public function getProposalListingFormDataQueryProxy(bool $semester): string
     {
         return $this->getProposalListingFormDataQuery($semester);
     }
