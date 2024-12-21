@@ -80,6 +80,7 @@ class DebugTest extends TestCase
 4. **Git**
     ```bash
     git status
+    git diff CONTRIBUTING.md
     git add CONTRIBUTING.md
     git status
     git commit -m "Update stuff"
