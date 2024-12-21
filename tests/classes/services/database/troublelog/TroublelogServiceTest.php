@@ -6,6 +6,8 @@ namespace Tests\classes\services\database\troublelog;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\CustomDebugMockTrait;
+use Tests\utilities\DBConnectionMockTrait;
 use App\services\database\troublelog\TroublelogService;
 use App\services\database\DatabaseService;
 
@@ -20,6 +22,9 @@ use App\services\database\DatabaseService;
  */
 class TroublelogServiceTest extends TestCase
 {
+    use CustomDebugMockTrait;
+    use DBConnectionMockTrait;
+
     /**
      * Mock instance of DBConnection.
      *
@@ -42,8 +47,8 @@ class TroublelogServiceTest extends TestCase
     public function testTroublelogServiceConstructorInitializesBaseService(): void
     {
         // Arrange
-        $this->dbMock = Mockery::mock('alias:' . \App\services\database\DBConnection::class);
-        $this->debugMock = Mockery::mock('alias:' . \App\core\common\CustomDebug::class);
+        $this->debugMock = $this->createCustomDebugMock();
+        $this->dbMock = $this->createDBConnectionMock();
         $this->mockGetInstance($this->dbMock, 'troublelog');
 
         // Act
