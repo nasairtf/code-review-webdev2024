@@ -48,8 +48,7 @@ trait DBConnectionMockTrait
     protected function mockGetInstance(
         Mockery\MockInterface $dbMock,
         string $dbName
-    ): void
-    {
+    ): void {
         $dbMock->shouldReceive('getInstance')
             ->with($dbName, false)
             ->andReturn($dbMock);
