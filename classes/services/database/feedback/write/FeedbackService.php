@@ -46,15 +46,15 @@ class FeedbackService extends BaseService
 
     protected function getFeedbackInsertQuery(): string
     {
-        return "INSERT INTO feedback
-            (
-                start_date, end_date, technical_rating,
-                technical_comments, scientific_staff_rating,
-                TO_rating, daycrew_rating, personnel_comment,
-                scientific_results, suggestions,
-                name, email, location, programID, semesterID
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        return "INSERT INTO feedback "
+            . "("
+            .    "start_date, end_date, technical_rating, "
+            .    "technical_comments, scientific_staff_rating, "
+            .    "TO_rating, daycrew_rating, personnel_comment, "
+            .    "scientific_results, suggestions, "
+            .    "name, email, location, programID, semesterID"
+            . ") "
+            . "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
     /**
