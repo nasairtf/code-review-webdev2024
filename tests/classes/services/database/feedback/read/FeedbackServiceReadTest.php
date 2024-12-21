@@ -114,7 +114,7 @@ class FeedbackServiceReadTest extends TestCase
         // Arrange
         $this->mockFetchDataWithQuery(
             $this->srvMock,
-            $data['sqlsemester'],
+            $data['sqlsemester']['sql'],
             [$data['year'], $data['semester']],
             'is',
             $data['successResult'],
@@ -143,7 +143,7 @@ class FeedbackServiceReadTest extends TestCase
         // Arrange
         $this->mockFetchDataWithQuery(
             $this->srvMock,
-            $data['sqlsemester'],
+            $data['sqlsemester']['sql'],
             [$data['year'], $data['semester']],
             'is',
             $data['failureResult'],
@@ -176,7 +176,7 @@ class FeedbackServiceReadTest extends TestCase
         // Arrange
         $this->mockFetchDataWithQuery(
             $this->srvMock,
-            $data['sqlproposal'],
+            $data['sqlproposal']['sql'],
             [$data['year'], $data['semester'], $data['program']],
             'isi',
             [$data['successResult'][0]],
@@ -205,7 +205,7 @@ class FeedbackServiceReadTest extends TestCase
         // Arrange
         $this->mockFetchDataWithQuery(
             $this->srvMock,
-            $data['sqlproposal'],
+            $data['sqlproposal']['sql'],
             [$data['year'], $data['semester'], $data['program']],
             'isi',
             $data['failureResult'],
@@ -236,6 +236,9 @@ class FeedbackServiceReadTest extends TestCase
      */
     public function testGetProposalListingFormDataQuery(): void
     {
+        // Define the test data
+        $data = $this->createTestData();
+
         // Arrange
         $service = new TestFeedbackService(false, null, null, null, null, $this->dbMock, $this->debugMock);
 
@@ -243,7 +246,7 @@ class FeedbackServiceReadTest extends TestCase
         $query = $service->getProposalListingFormDataQueryProxy(true);
 
         // Assert
-        $expect = $this->createTestQuery(true);
+        $expect = $data['sqlsemester']['sql'];
         $this->assertSame($expect, $query);
     }
 
@@ -264,6 +267,9 @@ class FeedbackServiceReadTest extends TestCase
      */
     public function testGetProposalProgramDataQuery(): void
     {
+        // Define the test data
+        $data = $this->createTestData();
+
         // Arrange
         $service = new TestFeedbackService(false, null, null, null, null, $this->dbMock, $this->debugMock);
 
@@ -271,7 +277,7 @@ class FeedbackServiceReadTest extends TestCase
         $query = $service->getProposalProgramDataQueryProxy();
 
         // Assert
-        $expect = $this->createTestQuery(false);
+        $expect = $data['sqlproposal']['sql'];
         $this->assertSame($expect, $query);
     }
 
@@ -324,8 +330,8 @@ class FeedbackServiceReadTest extends TestCase
             'year' => 2024,
             'semester' => 'A',
             'program' => 31,
-            'sqlsemester' => $this->createTestQuery(true),
-            'sqlproposal' => $this->createTestQuery(false),
+            'sqlsemester' => $this->createTestQueryParts(true),
+            'sqlproposal' => $this->createTestQueryParts(false),
             // test outputs (method return values, etc)
             'successResult' => [ // Expected result for successful record retrieval
                 [
@@ -352,21 +358,32 @@ class FeedbackServiceReadTest extends TestCase
     }
 
     /**
-     * Generates a SQL query string for fetching semester or program data.
+     * Generates components for a SQL query for fetching semester or program data.
      *
-     * This method returns a SQL query string for retrieving data from the ObsApp
-     * table. It supports generating queries for either semester-based data or
+     * This method returns an array containing the components required to construct
+     * a SQL query: the query string, parameter types, and an array of parameters.
+     * It supports generating components for either semester-based data or
      * program-specific data, depending on the $semester parameter.
      *
-     * @param bool $semester True to generate a query for semester-based data.
-     *                       False to generate a query for program-specific data.
+     * @param bool $semester True to generate components for semester-based data.
+     *                       False to generate components for program-specific data.
      *
-     * @return string The generated SQL query string.
+     * @return array An associative array with the following keys:
+     *               - 'sql' (string): The SQL query string.
+     *               - 'types' (string): The types of the query parameters.
+     *               - 'params' (array): The parameters to bind to the query.
      */
-    private function createTestQueryParts(bool $semester): string
+    private function createTestQueryParts(bool $semester): array
     {
-        return "SELECT ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate"
+        return [
+            // Return SQL types string
+            'types' => '',
+            // Return SQL query string
+            'sql' => "SELECT ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate"
             . " FROM ObsApp WHERE semesterYear = ? AND semesterCode = ?"
-            . ($semester ? " ORDER BY creationDate ASC;" : " AND ProgramNumber = ?;");
+            . ($semester ? " ORDER BY creationDate ASC;" : " AND ProgramNumber = ?;"),
+            // Return SQL params array
+            'params' => [],
+        ];
     }
 }
