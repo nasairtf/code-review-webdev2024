@@ -3,14 +3,14 @@
 ---
 
 1. **Available Tools**:
-    - PHPUnit
-    - Mockery
-    - tests/utilities
-        - `ConfigMockTrait`
-        - `DebugMockTrait`, `CustomDebugMockTrait`
-        - `DBConnectionMockTrait`, `MySQLiWrapperMockTrait`
-        - `DatabaseServiceMockTrait`
-        - `MockBehaviorTrait`, `PrivatePropertyTrait`
+    - `PHPUnit`
+    - `Mockery`
+    - [tests/utilities](https://github.com/ifauh/webdev2024/tree/main/tests/utilities)
+        - [`ConfigMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/ConfigMockTrait.php)
+        - [`DebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DebugMockTrait.php), [`CustomDebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/CustomDebugMockTrait.php)
+        - [`DBConnectionMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DBConnectionMockTrait.php), [`MySQLiWrapperMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MySQLiWrapperMockTrait.php)
+        - [`DatabaseServiceMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DatabaseServiceMockTrait.php)
+        - [`MockBehaviorTrait`], [`PrivatePropertyTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MockBehaviorTrait.php)
     - Note: use `DebugMockTrait` or `CustomDebugMockTrait` depending on the version of the `Debug` class used in the class under test. `CustomDebug` extends `Debug` with additional exception types and `fail*()` methods.
 
 2. **Test Methodology**:
@@ -21,15 +21,15 @@
     - Use `createTestQueryParts()` to generate the SQL parts. Include SQL strings, params arrays, and type strings as needed.
 
 3. **Debug Class**:
-    - Ensure the `Debug` class instances' `debugMode` is set to false.
+    - Ensure the [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) class instances' `debugMode` is set to false.
     - If debugMode cannot be set to false, ensure `debugLevel` is set to 0.
     - `Debug` throws `Exceptions` in `fail()`.
     - `Debug` writes to `error_log` in `log()` if `debugLevel` is >0.
     - `Debug` echos output if `debugMode` is true.
     - Ensure unit tests take this into consideration.
     - Mocking `Debug` or disabling `debugMode`/`debugLevel` ensures no test interference.
-    - `CustomDebug` extends `Debug` with additional custom exception types and methods to throw these exceptions.
-    - See `classes/exceptions` for more informaton on the exceptions available.
+    - [`CustomDebug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/CustomDebug.php) extends `Debug` with additional custom exception types and methods to throw these exceptions.
+    - See [`classes/exceptions`](https://github.com/ifauh/webdev2024/tree/main/classes/exceptions) for more informaton on the exceptions available.
 
 4. **Traits**:
     - There is a collection of assorted Traits in `tests/utilities`.
