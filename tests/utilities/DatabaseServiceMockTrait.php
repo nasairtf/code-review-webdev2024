@@ -88,6 +88,7 @@ trait DatabaseServiceMockTrait
      * @param string                $query        The query string.
      * @param array                 $params       Parameters to bind to the query.
      * @param string                $types        Parameter types.
+     * @param int                   $expectedRows The expected number of affected rows.
      * @param int                   $affectedRows The number of affected rows to return.
      * @param string|null           $errorMessage Error message if modification fails.
      *
@@ -98,6 +99,7 @@ trait DatabaseServiceMockTrait
         string $query,
         array $params,
         string $types,
+        int $expectedRows,
         int $affectedRows,
         ?string $errorMessage = null
     ): void {
@@ -106,6 +108,7 @@ trait DatabaseServiceMockTrait
                 $query,
                 $params,
                 $types,
+                $expectedRows,
                 $errorMessage ?? Mockery::any()
             )
             ->andReturn($affectedRows);
