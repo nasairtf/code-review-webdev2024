@@ -329,7 +329,8 @@ class FeedbackServiceWriteTest extends TestCase
             'feedbackId' => 6432,
             'affectedRows' => 1,
         ];
-        $data['query'] = $this->createTestQueryParts($data['feedback']); // Expected result for each query part
+        // Expected result for each query part
+        $data['query'] = $this->createTestQueryParts($data['feedback']);
         return $data;
     }
 
