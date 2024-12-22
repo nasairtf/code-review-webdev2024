@@ -109,15 +109,18 @@ class FeedbackServiceWriteTest extends TestCase
     public function testReturnFeedbackRecordIdSucceeds(): void
     {
         // Define the test data
-        //$data = $this->createTestData();
+        $data = $this->createTestData();
 
         // Arrange
+        $this->dbMock->shouldReceive('getLastInsertId')
+            ->andReturn($data['feedbackId'])
+            ->once();
 
         // Act
-        //$result = $this->srvMock->returnFeedbackRecordId();
+        $result = $this->srvMock->returnFeedbackRecordId();
 
         // Assert
-        //$this->assertSame($data['recordID'], $result);
+        $this->assertSame($data['feedbackId'], $result);
     }
 
     /**
@@ -132,15 +135,24 @@ class FeedbackServiceWriteTest extends TestCase
     public function testInsertFeedbackRecordSucceeds(): void
     {
         // Define the test data
-        //$data = $this->createTestData();
+        $data = $this->createTestData();
 
         // Arrange
+        $this->mockModifyDataWithQuery(
+            $this->srvMock,
+            $data['query']['sql'],
+            $data['query']['params'],
+            $data['query']['types'],
+            $data['query']['expectedRows'],
+            $data['affectedRows'],
+            $data['query']['errorMsg']
+        );
 
         // Act
-        //$result = $this->srvMock->insertFeedbackRecord();
+        $result = $this->srvMock->insertFeedbackRecord($data['feedback']);
 
         // Assert
-        //$this->assertSame($data['successResult'], $result);
+        $this->assertSame($data['affectedRows'], $result);
     }
 
     /**
@@ -151,15 +163,26 @@ class FeedbackServiceWriteTest extends TestCase
     public function testInsertFeedbackRecordFails(): void
     {
         // Define the test data
-        //$data = $this->createTestData();
+        $data = $this->createTestData();
 
         // Arrange
+        $this->srvMock->shouldReceive('modifyDataWithQuery')
+            ->with(
+                $data['query']['sql'],
+                $data['query']['params'],
+                $data['query']['types'],
+                $data['query']['expectedRows'],
+                $data['query']['errorMsg']
+            )
+            ->andThrow(new DatabaseException($data['query']['errorMsg']))
+            ->once();
+
+        // Expect exception
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage($data['query']['errorMsg']);
 
         // Act
-        //$result = $this->srvMock->insertFeedbackRecord();
-
-        // Assert
-        //$this->assertSame($data['failureResult'], $result);
+        $result = $this->srvMock->insertFeedbackRecord($data['feedback']);
     }
 
     /**
@@ -302,25 +325,39 @@ class FeedbackServiceWriteTest extends TestCase
                 'programID' => 31,
                 'semesterID' => '2024B',
             ],
-            'instruments' => ['moris', 'spex', 'texes'],
-            'operators' => ['BM', 'CM', 'BW', 'TM'],
-            'support' => ['MC', 'AB'],
             // test outputs (method return values)
-            'feedbackId' => 6432,     // Mocked ID returned from FeedbackWrite
-            'affectedRows' => 1,      // Expected affectedRow count for each insert method call
-            'successResult' => true,  // Expected result for successful record insertion
-            'failureResult' => false, // Expected result for record insertion failure
+            'feedbackId' => 6432,
+            'affectedRows' => 1,
         ];
-        $data['query'] = $this->createTestQueryParts($data['feedback']); // Expect result for each query part
+        $data['query'] = $this->createTestQueryParts($data['feedback']); // Expected result for each query part
         return $data;
     }
 
+    /**
+     * Generates query components for inserting a feedback record.
+     *
+     * This method creates the SQL query string, parameter array, parameter types string,
+     * expected affected row count, and error message for inserting a feedback record
+     * into the `feedback` table.
+     *
+     * @param array $data The data to be inserted, containing keys for feedback attributes.
+     *                    Keys include: 'start_date', 'end_date', 'technical_rating',
+     *                    'technical_comments', 'scientific_staff_rating', 'TO_rating',
+     *                    'daycrew_rating', 'personnel_comment', 'scientific_results',
+     *                    'suggestions', 'name', 'email', 'location', 'programID',
+     *                    and 'semesterID'.
+     *
+     * @return array Associative array containing:
+     *               - 'sql' (string): The SQL query string.
+     *               - 'params' (array): The parameters to bind to the query.
+     *               - 'types' (string): The types of the parameters.
+     *               - 'expectedRows' (int): The expected number of affected rows.
+     *               - 'errorMsg' (string): The error message to throw on failure.
+     */
     private function createTestQueryParts(array $data): array
     {
         return [
-            // Return SQL types string
-            'types' => 'iiisiiisssssiis',
-            // Return SQL query string
+            // Query's SQL string
             'sql' => "INSERT INTO feedback "
                 . "("
                 .    "start_date, end_date, technical_rating, "
@@ -330,7 +367,7 @@ class FeedbackServiceWriteTest extends TestCase
                 .    "name, email, location, programID, semesterID"
                 . ") "
                 . "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            // Return SQL params array
+            // Query's params array
             'params' => [
                 $data['start_date'], $data['end_date'], $data['technical_rating'],
                 $data['technical_comments'], $data['scientific_staff_rating'],
@@ -338,6 +375,12 @@ class FeedbackServiceWriteTest extends TestCase
                 $data['scientific_results'], $data['suggestions'],
                 $data['name'], $data['email'], $data['location'], $data['programID'], $data['semesterID']
             ],
+            // Query's params types string
+            'types' => 'iiisiiisssssiis',
+            // Query's expected row count
+            'expectedRows' => 1,
+            // Query's failure error message
+            'errorMsg' => 'Feedback insert failed.',
         ];
     }
 }

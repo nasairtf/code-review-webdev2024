@@ -95,15 +95,24 @@ class InstrumentServiceWriteTest extends TestCase
     public function testInsertInstrumentRecordSucceeds(): void
     {
         // Define the test data
-        //$data = $this->createTestData();
+        $data = $this->createTestData();
 
         // Arrange
+        $this->mockModifyDataWithQuery(
+            $this->srvMock,
+            $data['query']['sql'],
+            $data['query']['params'],
+            $data['query']['types'],
+            $data['query']['expectedRows'],
+            $data['affectedRows'],
+            $data['query']['errorMsg']
+        );
 
         // Act
-        //$result = $this->srvMock->insertInstrumentRecord();
+        $result = $this->srvMock->insertInstrumentRecord($data['feedbackId'], $data['instruments'][0]);
 
         // Assert
-        //$this->assertSame($data['successResult'], $result);
+        $this->assertSame($data['affectedRows'], $result);
     }
 
     /**
@@ -114,15 +123,26 @@ class InstrumentServiceWriteTest extends TestCase
     public function testInsertInstrumentRecordFails(): void
     {
         // Define the test data
-        //$data = $this->createTestData();
+        $data = $this->createTestData();
 
         // Arrange
+        $this->srvMock->shouldReceive('modifyDataWithQuery')
+            ->with(
+                $data['query']['sql'],
+                $data['query']['params'],
+                $data['query']['types'],
+                $data['query']['expectedRows'],
+                $data['query']['errorMsg']
+            )
+            ->andThrow(new DatabaseException($data['query']['errorMsg']))
+            ->once();
+
+        // Expect exception
+        $this->expectException(DatabaseException::class);
+        $this->expectExceptionMessage($data['query']['errorMsg']);
 
         // Act
-        //$result = $this->srvMock->insertInstrumentRecord();
-
-        // Assert
-        //$this->assertSame($data['failureResult'], $result);
+        $result = $this->srvMock->insertInstrumentRecord($data['feedbackId'], $data['instruments'][0]);
     }
 
     /**
@@ -198,45 +218,46 @@ class InstrumentServiceWriteTest extends TestCase
         // Set up the test data
         $data = [
             // test inputs (data arrays for testing)
-            'feedback' => [
-                'start_date' => 1732528800,
-                'end_date' => 1734084000,
-                'technical_rating' => 4,
-                'technical_comments' => 'Dithering issues',
-                'scientific_staff_rating' => 5,
-                'TO_rating' => 5,
-                'daycrew_rating' => null,
-                'personnel_comment' => 'Great effort overall.',
-                'scientific_results' => 'The shift went smoothly.',
-                'suggestions' => 'Please put in the full name of the operators.',
-                'name' => 'John Doe',
-                'email' => 'johndoe@example.com',
-                'location' => 1,
-                'programID' => 31,
-                'semesterID' => '2024B',
-            ],
             'instruments' => ['moris', 'spex', 'texes'],
-            'operators' => ['BM', 'CM', 'BW', 'TM'],
-            'support' => ['MC', 'AB'],
+            'feedbackId' => 6432,
             // test outputs (method return values)
-            'feedbackId' => 6432,     // Mocked ID returned from FeedbackWrite
-            'affectedRows' => 1,      // Expected affectedRow count for each insert method call
-            'successResult' => true,  // Expected result for successful record insertion
-            'failureResult' => false, // Expected result for record insertion failure
-            'query' => $this->createTestQueryParts(), // Expect result for each query part
+            'affectedRows' => 1,
         ];
+        // Expected result for each query part
+        $data['query'] = $this->createTestQueryParts($data['feedbackId'], $data['instruments']);
         return $data;
     }
 
-    private function createTestQueryParts(): array
+    /**
+     * Generates query components for inserting an instrument record.
+     *
+     * This method creates the SQL query string, parameter array, parameter types string,
+     * expected affected row count, and error message for inserting an instrument record
+     * into the `instrument` table.
+     *
+     * @param int   $feedbackId The ID of the feedback record associated with this instrument.
+     * @param array $data       The data to be inserted, containing the hardware ID as the first element.
+     *
+     * @return array Associative array containing:
+     *               - 'sql' (string): The SQL query string.
+     *               - 'params' (array): The parameters to bind to the query.
+     *               - 'types' (string): The types of the parameters.
+     *               - 'expectedRows' (int): The expected number of affected rows.
+     *               - 'errorMsg' (string): The error message to throw on failure.
+     */
+    private function createTestQueryParts($feedbackId, $data): array
     {
         return [
-            // Return SQL types string
-            'types' => '',
-            // Return SQL query string
+            // Query's SQL string
             'sql' => "INSERT INTO instrument (feedback_id, hardwareID) VALUES (?, ?)",
-            // Return SQL params array
-            'params' => [],
+            // Query's params array
+            'params' => [$feedbackId, $data[0]],
+            // Query's params types string
+            'types' => 'is',
+            // Query's expected row count
+            'expectedRows' => 1,
+            // Query's failure error message
+            'errorMsg' => 'Instrument insert failed.',
         ];
     }
 }
