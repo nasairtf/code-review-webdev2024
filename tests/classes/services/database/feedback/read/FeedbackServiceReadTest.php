@@ -115,10 +115,10 @@ class FeedbackServiceReadTest extends TestCase
         $this->mockFetchDataWithQuery(
             $this->srvMock,
             $data['sqlsemester']['sql'],
-            [$data['year'], $data['semester']],
-            'is',
+            $data['sqlsemester']['params'],
+            $data['sqlsemester']['types'],
             $data['successResult'],
-            'No proposals found for the selected semester.'
+            $data['sqlsemester']['errorMsg']
         );
 
         // Act
@@ -144,10 +144,10 @@ class FeedbackServiceReadTest extends TestCase
         $this->mockFetchDataWithQuery(
             $this->srvMock,
             $data['sqlsemester']['sql'],
-            [$data['year'], $data['semester']],
-            'is',
+            $data['sqlsemester']['params'],
+            $data['sqlsemester']['types'],
             $data['failureResult'],
-            'No proposals found for the selected semester.'
+            $data['sqlsemester']['errorMsg']
         );
 
         // Act
@@ -177,10 +177,10 @@ class FeedbackServiceReadTest extends TestCase
         $this->mockFetchDataWithQuery(
             $this->srvMock,
             $data['sqlproposal']['sql'],
-            [$data['year'], $data['semester'], $data['program']],
-            'isi',
+            $data['sqlproposal']['params'],
+            $data['sqlproposal']['types'],
             [$data['successResult'][0]],
-            'No proposal found for the given program.'
+            $data['sqlproposal']['errorMsg']
         );
 
         // Act
@@ -206,10 +206,10 @@ class FeedbackServiceReadTest extends TestCase
         $this->mockFetchDataWithQuery(
             $this->srvMock,
             $data['sqlproposal']['sql'],
-            [$data['year'], $data['semester'], $data['program']],
-            'isi',
+            $data['sqlproposal']['params'],
+            $data['sqlproposal']['types'],
             $data['failureResult'],
-            'No proposal found for the given program.'
+            $data['sqlproposal']['errorMsg']
         );
 
         // Act
@@ -325,13 +325,11 @@ class FeedbackServiceReadTest extends TestCase
     private function createTestData(): array
     {
         // Set up the test data
-        return [
+        $data = [
             // test inputs (data values for testing)
             'year' => 2024,
             'semester' => 'A',
             'program' => 31,
-            'sqlsemester' => $this->createTestQueryParts(true),
-            'sqlproposal' => $this->createTestQueryParts(false),
             // test outputs (method return values, etc)
             'successResult' => [ // Expected result for successful record retrieval
                 [
@@ -355,6 +353,10 @@ class FeedbackServiceReadTest extends TestCase
             ],
             'failureResult' => [], // Expected result for record retrieval failure
         ];
+        // Expected results for each query part
+        $data['sqlsemester'] = $this->createTestQueryParts(true, $data);
+        $data['sqlproposal'] = $this->createTestQueryParts(false, $data);
+        return $data;
     }
 
     /**
@@ -373,17 +375,33 @@ class FeedbackServiceReadTest extends TestCase
      *               - 'types' (string): The types of the query parameters.
      *               - 'params' (array): The parameters to bind to the query.
      */
-    private function createTestQueryParts(bool $semester): array
+    private function createTestQueryParts(bool $semester, array $data): array
     {
+        $sql = "SELECT ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate"
+            . " FROM ObsApp WHERE semesterYear = ? AND semesterCode = ?";
+        $params = [$data['year'], $data['semester']];
+        $types = 'is';
+        $errorMsg = '';
+
+        if ($semester) {
+            $sql .= " ORDER BY creationDate ASC;";
+            $errorMsg = 'No proposals found for the selected semester.';
+        } else {
+            $sql .= " AND ProgramNumber = ?;";
+            $params[] = $data['program'];
+            $types .= 'i';
+            $errorMsg = 'No proposal found for the given program.';
+        }
+
         return [
-            // Return SQL types string
-            'types' => '',
-            // Return SQL query string
-            'sql' => "SELECT ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate"
-            . " FROM ObsApp WHERE semesterYear = ? AND semesterCode = ?"
-            . ($semester ? " ORDER BY creationDate ASC;" : " AND ProgramNumber = ?;"),
-            // Return SQL params array
-            'params' => [],
+            // Query's SQL string
+            'sql' => $sql,
+            // Query's params array
+            'params' => $params,
+            // Query's params types string
+            'types' => $types,
+            // Query's failure error message
+            'errorMsg' => $errorMsg,
         ];
     }
 }
