@@ -17,8 +17,8 @@
     - Ensure protected methods are tested via derived class proxy method exposure.
     - Use `setUp()` to configure common mocks and methods used by all unit tests in a class and execute the parent class `setUp()` method.
     - Use `tearDown()` to clean up Mock expectations and execute the parent class `tearDown()` method.
-    - Use `createTestData()` to generate all test data. Include inputs, outputs, and relevant variables in the array.
-    - Use `createTestQueryParts()` to generate the SQL parts. Include SQL strings, params arrays, and type strings as needed.
+    - Use `createTestData()` to generate all test data. Include inputs, outputs, and relevant variables in the array. Make use of `createTestQueryParts()` to generate the necessary query parts for use with mocked query methods, and so on.
+    - Use `createTestQueryParts()` to generate the SQL parts. Include SQL strings, params arrays, type strings, expected return rows, and error messages, as needed.
 
 3. **Debug Class**:
     - Ensure the [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) class instances' `debugMode` is set to false.
