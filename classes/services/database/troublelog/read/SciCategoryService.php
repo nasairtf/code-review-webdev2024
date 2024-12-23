@@ -19,12 +19,13 @@ class SciCategoryService extends BaseService
 {
     /**
      * Query methods that fetch scientific category data
-     *
-     * fetchScientificCategoryData - retrieves the scientific category list
-     * fetchScientificCategoryId   - retrieves the scientific category id
-     * fetchScientificCategoryName - retrieves the scientific category name
      */
 
+    /**
+     * Fetches all scientific categories.
+     *
+     * @return array An array of scientific category data.
+     */
     public function fetchScientificCategoryData(): array
     {
         return $this->fetchDataWithQuery(
@@ -35,6 +36,13 @@ class SciCategoryService extends BaseService
         );
     }
 
+    /**
+     * Fetches the ID of a scientific category based on its name.
+     *
+     * @param string $sciCatName The name of the scientific category.
+     *
+     * @return array An array containing the scientific category ID.
+     */
     public function fetchScientificCategoryId(string $sciCatName): array
     {
         return $this->fetchDataWithQuery(
@@ -45,6 +53,13 @@ class SciCategoryService extends BaseService
         );
     }
 
+    /**
+     * Fetches the name of a scientific category based on its ID.
+     *
+     * @param int $sciCatId The ID of the scientific category.
+     *
+     * @return array An array containing the scientific category name.
+     */
     public function fetchScientificCategoryName(int $sciCatId): array
     {
         return $this->fetchDataWithQuery(
@@ -57,12 +72,15 @@ class SciCategoryService extends BaseService
 
     /**
      * Helper methods to return the query strings
-     *
-     * getScientificCategoryListQuery                  - return the scientific category list select SQL string
-     * getScientificCategoryIDQuery                    - return a scientific category id select SQL string
-     * getScientificCategoryNameQuery                  - return a scientific category name select SQL string
      */
 
+    /**
+     * Returns the SQL query string for fetching all scientific categories.
+     *
+     * @param bool $sortAsc Whether to sort the results in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getScientificCategoryListQuery(bool $sortAsc = true): string
     {
         /** NOTE: fix field names once table is refactored */
@@ -71,6 +89,11 @@ class SciCategoryService extends BaseService
             . "ORDER BY SciCategory " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching the ID of a scientific category by its name.
+     *
+     * @return string The SQL query string.
+     */
     protected function getScientificCategoryIdQuery(): string
     {
         /** NOTE: fix field names once table is refactored */
@@ -79,6 +102,11 @@ class SciCategoryService extends BaseService
             . "WHERE SciCategoryText = ?";
     }
 
+    /**
+     * Returns the SQL query string for fetching the name of a scientific category by its ID.
+     *
+     * @return string The SQL query string.
+     */
     protected function getScientificCategoryNameQuery(): string
     {
         /** NOTE: fix field names once table is refactored */

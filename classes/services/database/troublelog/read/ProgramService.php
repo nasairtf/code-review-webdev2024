@@ -19,10 +19,15 @@ class ProgramService extends BaseService
 {
     /**
      * Query methods that fetch observing program data
-     *
-     * fetchSemesterProgramData - retrieves a semester's program list
      */
 
+    /**
+     * Fetches program data for a given semester.
+     *
+     * @param string $semester  The semester identifier.
+     *
+     * @return array An array of program data.
+     */
     public function fetchSemesterProgramData(string $semester): array
     {
         return $this->fetchDataWithQuery(
@@ -35,10 +40,15 @@ class ProgramService extends BaseService
 
     /**
      * Helper methods to return the query strings
-     *
-     * getProgramInfoListQuery - return a semester's program list select SQL string
      */
 
+    /**
+     * Returns a query for program information.
+     *
+     * @param bool $sortAsc Whether to sort in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getProgramInfoListQuery(bool $sortAsc = true): string
     {
         // Filter: 'programID' < 900 indicates non-engineering programs

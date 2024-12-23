@@ -19,11 +19,16 @@ class ObsAppService extends BaseService
 {
     /**
      * Query methods that interface directly with DB Class
-     *
-     * fetchSemesterData - retrieves the semester data
-     * fetchProposalData - retrieves the proposal data
      */
 
+    /**
+     * Fetches semester proposal listing form data.
+     *
+     * @param int    $year      The year of the semester.
+     * @param string $semester  The semester code.
+     *
+     * @return array The fetched semester proposal data.
+     */
     public function fetchSemesterProposalListingFormData(int $year, string $semester): array
     {
         return $this->fetchDataWithQuery(
@@ -34,6 +39,13 @@ class ObsAppService extends BaseService
         );
     }
 
+    /**
+     * Fetches proposal listing form data for a specific session.
+     *
+     * @param int $obsAppId The ID of the proposal session.
+     *
+     * @return array An array of proposal data for the specified session.
+     */
     public function fetchProposalListingFormData(int $obsAppId): array
     {
         return $this->fetchDataWithQuery(
@@ -44,6 +56,14 @@ class ObsAppService extends BaseService
         );
     }
 
+    /**
+     * Fetches a list of programs for a specific semester.
+     *
+     * @param int    $year      The year of the semester.
+     * @param string $semester  The semester code ('A' or 'B').
+     *
+     * @return array An array of program data for the specified semester.
+     */
     public function fetchScheduleSemesterProgramList(int $year, string $semester): array
     {
         return $this->fetchDataWithQuery(
@@ -52,33 +72,6 @@ class ObsAppService extends BaseService
             'is',
             'No proposals found for the selected semester.'
         );
-    }
-
-    protected function getScheduleSemesterProgramListQuery(): string
-    {
-        return "
-            SELECT
-                ProgramNumber AS programID,
-                CONCAT(semesterYear,semesterCode) AS semesterID,
-                InvLastName1 AS projectPI,
-                CONCAT_WS(' ',InvFirstName1,InvLastName1) as projectMembers1,
-                CONCAT_WS(' ',InvFirstName2,InvLastName2) as projectMembers2,
-                CONCAT_WS(' ',InvFirstName3,InvLastName3) as projectMembers3,
-                CONCAT_WS(' ',InvFirstName4,InvLastName4) as projectMembers4,
-                CONCAT_WS(' ',InvFirstName5,InvLastName5) as projectMembers5,
-                AdditionalCoInvs AS projectMembers6,
-                PIEmail,
-                PIName,
-                NULL AS otherInfo
-            FROM
-                ObsApp
-            WHERE
-                semesterYear = ? AND
-                semesterCode = ? AND
-                ProgramNumber > 0
-            ORDER BY
-                ProgramNumber ASC;
-            ";
     }
 
     /**
@@ -107,10 +100,47 @@ class ObsAppService extends BaseService
 
     /**
      * Helper methods to return the query strings
-     *
-     * getProposalListingFormDataQuery - return proposal data select SQL string
      */
 
+    /**
+     * Returns a query string for fetching program data for a specific semester.
+     *
+     * @return string The SQL query string.
+     */
+    protected function getScheduleSemesterProgramListQuery(): string
+    {
+        return "
+            SELECT
+                ProgramNumber AS programID,
+                CONCAT(semesterYear,semesterCode) AS semesterID,
+                InvLastName1 AS projectPI,
+                CONCAT_WS(' ',InvFirstName1,InvLastName1) as projectMembers1,
+                CONCAT_WS(' ',InvFirstName2,InvLastName2) as projectMembers2,
+                CONCAT_WS(' ',InvFirstName3,InvLastName3) as projectMembers3,
+                CONCAT_WS(' ',InvFirstName4,InvLastName4) as projectMembers4,
+                CONCAT_WS(' ',InvFirstName5,InvLastName5) as projectMembers5,
+                AdditionalCoInvs AS projectMembers6,
+                PIEmail,
+                PIName,
+                NULL AS otherInfo
+            FROM
+                ObsApp
+            WHERE
+                semesterYear = ? AND
+                semesterCode = ? AND
+                ProgramNumber > 0
+            ORDER BY
+                ProgramNumber ASC;
+            ";
+    }
+
+    /**
+     * Returns a query string for fetching proposal listing data.
+     *
+     * @param bool $semester Whether to filter by semester or session.
+     *                       True for semester-based query, false for session-based query.
+     * @return string The SQL query string.
+     */
     protected function getProposalListingFormDataQuery(bool $semester = true): string
     {
         $query = [];

@@ -19,11 +19,13 @@ class SupportAstronomerService extends BaseService
 {
     /**
      * Query methods that fetch support astronomer data
-     *
-     * fetchFullSupportAstronomerData   - retrieves the full support astronomer list
-     * fetchActiveSupportAstronomerData - retrieves the active support astronomer list
      */
 
+    /**
+     * Fetches all support astronomers.
+     *
+     * @return array An array of support astronomer data.
+     */
     public function fetchFullSupportAstronomerData(): array
     {
         return $this->fetchDataWithQuery(
@@ -34,6 +36,11 @@ class SupportAstronomerService extends BaseService
         );
     }
 
+    /**
+     * Fetches active support astronomers.
+     *
+     * @return array An array of support astronomer data.
+     */
     public function fetchSupportAstronomerData(): array
     {
         return $this->fetchDataWithQuery(
@@ -46,11 +53,17 @@ class SupportAstronomerService extends BaseService
 
     /**
      * Helper methods to return the query strings
-     *
-     * getAllSupportAstronomersListQuery               - return the full support astronomer list select SQL string
-     * getSupportAstronomerListQuery                   - return the support astronomer list select SQL string
      */
 
+    /**
+     * Returns the SQL query string for fetching all support astronomers.
+     *
+     * This query retrieves all entries in the `SupportAstronomer` table, sorted by the last name.
+     *
+     * @param bool $sortAsc Whether to sort the results in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getAllSupportAstronomersListQuery(bool $sortAsc = true): string
     {
         // Filter: 'status' = 0 indicates non-active support astronomers
@@ -59,6 +72,16 @@ class SupportAstronomerService extends BaseService
             . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching active support astronomers.
+     *
+     * This query retrieves entries in the `SupportAstronomer` table where the `status` field
+     * indicates active astronomers.
+     *
+     * @param bool $sortAsc Whether to sort the results in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getSupportAstronomerListQuery(bool $sortAsc = true): string
     {
         // Filter: 'status' = 1 indicates active support astronomers

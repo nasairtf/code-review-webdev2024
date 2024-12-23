@@ -18,11 +18,16 @@ use App\services\database\troublelog\TroublelogService as BaseService;
 class GuestAcctsService extends BaseService
 {
     /**
-     * Query methods that fetch guest acct data
-     *
-     * fetchGuestAcctData - retrieves a guest account's data
+     * Query methods that fetch guest account data
      */
 
+    /**
+     * Fetches data for guest accounts by semester.
+     *
+     * @param string $semester  The semester identifier.
+     *
+     * @return array An array of guest account data.
+     */
     public function fetchGuestAccountData(string $semester): array
     {
         return $this->fetchDataWithQuery(
@@ -33,6 +38,14 @@ class GuestAcctsService extends BaseService
         );
     }
 
+    /**
+     * Fetches program session data.
+     *
+     * @param string $program The program identifier.
+     * @param string $session The session identifier (partial match).
+     *
+     * @return array An array of program session data.
+     */
     public function fetchProgramSessionData(string $program, string $session): array
     {
         return $this->fetchDataWithQuery(
@@ -43,6 +56,14 @@ class GuestAcctsService extends BaseService
         );
     }
 
+    /**
+     * Validates the existence of a program session.
+     *
+     * @param string $program The program identifier.
+     * @param string $session The session identifier (partial match).
+     *
+     * @return array Validation results as an associative array.
+     */
     public function fetchProgramValidation(string $program, string $session): array
     {
         return $this->executeSelectQuery(
@@ -54,10 +75,13 @@ class GuestAcctsService extends BaseService
 
     /**
      * Helper methods to return the query strings
-     *
-     * getProgramInfoListQuery - return a semester's program list select SQL string
      */
 
+    /**
+     * Returns a query for a single program session.
+     *
+     * @return string The SQL query string.
+     */
     protected function getSingleProgramSessionQuery(): string
     {
         return "SELECT username as program, defaultpwd as session "
@@ -65,6 +89,11 @@ class GuestAcctsService extends BaseService
             . "WHERE username = ? AND defaultpwd LIKE BINARY ?;";
     }
 
+    /**
+     * Returns a query for validating a program session.
+     *
+     * @return string The SQL query string.
+     */
     protected function getValidateProgramQuery(): string
     {
         return "SELECT COUNT(*) AS count "

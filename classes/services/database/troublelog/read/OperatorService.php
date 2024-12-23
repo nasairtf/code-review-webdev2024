@@ -19,12 +19,13 @@ class OperatorService extends BaseService
 {
     /**
      * Query methods that fetch operator data
-     *
-     * fetchFullOperatorData    - retrieves the full operators list
-     * fetchActiveOperatorData  - retrieves the active telescope operator list
-     * fetchActiveAssistantData - retrieves the active observatory assistant list
      */
 
+    /**
+     * Fetches the full list of operators.
+     *
+     * @return array An array of operator data.
+     */
     public function fetchFullOperatorData(): array
     {
         return $this->fetchDataWithQuery(
@@ -35,6 +36,11 @@ class OperatorService extends BaseService
         );
     }
 
+    /**
+     * Fetches active telescope operator data.
+     *
+     * @return array An array of active telescope operator data.
+     */
     public function fetchOperatorData(): array
     {
         return $this->fetchDataWithQuery(
@@ -45,6 +51,11 @@ class OperatorService extends BaseService
         );
     }
 
+    /**
+     * Fetches active observatory assistant data.
+     *
+     * @return array An array of active observatory assistant data.
+     */
     public function fetchAssistantData(): array
     {
         return $this->fetchDataWithQuery(
@@ -57,12 +68,15 @@ class OperatorService extends BaseService
 
     /**
      * Helper methods to return the query strings
-     *
-     * getAllOperatorsListQuery                        - return the full operators list select SQL string
-     * getTelescopeOperatorsListQuery                  - return the telescope operator list select SQL string
-     * getObservatoryAssistantsListQuery               - return the observatory assistant list select SQL string
      */
 
+    /**
+     * Returns the SQL query string for fetching the full list of operators.
+     *
+     * @param bool $sortAsc Whether to sort the results in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getAllOperatorsListQuery(bool $sortAsc = true): string
     {
         // Filter: 'nightAttend' = -1 indicates non-active operators
@@ -71,6 +85,13 @@ class OperatorService extends BaseService
             . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching active telescope operators.
+     *
+     * @param bool $sortAsc Whether to sort the results in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getTelescopeOperatorsListQuery(bool $sortAsc = true): string
     {
         // Filter: 'nightAttend' = 0 indicates active operators
@@ -80,6 +101,13 @@ class OperatorService extends BaseService
             . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching active observatory assistants.
+     *
+     * @param bool $sortAsc Whether to sort the results in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getObservatoryAssistantsListQuery(bool $sortAsc = true): string
     {
         // Filter: 'nightAttend' = 1 indicates active assistants

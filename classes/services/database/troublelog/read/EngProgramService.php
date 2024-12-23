@@ -18,6 +18,10 @@ use App\services\database\troublelog\TroublelogService as BaseService;
 class EngProgramService extends BaseService
 {
     /**
+     * Query methods that fetch engineering program data
+     */
+
+    /**
      * Fetches data for a specific proposal program based on semester and program number.
      *
      * @param string $semester  The semester code, either 'A' or 'B'.
@@ -34,6 +38,10 @@ class EngProgramService extends BaseService
             'No record found for the given program.'
         );
     }
+
+    /**
+     * Helper methods to return the query strings
+     */
 
     /**
      * Returns the SQL query string for fetching proposal program data.

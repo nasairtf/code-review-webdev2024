@@ -19,14 +19,13 @@ class HardwareService extends BaseService
 {
     /**
      * Query methods that fetch instrumentation data
-     *
-     * fetchFullInstrumentData            - retrieves the full instrument list
-     * fetchActiveSecondariesData         - retrieves the active secondary instrument list
-     * fetchActiveFacilityInstrumentsData - retrieves the active facility instruments list
-     * fetchActiveInstrumentsListData     - retrieves the full active instrument list
-     * fetchActiveVisitorInstrumentsData  - retrieves the active visitor instrument list
      */
 
+    /**
+     * Fetches the full list of non-obsolete instruments.
+     *
+     * @return array An array of instrument data.
+     */
     public function fetchFullNotObsoleteInstrumentsList(): array
     {
         return $this->fetchDataWithQuery(
@@ -37,6 +36,11 @@ class HardwareService extends BaseService
         );
     }
 
+    /**
+     * Fetches the full list of instruments from the database.
+     *
+     * @return array An array of instrument data.
+     */
     public function fetchFullInstrumentData(): array
     {
         return $this->fetchDataWithQuery(
@@ -47,6 +51,11 @@ class HardwareService extends BaseService
         );
     }
 
+    /**
+     * Fetches the list of active secondary instruments.
+     *
+     * @return array An array of active secondary instrument data.
+     */
     public function fetchSecondariesData(): array
     {
         return $this->fetchDataWithQuery(
@@ -57,6 +66,11 @@ class HardwareService extends BaseService
         );
     }
 
+    /**
+     * Fetches the list of active facility instruments.
+     *
+     * @return array An array of active facility instrument data.
+     */
     public function fetchFacilityInstrumentsData(): array
     {
         return $this->fetchDataWithQuery(
@@ -67,6 +81,13 @@ class HardwareService extends BaseService
         );
     }
 
+    /**
+     * Fetches the list of active instruments, sorted by index or name.
+     *
+     * @param bool $byIndex Whether to sort by index (true) or by name (false).
+     *
+     * @return array An array of active instrument data.
+     */
     public function fetchInstrumentsListData(bool $byIndex = true): array
     {
         $sql = $byIndex
@@ -80,6 +101,11 @@ class HardwareService extends BaseService
         );
     }
 
+    /**
+     * Fetches the list of active visitor instruments.
+     *
+     * @return array An array of active visitor instrument data.
+     */
     public function fetchVisitorInstrumentsData(): array
     {
         return $this->fetchDataWithQuery(
@@ -92,15 +118,15 @@ class HardwareService extends BaseService
 
     /**
      * Helper methods to return the query strings
-     *
-     * getAllInstrumentsListQuery                      - return the full instrument list select SQL string
-     * getActiveSecondaryInstrumentsListQuery          - return the active secondary instrument list select SQL string
-     * getAllActiveFacilityInstrumentsListByIndexQuery - return the active facility instruments list select SQL string
-     * getAllActiveInstrumentsListByIndexQuery         - return the full active instrument list select SQL string
-     * getAllActiveInstrumentsListByNameQuery          - return the full active instrument list select SQL string
-     * getAllActiveVisitorInstrumentListQuery          - return the active visitor instrument list select SQL string
      */
 
+    /**
+     * Returns the SQL query string for fetching the full list of instruments.
+     *
+     * @param bool $sortAsc Whether to sort the result in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getAllInstrumentsListQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
@@ -111,6 +137,13 @@ class HardwareService extends BaseService
             . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching the list of active secondary instruments.
+     *
+     * @param bool $sortAsc Whether to sort the result in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getActiveSecondaryInstrumentsListQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
@@ -124,6 +157,13 @@ class HardwareService extends BaseService
             . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching the list of active facility instruments, sorted by index.
+     *
+     * @param bool $sortAsc Whether to sort the result in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getAllActiveFacilityInstrumentsListByIndexQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
@@ -140,6 +180,13 @@ class HardwareService extends BaseService
             . "ORDER BY pulldownIndex " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching the list of all active instruments, sorted by index.
+     *
+     * @param bool $sortAsc Whether to sort the result in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getAllActiveInstrumentsListByIndexQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
@@ -154,6 +201,13 @@ class HardwareService extends BaseService
             . "ORDER BY pulldownIndex " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching the list of all active instruments, sorted by name.
+     *
+     * @param bool $sortAsc Whether to sort the result in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getAllActiveInstrumentsListByNameQuery(bool $sortAsc = true): string
     {
         #-- from irtfhelper.inc:
@@ -168,6 +222,13 @@ class HardwareService extends BaseService
             . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching the list of all non-obsolete instruments, sorted by name.
+     *
+     * @param bool $sortAsc Whether to sort the result in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getAllNotObsoleteInstrumentsListByNameQuery(bool $sortAsc = true): string
     {
         // Filter: 'notes' <> 'obsolete' indicates active instrument, including 'ic', 'unk', etc
@@ -177,6 +238,13 @@ class HardwareService extends BaseService
             . "ORDER BY itemName " . $this->getSortString($sortAsc) . ";";
     }
 
+    /**
+     * Returns the SQL query string for fetching the list of active visitor instruments.
+     *
+     * @param bool $sortAsc Whether to sort the result in ascending order.
+     *
+     * @return string The SQL query string.
+     */
     protected function getAllActiveVisitorInstrumentListQuery(bool $sortAsc = true): string
     {
         // Filter: 'notes' = 'visitor' indicates active visitor instrument
