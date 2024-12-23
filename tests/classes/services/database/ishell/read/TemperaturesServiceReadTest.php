@@ -21,15 +21,15 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testQueryWithSensorIdOnly
- * - testQueryWithSystemFilter
- * - testQueryWithTimestampFilter
- * - testQueryWithSystemAndTimestampFilters
- * - testQueryWithLimitToOne
- * - testQueryWithSortDescending
- * - testQueryWithAllFilters
- * - testQueryWithNoResults
- * - testQueryErrorHandling
+ * - testQueryWithSensorIdOnly [DONE]
+ * - testQueryWithSystemFilter [DONE]
+ * - testQueryWithTimestampFilter [DONE]
+ * - testQueryWithSystemAndTimestampFilters [DONE]
+ * - testQueryWithLimitToOne [DONE]
+ * - testQueryWithSortDescending [DONE]
+ * - testQueryWithAllFilters [DONE]
+ * - testQueryWithNoResults [DONE]
+ * - testQueryErrorHandling [DONE]
  *
  * @covers \App\services\database\ishell\read\TemperaturesService
  *

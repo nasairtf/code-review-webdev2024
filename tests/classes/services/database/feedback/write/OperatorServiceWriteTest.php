@@ -22,9 +22,9 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testInsertOperatorRecordSucceeds
- * - testInsertOperatorRecordFails
- * - testGetOperatorInsertQuery
+ * - testInsertOperatorRecordSucceeds [DONE]
+ * - testInsertOperatorRecordFails [DONE]
+ * - testGetOperatorInsertQuery [DONE]
  *
  * @covers \App\services\database\feedback\write\OperatorService
  *

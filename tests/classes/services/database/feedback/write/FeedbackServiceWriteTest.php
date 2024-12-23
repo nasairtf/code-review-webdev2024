@@ -22,12 +22,12 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testReturnFeedbackRecordIdSucceeds
- * - testInsertFeedbackRecordSucceeds
- * - testInsertFeedbackRecordFails
- * - testGetFeedbackInsertQuery
- * - testGetFeedbackInsertParams
- * - testGetFeedbackInsertTypes
+ * - testReturnFeedbackRecordIdSucceeds [DONE]
+ * - testInsertFeedbackRecordSucceeds [DONE]
+ * - testInsertFeedbackRecordFails [DONE]
+ * - testGetFeedbackInsertQuery [DONE]
+ * - testGetFeedbackInsertParams [DONE]
+ * - testGetFeedbackInsertTypes [DONE]
  *
  * @covers \App\services\database\feedback\write\FeedbackService
  *

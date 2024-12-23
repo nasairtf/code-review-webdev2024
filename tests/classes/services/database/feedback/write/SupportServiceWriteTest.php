@@ -22,9 +22,9 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testInsertSupportAstronomerRecordSucceeds
- * - testInsertSupportAstronomerRecordFails
- * - testGetSupportAstronomerInsertQuery
+ * - testInsertSupportAstronomerRecordSucceeds [DONE]
+ * - testInsertSupportAstronomerRecordFails [DONE]
+ * - testGetSupportAstronomerInsertQuery [DONE]
  *
  * @covers \App\services\database\feedback\write\SupportService
  *

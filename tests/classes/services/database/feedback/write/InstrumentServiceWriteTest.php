@@ -22,9 +22,9 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testInsertInstrumentRecordSucceeds
- * - testInsertInstrumentRecordFails
- * - testGetInstrumentInsertQuery
+ * - testInsertInstrumentRecordSucceeds [DONE]
+ * - testInsertInstrumentRecordFails [DONE]
+ * - testGetInstrumentInsertQuery [DONE]
  *
  * @covers \App\services\database\feedback\write\InstrumentService
  *
