@@ -372,8 +372,9 @@ class FeedbackServiceReadTest extends TestCase
      *
      * @return array An associative array with the following keys:
      *               - 'sql' (string): The SQL query string.
-     *               - 'types' (string): The types of the query parameters.
      *               - 'params' (array): The parameters to bind to the query.
+     *               - 'types' (string): The types of the query parameters.
+     *               - 'errorMsg' (string): The message to output for query errors.
      */
     private function createTestQueryParts(bool $semester, array $data): array
     {
