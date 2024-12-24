@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\utilities;
 
 use Mockery;
+use App\exceptions\DatabaseException;
 
 /**
  * Trait for mocking the DatabaseService class and its methods in unit tests.
@@ -52,125 +53,6 @@ trait DatabaseServiceMockTrait
     }
 
     /**
-     * Sets up a mock expectation for the `fetchDataWithQuery` method.
-     *
-     * @param Mockery\MockInterface $dsMock       The partially mocked derived service.
-     * @param string                $query        The query string.
-     * @param array                 $params       Parameters to bind to the query.
-     * @param string                $types        Parameter types.
-     * @param array                 $result       The result to return from the mock.
-     * @param string|null           $errorMessage Error message if no data found.
-     *
-     * @return void
-     */
-    protected function mockFetchDataWithQuery(
-        Mockery\MockInterface $dsMock,
-        string $query,
-        array $params,
-        string $types,
-        array $result,
-        ?string $errorMessage = null
-    ): void {
-        $dsMock->shouldReceive('fetchDataWithQuery')
-            ->with(
-                $query,
-                $params,
-                $types,
-                $errorMessage ?? Mockery::any()
-            )
-            ->andReturn($result);
-    }
-
-    /**
-     * Sets up a mock expectation for the `modifyDataWithQuery` method.
-     *
-     * @param Mockery\MockInterface $dsMock       The partially mocked derived service.
-     * @param string                $query        The query string.
-     * @param array                 $params       Parameters to bind to the query.
-     * @param string                $types        Parameter types.
-     * @param int                   $expectedRows The expected number of affected rows.
-     * @param int                   $affectedRows The number of affected rows to return.
-     * @param string|null           $errorMessage Error message if modification fails.
-     *
-     * @return void
-     */
-    protected function mockModifyDataWithQuery(
-        Mockery\MockInterface $dsMock,
-        string $query,
-        array $params,
-        string $types,
-        int $expectedRows,
-        int $affectedRows,
-        ?string $errorMessage = null
-    ): void {
-        $dsMock->shouldReceive('modifyDataWithQuery')
-            ->with(
-                $query,
-                $params,
-                $types,
-                $expectedRows,
-                $errorMessage ?? Mockery::any()
-            )
-            ->andReturn($affectedRows);
-    }
-
-    /**
-     * Sets up a mock expectation for the `executeSelectQuery` method.
-     *
-     * @param Mockery\MockInterface $dsMock       The partially mocked derived service.
-     * @param string                $query        The query string.
-     * @param array                 $params       Parameters to bind to the query.
-     * @param string                $types        Parameter types.
-     * @param int                   $resultType   The type of result array to return (e.g., MYSQLI_ASSOC).
-     * @param array                 $result       The result to return from the mock.
-     *
-     * @return void
-     */
-    protected function mockExecuteSelectQuery(
-        Mockery\MockInterface $dsMock,
-        string $query,
-        array $params,
-        string $types,
-        int $resultType,
-        array $result
-    ): void {
-        $dsMock->shouldReceive('executeSelectQuery')
-            ->with(
-                $query,
-                $params,
-                $types
-            )
-            ->andReturn($result);
-    }
-
-    /**
-     * Sets up a mock expectation for the `executeUpdateQuery` method.
-     *
-     * @param Mockery\MockInterface $dsMock       The partially mocked derived service.
-     * @param string                $query        The query string.
-     * @param array                 $params       Parameters to bind to the query.
-     * @param string                $types        Parameter types.
-     * @param int                   $affectedRows The number of affected rows to return.
-     *
-     * @return void
-     */
-    protected function mockExecuteUpdateQuery(
-        Mockery\MockInterface $dsMock,
-        string $query,
-        array $params,
-        string $types,
-        int $affectedRows
-    ): void {
-        $dsMock->shouldReceive('executeUpdateQuery')
-            ->with(
-                $query,
-                $params,
-                $types
-            )
-            ->andReturn($affectedRows);
-    }
-
-    /**
      * Sets up a mock expectation for the `getSortString` method.
      *
      * @param Mockery\MockInterface $mock    The mock instance to add behavior to.
@@ -186,5 +68,259 @@ trait DatabaseServiceMockTrait
         $mock->shouldReceive('getSortString')
             ->with($sortAsc)
             ->andReturn($sortString);
+    }
+
+    /**
+     * Applies success or exception behavior to a mock expectation.
+     *
+     * @param Mockery\CompositeExpectation
+     *                            $dsMockExp   The mock expectation to modify.
+     * @param bool                $isSuccess   Determines whether to return a result or throw an exception.
+     * @param mixed|null          $result      The result to return on success (ignored if $isSuccess is false).
+     * @param string              $errorMsg    The error message for the exception on failure.
+     *
+     * @return void
+     */
+    protected function arrangeQueryExpectationBehavior(
+        Mockery\CompositeExpectation $dsMockExp,
+        bool $isSuccess,
+        $result,
+        string $errorMsg
+    ): void {
+        if ($isSuccess) {
+            $dsMockExp->once()->andReturn($result);
+        } else {
+            $dsMockExp->once()->andThrow(new DatabaseException($errorMsg));
+            // Expect exception
+            $this->expectException(DatabaseException::class);
+            $this->expectExceptionMessage($errorMsg);
+        }
+    }
+
+    /**
+     * Sets up a mock expectation for the `fetchDataWithQuery` method.
+     *
+     * @param Mockery\MockInterface $dsMock    The partially mocked derived service.
+     * @param string                $query     The query string.
+     * @param array                 $params    Parameters to bind to the query.
+     * @param string                $types     Parameter types.
+     * @param string                $errorMsg  Error message if no data found.
+     * @param bool                  $isSuccess Mock of success (return result) or failure (throw exception).
+     * @param array|null            $result    The result to return from the mock.
+     *
+     * @return void
+     */
+    protected function mockFetchDataWithQuery(
+        Mockery\MockInterface $dsMock,
+        string $query,
+        array $params,
+        string $types,
+        string $errorMsg,
+        bool $isSuccess,
+        ?array $result = null
+    ): void {
+        $this->arrangeQueryExpectationBehavior(
+            $dsMock->shouldReceive('fetchDataWithQuery')
+                ->with(
+                    $query,
+                    $params,
+                    $types,
+                    $errorMsg
+                ),
+            $isSuccess,
+            $result,
+            $errorMsg
+        );
+    }
+
+    /**
+     * Sets up a mock expectation for the `modifyDataWithQuery` method.
+     *
+     * @param Mockery\MockInterface $dsMock       The partially mocked derived service.
+     * @param string                $query        The query string.
+     * @param array                 $params       Parameters to bind to the query.
+     * @param string                $types        Parameter types.
+     * @param int                   $expectedRows The expected number of affected rows.
+     * @param string                $errorMsg     Error message if modification fails.
+     * @param bool                  $isSuccess    Mock of success (return result) or failure (throw exception).
+     * @param int|null              $affectedRows The number of affected rows to return.
+     *
+     * @return void
+     */
+    protected function mockModifyDataWithQuery(
+        Mockery\MockInterface $dsMock,
+        string $query,
+        array $params,
+        string $types,
+        int $expectedRows,
+        string $errorMsg,
+        bool $isSuccess,
+        ?int $affectedRows = null
+    ): void {
+        $this->arrangeQueryExpectationBehavior(
+            $dsMock->shouldReceive('modifyDataWithQuery')
+                ->with(
+                    $query,
+                    $params,
+                    $types,
+                    $expectedRows,
+                    $errorMsg
+                ),
+            $isSuccess,
+            $affectedRows,
+            $errorMsg
+        );
+    }
+
+    /**
+     * Sets up a mock expectation for the `executeSelectQuery` method.
+     *
+     * @param Mockery\MockInterface $dsMock       The partially mocked derived service.
+     * @param string                $query        The query string.
+     * @param array                 $params       Parameters to bind to the query.
+     * @param string                $types        Parameter types.
+     * @param int                   $resultType   The type of result array to return (e.g., MYSQLI_ASSOC).
+     * @param bool                  $isSuccess    Mock of success (return result) or failure (throw exception).
+     * @param array                 $result       The result to return from the mock.
+     *
+     * @return void
+     */
+    protected function mockExecuteSelectQuery(
+        Mockery\MockInterface $dsMock,
+        string $query,
+        array $params,
+        string $types,
+        int $resultType,
+        bool $isSuccess,
+        array $result
+    ): void {
+        $this->arrangeQueryExpectationBehavior(
+            $dsMock->shouldReceive('executeSelectQuery')
+                ->with(
+                    $query,
+                    $params,
+                    $types
+                ),
+            $isSuccess,
+            $result,
+            "Error executing SELECT query."
+        );
+    }
+
+    /**
+     * Sets up a mock expectation for the `executeUpdateQuery` method.
+     *
+     * @param Mockery\MockInterface $dsMock       The partially mocked derived service.
+     * @param string                $query        The query string.
+     * @param array                 $params       Parameters to bind to the query.
+     * @param string                $types        Parameter types.
+     * @param bool                  $isSuccess    Mock of success (return result) or failure (throw exception).
+     * @param int                   $affectedRows The number of affected rows to return.
+     *
+     * @return void
+     */
+    protected function mockExecuteUpdateQuery(
+        Mockery\MockInterface $dsMock,
+        string $query,
+        array $params,
+        string $types,
+        bool $isSuccess,
+        int $affectedRows
+    ): void {
+        $this->arrangeQueryExpectationBehavior(
+            $dsMock->shouldReceive('executeUpdateQuery')
+                ->with(
+                    $query,
+                    $params,
+                    $types
+                ),
+            $isSuccess,
+            $affectedRows,
+            "Error executing INSERT/UPDATE/DELETE query."
+        );
+    }
+
+    /**
+     * Arranges expectations for mock objects in the test.
+     *
+     * @param array $data Query data including SQL, parameters, types, and results.
+     *
+     * @return void
+     */
+    private function arrangeFetchDataWithQueryExpectations(array $data): void
+    {
+        $this->mockFetchDataWithQuery(
+            $this->srvMock,
+            $data['sql'],
+            $data['params'],
+            $data['types'],
+            $data['errorMsg'],
+            $data['resultType'],
+            $data['result']
+        );
+    }
+
+    /**
+     * Arranges expectations for mock objects in the test.
+     *
+     * @param array $data Query data including SQL, parameters, types, expected and affected rows.
+     *
+     * @return void
+     */
+    private function arrangeModifyDataWithQueryExpectations(array $data): void
+    {
+        $this->mockModifyDataWithQuery(
+            $this->srvMock,
+            $data['sql'],
+            $data['params'],
+            $data['types'],
+            $data['expectedRows'],
+            $data['errorMsg'],
+            $data['resultType'],
+            $data['result']
+        );
+    }
+
+    /**
+     * Asserts expectations for mock objects and test results.
+     *
+     * @param mixed $result The actual result from the method under test.
+     * @param array $data Query data including expected results.
+     *
+     * @return void
+     */
+    private function assertFetchDataWithQueryExpectations($result, array $data): void
+    {
+        $this->assertSame($data['result'], $result);
+        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
+            ->once()
+            ->with(
+                $data['sql'],
+                $data['params'],
+                $data['types'],
+                $data['errorMsg']
+            );
+    }
+
+    /**
+     * Asserts expectations for mock objects and test results.
+     *
+     * @param mixed $result The actual result from the method under test.
+     * @param array $data Query data including expected results.
+     *
+     * @return void
+     */
+    private function assertModifyDataWithQueryExpectations($result, array $data): void
+    {
+        $this->assertSame($data['result'], $result);
+        $this->srvMock->shouldHaveReceived('modifyDataWithQuery')
+            ->once()
+            ->with(
+                $data['sql'],
+                $data['params'],
+                $data['types'],
+                $data['expectedRows'],
+                $data['errorMsg']
+            );
     }
 }

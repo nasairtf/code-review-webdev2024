@@ -96,23 +96,17 @@ class SupportServiceWriteTest extends TestCase
     {
         // Define the test data
         $data = $this->createTestData();
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['affectedRows'];
 
         // Arrange
-        $this->mockModifyDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['query']['expectedRows'],
-            $data['affectedRows'],
-            $data['query']['errorMsg']
-        );
+        $this->arrangeModifyDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->insertSupportAstronomerRecord($data['feedbackId'], $data['support'][0]);
 
         // Assert
-        $this->assertSame($data['affectedRows'], $result);
+        $this->assertModifyDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -124,22 +118,11 @@ class SupportServiceWriteTest extends TestCase
     {
         // Define the test data
         $data = $this->createTestData();
+        $data['query']['resultType'] = false;
+        $data['query']['result'] = $data['affectedRows'];
 
         // Arrange
-        $this->srvMock->shouldReceive('modifyDataWithQuery')
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['expectedRows'],
-                $data['query']['errorMsg']
-            )
-            ->andThrow(new DatabaseException($data['query']['errorMsg']))
-            ->once();
-
-        // Expect exception
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage($data['query']['errorMsg']);
+        $this->arrangeModifyDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->insertSupportAstronomerRecord($data['feedbackId'], $data['support'][0]);

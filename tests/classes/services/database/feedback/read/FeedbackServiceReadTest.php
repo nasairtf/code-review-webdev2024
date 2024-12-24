@@ -30,43 +30,6 @@ use App\exceptions\DatabaseException;
  * - testGetProposalProgramDataQuery [DONE]
  *
  * @covers \App\services\database\feedback\read\FeedbackService
- *
- *------------------------------------------------------------------------------
- * Test Plan For FeedbackService (Read Class)
- *
- * This class contains two public methods to test:
- *
- * - fetchSemesterProposalListingFormData
- * - fetchProposalProgramData
- *
- * And contains two protected methods to test:
- *
- * - getProposalListingFormDataQuery
- * - getProposalProgramDataQuery
- *
- * Test Cases
- *
- * 1. fetchSemesterProposalListingFormData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *    - Verify correct SQL query generation.
- *    - Verify parameters binding and types (is).
- *
- * 2. fetchProposalProgramData
- *    - Success case: Query returns a valid result array for a specific program.
- *    - Failure case: Query returns no matching results (empty array).
- *    - Verify SQL query generation and parameter binding (isi).
- *
- * 3. getProposalListingFormDataQuery
- *    - Verify SQL query generation for a propsal listing.
- *
- * 4. getProposalProgramDataQuery
- *    - Verify SQL query generation.
- *
- * Mocking
- *
- * Mock the fetchDataWithQuery method in the base FeedbackService to simulate database
- * responses for the tests.
  */
 class FeedbackServiceReadTest extends TestCase
 {
@@ -110,22 +73,17 @@ class FeedbackServiceReadTest extends TestCase
     {
         // Define the test data
         $data = $this->createTestData();
+        $data['sqlsemester']['resultType'] = true;
+        $data['sqlsemester']['result'] = $data['successResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['sqlsemester']['sql'],
-            $data['sqlsemester']['params'],
-            $data['sqlsemester']['types'],
-            $data['successResult'],
-            $data['sqlsemester']['errorMsg']
-        );
+        $this->arrangeFetchDataWithQueryExpectations($data['sqlsemester']);
 
         // Act
         $result = $this->srvMock->fetchSemesterProposalListingFormData($data['year'], $data['semester']);
 
         // Assert
-        $this->assertSame($data['successResult'], $result);
+        $this->assertFetchDataWithQueryExpectations($result, $data['sqlsemester']);
     }
 
     /**
@@ -139,22 +97,17 @@ class FeedbackServiceReadTest extends TestCase
     {
         // Define the test data
         $data = $this->createTestData();
+        $data['sqlsemester']['resultType'] = false;
+        $data['sqlsemester']['result'] = $data['failureResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['sqlsemester']['sql'],
-            $data['sqlsemester']['params'],
-            $data['sqlsemester']['types'],
-            $data['failureResult'],
-            $data['sqlsemester']['errorMsg']
-        );
+        $this->arrangeFetchDataWithQueryExpectations($data['sqlsemester']);
 
         // Act
         $result = $this->srvMock->fetchSemesterProposalListingFormData($data['year'], $data['semester']);
 
         // Assert
-        $this->assertSame($data['failureResult'], $result);
+        $this->assertFetchDataWithQueryExpectations($result, $data['sqlsemester']);
     }
 
     /**
@@ -172,22 +125,17 @@ class FeedbackServiceReadTest extends TestCase
     {
         // Define the test data
         $data = $this->createTestData();
+        $data['sqlproposal']['resultType'] = true;
+        $data['sqlproposal']['result'] = [$data['successResult'][0]];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['sqlproposal']['sql'],
-            $data['sqlproposal']['params'],
-            $data['sqlproposal']['types'],
-            [$data['successResult'][0]],
-            $data['sqlproposal']['errorMsg']
-        );
+        $this->arrangeFetchDataWithQueryExpectations($data['sqlproposal']);
 
         // Act
         $result = $this->srvMock->fetchProposalProgramData($data['year'], $data['semester'], $data['program']);
 
         // Assert
-        $this->assertSame([$data['successResult'][0]], $result);
+        $this->assertFetchDataWithQueryExpectations($result, $data['sqlproposal']);
     }
 
     /**
@@ -201,22 +149,17 @@ class FeedbackServiceReadTest extends TestCase
     {
         // Define the test data
         $data = $this->createTestData();
+        $data['sqlproposal']['resultType'] = false;
+        $data['sqlproposal']['result'] = $data['failureResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['sqlproposal']['sql'],
-            $data['sqlproposal']['params'],
-            $data['sqlproposal']['types'],
-            $data['failureResult'],
-            $data['sqlproposal']['errorMsg']
-        );
+        $this->arrangeFetchDataWithQueryExpectations($data['sqlproposal']);
 
         // Act
         $result = $this->srvMock->fetchProposalProgramData($data['year'], $data['semester'], $data['program']);
 
         // Assert
-        $this->assertSame($data['failureResult'], $result);
+        $this->assertFetchDataWithQueryExpectations($result, $data['sqlproposal']);
     }
 
     /**

@@ -14,11 +14,11 @@ class TestSupportAstronomerService extends BaseService
      * @param bool $sortAsc Determines 'ASC' or 'DESC' sort.
      *
      * @return string The SQL query string.
-     */
+     *//*
     public function getAllSupportAstronomersListQueryProxy(bool $sortAsc): string
     {
         return $this->getAllSupportAstronomersListQuery($sortAsc);
-    }
+    }*/
 
     /**
      * Proxy method for testing the protected getSupportAstronomerListQuery method.
@@ -26,9 +26,23 @@ class TestSupportAstronomerService extends BaseService
      * @param bool $sortAsc Determines 'ASC' or 'DESC' sort.
      *
      * @return string The SQL query string.
-     */
+     *//*
     public function getSupportAstronomerListQueryProxy(bool $sortAsc): string
     {
         return $this->getSupportAstronomerListQuery($sortAsc);
+    }*/
+
+    /**
+     * Proxy method for testing the protected getSupportAstronomersQuery method.
+     *
+     * @param bool $sortAsc    Whether to sort the results in ascending order.
+     * @param bool $status     Whether to include only active support astronomers.
+     *                         True for active astronomers only, false for all.
+     *
+     * @return string The SQL query string.
+     */
+    protected function getSupportAstronomersQueryProxy(bool $sortAsc, bool $status): string
+    {
+        return $this->getSupportAstronomerListQuery($sortAsc, $status);
     }
 }

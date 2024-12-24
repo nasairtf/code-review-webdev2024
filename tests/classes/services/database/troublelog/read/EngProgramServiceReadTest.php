@@ -97,30 +97,17 @@ class EngProgramServiceReadTest extends TestCase
     {
         // Define the test data
         $data = $this->createTestData();
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['successResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['successResult'],
-            $data['query']['errorMsg']
-        );
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchProposalEngProgramData($data['semester'], $data['program']);
 
         // Assert
-        $this->assertSame($data['successResult'], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -134,30 +121,17 @@ class EngProgramServiceReadTest extends TestCase
     {
         // Define the test data
         $data = $this->createTestData();
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['failureResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['failureResult'],
-            $data['query']['errorMsg']
-        );
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchProposalEngProgramData($data['semester'], $data['program']);
 
         // Assert
-        $this->assertSame($data['failureResult'], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**

@@ -121,20 +121,12 @@ class TemperaturesServiceReadTest extends TestCase
         $data['system'] = null;
         $data['timestamp'] = null;
         $data['query'] = $this->createTestQueryParts($data);
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['successResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['successResult'],
-            $data['query']['errorMsg']
-        );
-        $this->mockGetSortString(
-            $this->srvMock,
-            $data['sortAsc']
-        );
+        $this->mockGetSortString($this->srvMock, $data['sortAsc']);
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchTemperatureData(
@@ -146,15 +138,7 @@ class TemperaturesServiceReadTest extends TestCase
         );
 
         // Assert
-        $this->assertSame($data['successResult'], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -174,20 +158,12 @@ class TemperaturesServiceReadTest extends TestCase
         $data = $this->createTestData();
         $data['timestamp'] = null;
         $data['query'] = $this->createTestQueryParts($data);
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['successResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['successResult'],
-            $data['query']['errorMsg']
-        );
-        $this->mockGetSortString(
-            $this->srvMock,
-            $data['sortAsc']
-        );
+        $this->mockGetSortString($this->srvMock, $data['sortAsc']);
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchTemperatureData(
@@ -199,15 +175,7 @@ class TemperaturesServiceReadTest extends TestCase
         );
 
         // Assert
-        $this->assertSame($data['successResult'], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -227,20 +195,12 @@ class TemperaturesServiceReadTest extends TestCase
         $data = $this->createTestData();
         $data['system'] = null;
         $data['query'] = $this->createTestQueryParts($data);
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['successResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['successResult'],
-            $data['query']['errorMsg']
-        );
-        $this->mockGetSortString(
-            $this->srvMock,
-            $data['sortAsc']
-        );
+        $this->mockGetSortString($this->srvMock, $data['sortAsc']);
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchTemperatureData(
@@ -252,15 +212,7 @@ class TemperaturesServiceReadTest extends TestCase
         );
 
         // Assert
-        $this->assertSame($data['successResult'], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -279,20 +231,12 @@ class TemperaturesServiceReadTest extends TestCase
         // Define the test data
         $data = $this->createTestData();
         $data['query'] = $this->createTestQueryParts($data);
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['successResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['successResult'],
-            $data['query']['errorMsg']
-        );
-        $this->mockGetSortString(
-            $this->srvMock,
-            $data['sortAsc']
-        );
+        $this->mockGetSortString($this->srvMock, $data['sortAsc']);
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchTemperatureData(
@@ -304,15 +248,7 @@ class TemperaturesServiceReadTest extends TestCase
         );
 
         // Assert
-        $this->assertSame($data['successResult'], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -334,20 +270,12 @@ class TemperaturesServiceReadTest extends TestCase
         $data['timestamp'] = null;
         $data['limitToOne'] = true;
         $data['query'] = $this->createTestQueryParts($data);
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['successResult'][0];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['successResult'][0],
-            $data['query']['errorMsg']
-        );
-        $this->mockGetSortString(
-            $this->srvMock,
-            $data['sortAsc']
-        );
+        $this->mockGetSortString($this->srvMock, $data['sortAsc']);
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchTemperatureData(
@@ -359,15 +287,7 @@ class TemperaturesServiceReadTest extends TestCase
         );
 
         // Assert
-        $this->assertSame($data['successResult'][0], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -388,20 +308,12 @@ class TemperaturesServiceReadTest extends TestCase
         $data['system'] = null;
         $data['timestamp'] = null;
         $data['query'] = $this->createTestQueryParts($data);
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['successResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['successResult'],
-            $data['query']['errorMsg']
-        );
-        $this->mockGetSortString(
-            $this->srvMock,
-            $data['sortAsc']
-        );
+        $this->mockGetSortString($this->srvMock, $data['sortAsc']);
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchTemperatureData(
@@ -413,15 +325,7 @@ class TemperaturesServiceReadTest extends TestCase
         );
 
         // Assert
-        $this->assertSame($data['successResult'], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -441,20 +345,12 @@ class TemperaturesServiceReadTest extends TestCase
         $data = $this->createTestData(false);
         $data['limitToOne'] = true;
         $data['query'] = $this->createTestQueryParts($data);
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['successResult'][0];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['successResult'][0],
-            $data['query']['errorMsg']
-        );
-        $this->mockGetSortString(
-            $this->srvMock,
-            $data['sortAsc']
-        );
+        $this->mockGetSortString($this->srvMock, $data['sortAsc']);
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchTemperatureData(
@@ -466,15 +362,7 @@ class TemperaturesServiceReadTest extends TestCase
         );
 
         // Assert
-        $this->assertSame($data['successResult'][0], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -492,20 +380,12 @@ class TemperaturesServiceReadTest extends TestCase
         // Define the test data
         $data = $this->createTestData();
         $data['query'] = $this->createTestQueryParts($data);
+        $data['query']['resultType'] = true;
+        $data['query']['result'] = $data['failureResult'];
 
         // Arrange
-        $this->mockFetchDataWithQuery(
-            $this->srvMock,
-            $data['query']['sql'],
-            $data['query']['params'],
-            $data['query']['types'],
-            $data['failureResult'],
-            $data['query']['errorMsg']
-        );
-        $this->mockGetSortString(
-            $this->srvMock,
-            $data['sortAsc']
-        );
+        $this->mockGetSortString($this->srvMock, $data['sortAsc']);
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchTemperatureData(
@@ -517,15 +397,7 @@ class TemperaturesServiceReadTest extends TestCase
         );
 
         // Assert
-        $this->assertSame($data['failureResult'], $result);
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
+        $this->assertFetchDataWithQueryExpectations($result, $data['query']);
     }
 
     /**
@@ -543,25 +415,12 @@ class TemperaturesServiceReadTest extends TestCase
         // Define the test data
         $data = $this->createTestData();
         $data['query'] = $this->createTestQueryParts($data);
+        $data['query']['resultType'] = false;
+        $data['query']['result'] = $data['failureResult'];
 
         // Arrange
-        $this->srvMock->shouldReceive('fetchDataWithQuery')
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            )
-            ->andThrow(new DatabaseException($data['query']['errorMsg']))
-            ->once();
-        $this->mockGetSortString(
-            $this->srvMock,
-            $data['sortAsc']
-        );
-
-        // Expect exception
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage($data['query']['errorMsg']);
+        $this->mockGetSortString($this->srvMock, $data['sortAsc']);
+        $this->arrangeFetchDataWithQueryExpectations($data['query']);
 
         // Act
         $result = $this->srvMock->fetchTemperatureData(
@@ -571,16 +430,6 @@ class TemperaturesServiceReadTest extends TestCase
             $data['limitToOne'],
             $data['sortAsc']
         );
-
-        // Assert
-        $this->srvMock->shouldHaveReceived('fetchDataWithQuery')
-            ->once()
-            ->with(
-                $data['query']['sql'],
-                $data['query']['params'],
-                $data['query']['types'],
-                $data['query']['errorMsg']
-            );
     }
 
     /**
