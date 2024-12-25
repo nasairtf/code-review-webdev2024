@@ -31,8 +31,8 @@ class GuestAcctsService extends BaseService
     public function fetchGuestAccountData(string $semester): array
     {
         return $this->fetchDataWithQuery(
-            $this->getSingleProgramSessionQuery(),
-            [$semester],
+            $this->getSemesterProgramsQuery(),
+            [$semester . '%'],
             's',
             'No programs found.'
         );
@@ -76,6 +76,18 @@ class GuestAcctsService extends BaseService
     /**
      * Helper methods to return the query strings
      */
+
+    /**
+     * Returns a query for guest accounts by semester.
+     *
+     * @return string The SQL query string.
+     */
+    protected function getSemesterProgramsQuery(): string
+    {
+        return "SELECT username as program, defaultpwd as session "
+            . "FROM GuestAccts "
+            . "WHERE username LIKE BINARY ?;";
+    }
 
     /**
      * Returns a query for a single program session.
