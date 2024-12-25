@@ -41,8 +41,8 @@ class TestSupportAstronomerService extends BaseService
      *
      * @return string The SQL query string.
      */
-    protected function getSupportAstronomersQueryProxy(bool $sortAsc, bool $status): string
+    public function getSupportAstronomersQueryProxy(bool $sortAsc, bool $status): string
     {
-        return $this->getSupportAstronomerListQuery($sortAsc, $status);
+        return $this->getSupportAstronomersQuery($sortAsc, $status);
     }
 }
