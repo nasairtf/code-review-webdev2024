@@ -56,42 +56,6 @@ class SupportAstronomerService extends BaseService
      */
 
     /**
-     * Returns the SQL query string for fetching all support astronomers.
-     *
-     * This query retrieves all entries in the `SupportAstronomer` table, sorted by the last name.
-     *
-     * @param bool $sortAsc Whether to sort the results in ascending order.
-     *
-     * @return string The SQL query string.
-     *//*
-    protected function getAllSupportAstronomersListQuery(bool $sortAsc = true): string
-    {
-        // Filter: 'status' = 0 indicates non-active support astronomers
-        return "SELECT * "
-            . "FROM SupportAstronomer "
-            . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
-    }*/
-
-    /**
-     * Returns the SQL query string for fetching active support astronomers.
-     *
-     * This query retrieves entries in the `SupportAstronomer` table where the `status` field
-     * indicates active astronomers.
-     *
-     * @param bool $sortAsc Whether to sort the results in ascending order.
-     *
-     * @return string The SQL query string.
-     *//*
-    protected function getSupportAstronomerListQuery(bool $sortAsc = true): string
-    {
-        // Filter: 'status' = 1 indicates active support astronomers
-        return "SELECT * "
-            . "FROM SupportAstronomer "
-            . "WHERE status = '1' "
-            . "ORDER BY lastName " . $this->getSortString($sortAsc) . ";";
-    }*/
-
-    /**
      * Returns the SQL query string for fetching support astronomers.
      *
      * This method can retrieve either all support astronomers or only active ones,
