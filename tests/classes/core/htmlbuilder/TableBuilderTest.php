@@ -23,19 +23,6 @@ class TableBuilderTest extends TestCase
     private $tableBuilder;
 
     /**
-     * Sets up the test environment by initializing the TableBuilder instance.
-     *
-     * Enables formatted output for the generated HTML elements.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->tableBuilder = new TableBuilder(true);
-    }
-
-    /**
      * Tests the getTableOpenTag method for generating the opening <table> tag.
      *
      * Verifies the correct rendering of the `<table>` tag with attributes and indentation.
@@ -309,5 +296,18 @@ class TableBuilderTest extends TestCase
             . '  </tr>';
 
         $this->assertSame($expected, $html);
+    }
+
+    /**
+     * Sets up the test environment by initializing the TableBuilder instance.
+     *
+     * Enables formatted output for the generated HTML elements.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->tableBuilder = new TableBuilder(true);
     }
 }

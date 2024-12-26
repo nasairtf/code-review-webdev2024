@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\App\core\htmlbuilder;
+namespace Tests\classes\core\htmlbuilder;
 
 use PHPUnit\Framework\TestCase;
 use App\core\htmlbuilder\ButtonBuilder;
@@ -20,19 +20,6 @@ class ButtonBuilderTest extends TestCase
      * @var ButtonBuilder
      */
      private $buttonBuilder;
-
-    /**
-     * Sets up the test environment by initializing the ButtonBuilder instance.
-     *
-     * Enables formatted output for the generated HTML elements.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->buttonBuilder = new ButtonBuilder(true);
-    }
 
     /**
      * Tests the getButton method for generating a basic button.
@@ -270,5 +257,18 @@ class ButtonBuilderTest extends TestCase
             '<a href="#item2">Item 2</a>' .
             '</div></div>';
         $this->assertSame($expected, $html);
+    }
+
+    /**
+     * Sets up the test environment by initializing the ButtonBuilder instance.
+     *
+     * Enables formatted output for the generated HTML elements.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->buttonBuilder = new ButtonBuilder(true);
     }
 }

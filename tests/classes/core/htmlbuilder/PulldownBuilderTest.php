@@ -22,17 +22,6 @@ class PulldownBuilderTest extends TestCase
     private $pulldownBuilder;
 
     /**
-     * Sets up the test environment by initializing the PulldownBuilder instance.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->pulldownBuilder = new PulldownBuilder(true);
-    }
-
-    /**
      * Tests the getPulldown method for generating a single-select dropdown.
      *
      * Validates the exact output, including selected options and HTML structure.
@@ -478,5 +467,16 @@ class PulldownBuilderTest extends TestCase
             . '  <option value="banana" selected>Banana</option>' . PHP_EOL
             . '</select> <label>Choose a fruit:</label>';
         $this->assertSame($expected, $html);
+    }
+
+    /**
+     * Sets up the test environment by initializing the PulldownBuilder instance.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->pulldownBuilder = new PulldownBuilder(true);
     }
 }

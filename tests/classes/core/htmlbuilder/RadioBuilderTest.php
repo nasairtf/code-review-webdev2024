@@ -22,20 +22,6 @@ class RadioBuilderTest extends TestCase
     private $radioBuilder;
 
     /**
-     * Sets up the RadioBuilder instance for testing.
-     *
-     * Initializes the builder with formatted output enabled.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        // Enable formatted output for tests
-        $this->radioBuilder = new RadioBuilder(true);
-    }
-
-    /**
      * Tests the getRadioButton method.
      *
      * Validates that the method generates a simple radio button with the correct attributes.
@@ -175,5 +161,19 @@ class RadioBuilderTest extends TestCase
         $this->assertStringContainsString('Option 1', $html);
         $this->assertStringContainsString('Option 2', $html);
         $this->assertStringContainsString('checked', $html); // Ensure "opt2" is checked
+    }
+
+    /**
+     * Sets up the RadioBuilder instance for testing.
+     *
+     * Initializes the builder with formatted output enabled.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Enable formatted output for tests
+        $this->radioBuilder = new RadioBuilder(true);
     }
 }

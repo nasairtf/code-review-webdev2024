@@ -22,19 +22,6 @@ class BaseHtmlBuilderTest extends TestCase
     private $baseHtmlBuilder;
 
     /**
-     * Sets up the test environment by initializing the BaseHtmlBuilder instance.
-     *
-     * Enables formatted output for the tested methods.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->baseHtmlBuilder = new BaseHtmlBuilder(true);
-    }
-
-    /**
      * Tests the getBreak method for generating a line break.
      *
      * Verifies the correct generation of a `<br />` element with padding.
@@ -279,5 +266,18 @@ class BaseHtmlBuilderTest extends TestCase
             . '  <li><a href="https://example.com">Example</a></li>' . PHP_EOL
             . '</ul>';
         $this->assertSame($expected, $html);
+    }
+
+    /**
+     * Sets up the test environment by initializing the BaseHtmlBuilder instance.
+     *
+     * Enables formatted output for the tested methods.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->baseHtmlBuilder = new BaseHtmlBuilder(true);
     }
 }

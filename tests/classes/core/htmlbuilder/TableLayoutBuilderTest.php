@@ -24,26 +24,6 @@ class TableLayoutBuilderTest extends TestCase
     private $tableLayoutBuilder;
 
     /**
-     * Sets up the test environment by initializing the TableLayoutBuilder instance.
-     *
-     * Enables formatted output for the generated HTML elements.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $htmlBuilder = new HtmlBuilder(true);
-        $formElementsBuilder = new FormElementsBuilder(true, $htmlBuilder);
-
-        $this->tableLayoutBuilder = new TableLayoutBuilder(
-            true,
-            $htmlBuilder,
-            $formElementsBuilder
-        );
-    }
-
-    /**
      * Tests the buildMessagePageTable method for generating a message page table.
      *
      * Verifies the exact structure of the generated table.
@@ -469,5 +449,25 @@ class TableLayoutBuilderTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="i" value="123" />', $html);
         $this->assertStringContainsString('<input type="hidden" name="n" value="Smith" />', $html);
         $this->assertStringContainsString('<input type="hidden" name="s" value="2024B" />', $html);
+    }
+
+    /**
+     * Sets up the test environment by initializing the TableLayoutBuilder instance.
+     *
+     * Enables formatted output for the generated HTML elements.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $htmlBuilder = new HtmlBuilder(true);
+        $formElementsBuilder = new FormElementsBuilder(true, $htmlBuilder);
+
+        $this->tableLayoutBuilder = new TableLayoutBuilder(
+            true,
+            $htmlBuilder,
+            $formElementsBuilder
+        );
     }
 }

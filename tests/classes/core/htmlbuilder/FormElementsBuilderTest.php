@@ -23,20 +23,6 @@ class FormElementsBuilderTest extends TestCase
     private $formElementsBuilder;
 
     /**
-     * Sets up the test environment with a mocked HtmlBuilder instance.
-     *
-     * Initializes the FormElementsBuilder with formatted output enabled for all tests.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $htmlBuilder = new HtmlBuilder(true); // Using formatted output for better readability.
-        $this->formElementsBuilder = new FormElementsBuilder(true, $htmlBuilder);
-    }
-
-    /**
      * Tests the buildLineTableCell method for generating a line in a table cell.
      *
      * Verifies that a `<tr>` element with a centered `<hr />` is correctly constructed.
@@ -201,5 +187,19 @@ class FormElementsBuilderTest extends TestCase
         );
         $this->assertStringContainsString('<select name="semester">', $html);
         $this->assertStringContainsString('<option value="FA24" selected>Fall 2024</option>', $html);
+    }
+
+    /**
+     * Sets up the test environment with a mocked HtmlBuilder instance.
+     *
+     * Initializes the FormElementsBuilder with formatted output enabled for all tests.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $htmlBuilder = new HtmlBuilder(true); // Using formatted output for better readability.
+        $this->formElementsBuilder = new FormElementsBuilder(true, $htmlBuilder);
     }
 }

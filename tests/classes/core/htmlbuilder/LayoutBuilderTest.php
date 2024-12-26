@@ -25,28 +25,6 @@ class LayoutBuilderTest extends TestCase
     private $layoutBuilder;
 
     /**
-     * Sets up the test environment by initializing the LayoutBuilder instance.
-     *
-     * Enables formatted output for the generated HTML elements.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $htmlBuilder = new HtmlBuilder(true);
-        $formElementsBuilder = new FormElementsBuilder(true, $htmlBuilder);
-        $tableLayoutBuilder = new TableLayoutBuilder(true, $htmlBuilder, $formElementsBuilder);
-
-        $this->layoutBuilder = new LayoutBuilder(
-            true,
-            $htmlBuilder,
-            $formElementsBuilder,
-            $tableLayoutBuilder
-        );
-    }
-
-    /**
      * Tests the LayoutBuilder constructor to ensure it uses default values when
      * no dependencies are injected.
      *
@@ -245,5 +223,27 @@ class LayoutBuilderTest extends TestCase
         $this->assertStringContainsString('<input type="hidden" name="i" value="12345" />', $html);
         $this->assertStringContainsString('(Doe)</td>', $html);
         $this->assertStringContainsString($inputField, $html);
+    }
+
+    /**
+     * Sets up the test environment by initializing the LayoutBuilder instance.
+     *
+     * Enables formatted output for the generated HTML elements.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $htmlBuilder = new HtmlBuilder(true);
+        $formElementsBuilder = new FormElementsBuilder(true, $htmlBuilder);
+        $tableLayoutBuilder = new TableLayoutBuilder(true, $htmlBuilder, $formElementsBuilder);
+
+        $this->layoutBuilder = new LayoutBuilder(
+            true,
+            $htmlBuilder,
+            $formElementsBuilder,
+            $tableLayoutBuilder
+        );
     }
 }

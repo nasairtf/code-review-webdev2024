@@ -22,21 +22,12 @@ class TextBuilderTest extends TestCase
     private $textBuilder;
 
     /**
-     * Sets up the test environment.
-     *
-     * Initializes the TextBuilder with formatted output enabled.
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->textBuilder = new TextBuilder(true);
-    }
-
-    /**
      * Tests the getTextInput method.
      *
      * This test validates the **exact output** of the method to ensure:
      * - Proper HTML structure and attributes for a text input.
+     *
+     * @covers \App\core\htmlbuilder\TextBuilder::getTextInput
      *
      * @return void
      */
@@ -60,6 +51,8 @@ class TextBuilderTest extends TestCase
      * - Proper HTML structure for a password input.
      * - Proper default handling for empty values.
      *
+     * @covers \App\core\htmlbuilder\TextBuilder::getPasswordInput
+     *
      * @return void
      */
     public function testGetPasswordInput(): void
@@ -79,6 +72,8 @@ class TextBuilderTest extends TestCase
      *
      * This test validates the **exact output** of the method to ensure:
      * - Proper HTML structure and attributes for an email input.
+     *
+     * @covers \App\core\htmlbuilder\TextBuilder::getEmailInput
      *
      * @return void
      */
@@ -100,6 +95,8 @@ class TextBuilderTest extends TestCase
      *
      * This test validates the **exact output** of the method to ensure:
      * - Correct min, max, and value attributes are rendered for a number input.
+     *
+     * @covers \App\core\htmlbuilder\TextBuilder::getNumberInput
      *
      * @return void
      */
@@ -123,6 +120,8 @@ class TextBuilderTest extends TestCase
      * This test validates the **exact output** of the method to ensure:
      * - Proper rendering of a `<textarea>` element.
      *
+     * @covers \App\core\htmlbuilder\TextBuilder::getTextarea
+     *
      * @return void
      */
     public function testGetTextarea(): void
@@ -144,6 +143,8 @@ class TextBuilderTest extends TestCase
      *
      * This test validates the **exact output** of the method to ensure:
      * - Proper rendering of a number input for Unix timestamps with min/max attributes.
+     *
+     * @covers \App\core\htmlbuilder\TextBuilder::getUnixTimestampInput
      *
      * @return void
      */
@@ -167,6 +168,8 @@ class TextBuilderTest extends TestCase
      * This test validates the **exact output** of the method to ensure:
      * - Proper HTML attributes for a URL input.
      *
+     * @covers \App\core\htmlbuilder\TextBuilder::getUrlInput
+     *
      * @return void
      */
     public function testGetUrlInput(): void
@@ -186,6 +189,8 @@ class TextBuilderTest extends TestCase
      *
      * This test validates the **exact output** of the method to ensure:
      * - Proper rendering of a hidden input field with appropriate attributes.
+     *
+     * @covers \App\core\htmlbuilder\TextBuilder::getHiddenInput
      *
      * @return void
      */
@@ -207,6 +212,8 @@ class TextBuilderTest extends TestCase
      * This test validates the **exact output** of the method to ensure:
      * - Proper rendering of a search input field.
      *
+     * @covers \App\core\htmlbuilder\TextBuilder::getSearchInput
+     *
      * @return void
      */
     public function testGetSearchInput(): void
@@ -227,6 +234,8 @@ class TextBuilderTest extends TestCase
      * This test validates the **exact output** of the method to ensure:
      * - Proper rendering of a telephone input field.
      *
+     * @covers \App\core\htmlbuilder\TextBuilder::getTelInput
+     *
      * @return void
      */
     public function testGetTelInput(): void
@@ -239,5 +248,16 @@ class TextBuilderTest extends TestCase
 
         $expected = '<input type="tel" name="phone" value="+123456789" class="tel-class" />';
         $this->assertSame($expected, $html);
+    }
+
+    /**
+     * Sets up the test environment.
+     *
+     * Initializes the TextBuilder with formatted output enabled.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->textBuilder = new TextBuilder(true);
     }
 }

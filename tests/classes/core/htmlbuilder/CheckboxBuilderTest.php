@@ -22,19 +22,6 @@ class CheckboxBuilderTest extends TestCase
     private $checkboxBuilder;
 
     /**
-     * Sets up the test environment by initializing the CheckboxBuilder instance.
-     *
-     * Enables formatted output for the generated HTML elements.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->checkboxBuilder = new CheckboxBuilder(true);
-    }
-
-    /**
      * Tests the getCheckbox method for generating a basic checkbox.
      *
      * Validates that the checkbox includes the correct name, value, state (checked/unchecked),
@@ -189,5 +176,18 @@ class CheckboxBuilderTest extends TestCase
             '<input type="checkbox" name="hidden_field" value="hidden_value" ' .
             'checked style="display:none;" />';
         $this->assertSame($expected, $html);
+    }
+
+    /**
+     * Sets up the test environment by initializing the CheckboxBuilder instance.
+     *
+     * Enables formatted output for the generated HTML elements.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->checkboxBuilder = new CheckboxBuilder(true);
     }
 }
