@@ -122,9 +122,9 @@ class SupportAstronomerServiceReadTest extends TestCase
     }
 
     /**
-     * Tests that fetchProposalEngProgramData fails gracefully when no data is found.
+     * Tests that fetchFullSupportAstronomerData fails gracefully when no data is found.
      *
-     * @covers \App\services\database\troublelog\read\SupportAstronomerService::fetchProposalEngProgramData
+     * @covers \App\services\database\troublelog\read\SupportAstronomerService::fetchFullSupportAstronomerData
      *
      * @return void
      */

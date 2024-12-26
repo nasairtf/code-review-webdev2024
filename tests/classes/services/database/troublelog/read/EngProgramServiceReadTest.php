@@ -145,7 +145,7 @@ class EngProgramServiceReadTest extends TestCase
      * EngProgramService class generates the correct SQL query string for
      * retrieving program-specific data from the EngProgram table.
      *
-     * @covers \App\services\database\troublelog\read\EngProgramService::getProposalProgramDataQuery
+     * @covers \App\services\database\troublelog\read\EngProgramService::getProposalEngProgramDataQuery
      *
      * @return void
      */

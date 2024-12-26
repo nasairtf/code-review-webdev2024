@@ -142,7 +142,7 @@ class ProgramServiceReadTest extends TestCase
 
     /**
      *
-     * @covers \App\services\database\troublelog\read\ProgramService::getProposalProgramDataQuery
+     * @covers \App\services\database\troublelog\read\ProgramService::getProgramInfoListQuery
      *
      * @return void
      */
@@ -164,7 +164,7 @@ class ProgramServiceReadTest extends TestCase
 
     /**
      *
-     * @covers \App\services\database\troublelog\read\ProgramService::getProposalProgramDataQuery
+     * @covers \App\services\database\troublelog\read\ProgramService::getProgramInfoListQuery
      *
      * @return void
      */
