@@ -25,11 +25,11 @@ class DailyOperatorService extends BaseService
 
     public function deleteOperators(string $delete): int
     {
-        return $this->executeUpdateQuery($delete);
+        return $this->executeUpdateQuery($delete, [], '');
     }
 
     public function updateOperatorsInfile(string $infile): int
     {
-        return $this->executeUpdateQuery($infile);
+        return $this->executeUpdateQuery($infile, [], '');
     }
 }

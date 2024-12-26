@@ -25,11 +25,11 @@ class DailyInstrumentService extends BaseService
 
     public function deleteInstruments(string $delete): int
     {
-        return $this->executeUpdateQuery($delete);
+        return $this->executeUpdateQuery($delete, [], '');
     }
 
     public function updateInstrumentsInfile(string $infile): int
     {
-        return $this->executeUpdateQuery($infile);
+        return $this->executeUpdateQuery($infile, [], '');
     }
 }

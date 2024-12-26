@@ -25,11 +25,11 @@ class ScheduleObsService extends BaseService
 
     public function deleteSchedule(string $delete): int
     {
-        return $this->executeUpdateQuery($delete);
+        return $this->executeUpdateQuery($delete, [], '');
     }
 
     public function updateScheduleInfile(string $infile): int
     {
-        return $this->executeUpdateQuery($infile);
+        return $this->executeUpdateQuery($infile, [], '');
     }
 }

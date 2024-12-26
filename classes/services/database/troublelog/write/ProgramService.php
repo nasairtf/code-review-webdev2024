@@ -25,11 +25,11 @@ class ProgramService extends BaseService
 
     public function deletePrograms(string $delete): int
     {
-        return $this->executeUpdateQuery($delete);
+        return $this->executeUpdateQuery($delete, [], '');
     }
 
     public function updateProgramsInfile(string $infile): int
     {
-        return $this->executeUpdateQuery($infile);
+        return $this->executeUpdateQuery($infile, [], '');
     }
 }
