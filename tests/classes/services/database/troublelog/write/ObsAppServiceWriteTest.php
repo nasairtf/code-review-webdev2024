@@ -26,7 +26,7 @@ use App\exceptions\DatabaseException;
  * - testModifyProposalCreationDateFails
  * - testGetUpdateProposalCreationDateQuery
  *
- * @covers \App\services\database\feedback\write\ObsAppService
+ * @covers \App\services\database\troublelog\write\ObsAppService
  *
  *------------------------------------------------------------------------------
  * Test Plan For ObsAppService (Write Classes)
@@ -88,7 +88,7 @@ class ObsAppServiceWriteTest extends TestCase
      */
 
     /**
-     * @covers \App\services\database\feedback\write\ObsAppService::modifyProposalCreationDate
+     * @covers \App\services\database\troublelog\write\ObsAppService::modifyProposalCreationDate
      *
      * @return void
      */
@@ -109,7 +109,7 @@ class ObsAppServiceWriteTest extends TestCase
     }
 
     /**
-     * @covers \App\services\database\feedback\write\ObsAppService::modifyProposalCreationDate
+     * @covers \App\services\database\troublelog\write\ObsAppService::modifyProposalCreationDate
      *
      * @return void
      */
@@ -131,7 +131,7 @@ class ObsAppServiceWriteTest extends TestCase
      */
 
     /**
-     * @covers \App\services\database\feedback\write\ObsAppService::getUpdateProposalCreationDateQuery
+     * @covers \App\services\database\troublelog\write\ObsAppService::getUpdateProposalCreationDateQuery
      *
      * @return void
      */
