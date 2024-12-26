@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\views\forms;
 
-use App\core\common\Debug;
+use App\core\common\CustomDebug;
+use App\exceptions\HtmlBuilderException;
 use App\core\htmlbuilder\HtmlBuilder as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
 use App\legacy\IRTFLayout as IrtfBuilder;
@@ -41,13 +42,13 @@ abstract class BaseFormView
     protected $formatHtml;
 
     /**
-     * Debug instance for logging and debugging output.
+     * CustomDebug instance for logging and debugging output.
      *
      * Provides methods for structured debug messages and error tracking. If no
      * instance is provided, a default instance is initialized with debug mode
      * disabled.
      *
-     * @var Debug
+     * @var CustomDebug
      */
     protected $debug;
 
@@ -97,13 +98,13 @@ abstract class BaseFormView
      */
     public function __construct(
         ?bool $formatHtml = null,
-        ?Debug $debug = null,
+        ?CustomDebug $debug = null,
         ?HtmlBuilder $htmlBuilder = null,
         ?CompBuilder $compBuilder = null,
         ?IrtfBuilder $irtfBuilder = null
     ) {
         // Initialize debugging
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? new CustomDebug('default', false, 0);
         $debugHeading = $this->debug->debugHeading("View", "__construct");
         $this->debug->debug($debugHeading);
 
