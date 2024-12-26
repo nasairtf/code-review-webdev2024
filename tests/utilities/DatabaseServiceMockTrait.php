@@ -282,6 +282,45 @@ trait DatabaseServiceMockTrait
     }
 
     /**
+     * Arranges expectations for mock objects in the test.
+     *
+     * @param array $data Query data including SQL, parameters, types, and results.
+     *
+     * @return void
+     */
+    private function arrangeExecuteSelectQueryExpectations(array $data): void
+    {
+        $this->mockExecuteSelectQuery(
+            $this->srvMock,
+            $data['sql'],
+            $data['params'],
+            $data['types'],
+            MYSQLI_ASSOC,
+            $data['resultType'],
+            $data['result']
+        );
+    }
+
+    /**
+     * Arranges expectations for mock objects in the test.
+     *
+     * @param array $data Query data including SQL, parameters, types, and results.
+     *
+     * @return void
+     */
+    private function arrangeExecuteUpdateQueryExpectations(array $data): void
+    {
+        $this->mockExecuteUpdateQuery(
+            $this->srvMock,
+            $data['sql'],
+            $data['params'],
+            $data['types'],
+            $data['resultType'],
+            $data['result']
+        );
+    }
+
+    /**
      * Asserts expectations for mock objects and test results.
      *
      * @param mixed $result The actual result from the method under test.
@@ -321,6 +360,46 @@ trait DatabaseServiceMockTrait
                 $data['types'],
                 $data['expectedRows'],
                 $data['errorMsg']
+            );
+    }
+
+    /**
+     * Asserts expectations for mock objects and test results.
+     *
+     * @param mixed $result The actual result from the method under test.
+     * @param array $data Query data including expected results.
+     *
+     * @return void
+     */
+    private function assertExecuteSelectQueryExpectations($result, array $data): void
+    {
+        $this->assertSame($data['result'], $result);
+        $this->srvMock->shouldHaveReceived('executeSelectQuery')
+            ->once()
+            ->with(
+                $data['sql'],
+                $data['params'],
+                $data['types']
+            );
+    }
+
+    /**
+     * Asserts expectations for mock objects and test results.
+     *
+     * @param mixed $result The actual result from the method under test.
+     * @param array $data Query data including expected results.
+     *
+     * @return void
+     */
+    private function assertExecuteUpdateQueryExpectations($result, array $data): void
+    {
+        $this->assertSame($data['result'], $result);
+        $this->srvMock->shouldHaveReceived('executeUpdateQuery')
+            ->once()
+            ->with(
+                $data['sql'],
+                $data['params'],
+                $data['types']
             );
     }
 }
