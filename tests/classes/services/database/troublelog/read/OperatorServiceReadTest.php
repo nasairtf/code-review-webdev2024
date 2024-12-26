@@ -22,66 +22,20 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testFetchFullOperatorDataSucceeds
- * - testFetchFullOperatorDataFails
- * - testFetchOperatorDataSucceeds
- * - testFetchOperatorDataFails
- * - testFetchAssistantDataSucceeds
- * - testFetchAssistantDataFails
- * - testGetAllOperatorsListQuerySortAscTrue
- * - testGetAllOperatorsListQuerySortAscFalse
- * - testGetTelescopeOperatorsListQuerySortAscTrue
- * - testGetTelescopeOperatorsListQuerySortAscFalse
- * - testGetObservatoryAssistantsListQuerySortAscTrue
- * - testGetObservatoryAssistantsListQuerySortAscFalse
+ * - testFetchFullOperatorDataSucceeds [DONE]
+ * - testFetchFullOperatorDataFails [DONE]
+ * - testFetchOperatorDataSucceeds [DONE]
+ * - testFetchOperatorDataFails [DONE]
+ * - testFetchAssistantDataSucceeds [DONE]
+ * - testFetchAssistantDataFails [DONE]
+ * - testGetAllOperatorsListQuerySortAscTrue [DONE]
+ * - testGetAllOperatorsListQuerySortAscFalse [DONE]
+ * - testGetTelescopeOperatorsListQuerySortAscTrue [DONE]
+ * - testGetTelescopeOperatorsListQuerySortAscFalse [DONE]
+ * - testGetObservatoryAssistantsListQuerySortAscTrue [DONE]
+ * - testGetObservatoryAssistantsListQuerySortAscFalse [DONE]
  *
  * @covers \App\services\database\troublelog\read\OperatorService
- *
- *------------------------------------------------------------------------------
- * Test Plan For OperatorService (Read Class)
- *
- * This class contains three public methods to test:
- *
- * - fetchFullOperatorData
- * - fetchOperatorData
- * - fetchAssistantData
- *
- * And contains three protected method to test:
- *
- * - getAllOperatorsListQuery
- * - getTelescopeOperatorsListQuery
- * - getObservatoryAssistantsListQuery
- *
- * Test Cases
- *
- * 1. fetchFullOperatorData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 2. fetchOperatorData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 3. fetchAssistantData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 4. getAllOperatorsListQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * 5. getTelescopeOperatorsListQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * 6. getObservatoryAssistantsListQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * Mocking
- *
- * Mock the fetchDataWithQuery method in the base OperatorService to simulate database
- * responses for the tests.
  */
 class OperatorServiceReadTest extends TestCase
 {

@@ -22,40 +22,12 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testFetchSemesterProgramDataSucceeds
- * - testFetchSemesterProgramDataFails
- * - testGetProgramInfoListQueryTrue
- * - testGetProgramInfoListQueryFalse
+ * - testFetchSemesterProgramDataSucceeds [DONE]
+ * - testFetchSemesterProgramDataFails [DONE]
+ * - testGetProgramInfoListQueryTrue [DONE]
+ * - testGetProgramInfoListQueryFalse [DONE]
  *
  * @covers \App\services\database\troublelog\read\ProgramService
- *
- *------------------------------------------------------------------------------
- * Test Plan For ProgramService (Read Class)
- *
- * This class contains one public method to test:
- *
- * - fetchSemesterProgramData
- *
- * And contains one protected method to test:
- *
- * - getProgramInfoListQuery
- *
- * Test Cases
- *
- * 1. fetchSemesterProgramData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *    - Verify correct SQL query generation.
- *    - Verify parameters binding and types (s).
- *
- * 2. getProgramInfoListQuery
- *    - Verify SQL query generation with $sortAsc true.
- *    - Verify SQL query generation with $sortAsc false.
- *
- * Mocking
- *
- * Mock the fetchDataWithQuery method in the base ProgramService to simulate database
- * responses for the tests.
  */
 class ProgramServiceReadTest extends TestCase
 {

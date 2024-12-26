@@ -22,35 +22,12 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testDeleteOperatorsSucceeds
- * - testDeleteOperatorsFails
- * - testUpdateOperatorsInfileSucceeds
- * - testUpdateOperatorsInfileFails
+ * - testDeleteOperatorsSucceeds [DONE]
+ * - testDeleteOperatorsFails [DONE]
+ * - testUpdateOperatorsInfileSucceeds [DONE]
+ * - testUpdateOperatorsInfileFails [DONE]
  *
  * @covers \App\services\database\troublelog\write\DailyOperatorService
- *
- *------------------------------------------------------------------------------
- * Test Plan For DailyOperatorService (Write Classes)
- *
- * This class contains one public method to test:
- *
- * - deleteOperators
- * - updateOperatorsInfile
- *
- * Test Cases
- *
- * 1. deleteOperators
- *    - Success case: Query returns a valid affected row count.
- *    - Failure case: Query returns a zero rows affected count.
- *
- * 2. updateOperatorsInfile
- *    - Success case: Query returns a valid affected row count.
- *    - Failure case: Query returns a zero rows affected count.
- *
- * Mocking
- *
- * Mock the executeUpdateQuery method in the base DailyOperatorService to simulate database
- * behavior for the tests.
  */
 class DailyOperatorServiceWriteTest extends TestCase
 {

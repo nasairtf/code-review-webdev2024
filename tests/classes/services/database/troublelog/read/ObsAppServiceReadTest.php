@@ -22,66 +22,20 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testFetchSemesterProposalListingFormDataSucceeds
- * - testFetchSemesterProposalListingFormDataFails
- * - testFetchProposalListingFormDataSucceeds
- * - testFetchProposalListingFormDataFails
- * - testFetchScheduleSemesterProgramListSucceeds
- * - testFetchScheduleSemesterProgramListFails
- * - testFetchProposalProgramDataSucceeds
- * - testFetchProposalProgramDataFails
- * - testGetScheduleSemesterProgramListQuery
- * - testGetProposalQueryConditionProgram
- * - testGetProposalQueryConditionSemester
- * - testGetProposalQueryConditionSession
+ * - testFetchSemesterProposalListingFormDataSucceeds [DONE]
+ * - testFetchSemesterProposalListingFormDataFails [DONE]
+ * - testFetchProposalListingFormDataSucceeds [DONE]
+ * - testFetchProposalListingFormDataFails [DONE]
+ * - testFetchScheduleSemesterProgramListSucceeds [DONE]
+ * - testFetchScheduleSemesterProgramListFails [DONE]
+ * - testFetchProposalProgramDataSucceeds [DONE]
+ * - testFetchProposalProgramDataFails [DONE]
+ * - testGetScheduleSemesterProgramListQuery [DONE]
+ * - testGetProposalQueryConditionProgram [DONE]
+ * - testGetProposalQueryConditionSemester [DONE]
+ * - testGetProposalQueryConditionSession [DONE]
  *
  * @covers \App\services\database\troublelog\read\ObsAppService
- *
- *------------------------------------------------------------------------------
- * Test Plan For ObsAppService (Read Class)
- *
- * This class contains four public methods to test:
- *
- * - fetchSemesterProposalListingFormData
- * - fetchProposalListingFormData
- * - fetchScheduleSemesterProgramList
- * - fetchProposalProgramData
- *
- * And contains three protected methods to test:
- *
- * - getScheduleSemesterProgramListQuery
- * - getProposalQuery
- *
- * Test Cases
- *
- * 1. fetchSemesterProposalListingFormData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 2. fetchProposalListingFormData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 3. fetchScheduleSemesterProgramList
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 4. fetchProposalProgramData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 5. getScheduleSemesterProgramListQuery
- *    - Verify SQL query generation.
- *
- * 6. getProposalQuery
- *    - Verify SQL query generation with $condition 'program'.
- *    - Verify SQL query generation with $condition 'semester'.
- *    - Verify SQL query generation with $condition 'session'.
- *
- * Mocking
- *
- * Mock the fetchDataWithQuery method in the base ObsAppService to simulate database
- * responses for the tests.
  */
 class ObsAppServiceReadTest extends TestCase
 {

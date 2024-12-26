@@ -22,39 +22,11 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testModifyProposalCreationDateSucceeds
- * - testModifyProposalCreationDateFails
- * - testGetUpdateProposalCreationDateQuery
+ * - testModifyProposalCreationDateSucceeds [DONE]
+ * - testModifyProposalCreationDateFails [DONE]
+ * - testGetUpdateProposalCreationDateQuery [DONE]
  *
  * @covers \App\services\database\troublelog\write\ObsAppService
- *
- *------------------------------------------------------------------------------
- * Test Plan For ObsAppService (Write Classes)
- *
- * This class contains one public method to test:
- *
- * - modifyProposalCreationDate
- *
- * And contains one protected method to test:
- *
- * - getUpdateProposalCreationDateQuery
- *
- * Test Cases
- *
- * 1. Success case:
- *    - Verify that the method calls modifyDataWithQuery with the correct SQL query, parameters, and types.
- *    - Ensure it returns affectedRows.
- *
- * 2. Failure case:
- *    - Simulate an exception thrown by modifyDataWithQuery and verify the correct error message is handled.
- *
- * 3. getUpdateProposalCreationDateQuery
- *    - Verify SQL query generation.
- *
- * Mocking
- *
- * Mock the modifyDataWithQuery method in the base ObsAppService to simulate database
- * behavior for the tests.
  */
 class ObsAppServiceWriteTest extends TestCase
 {

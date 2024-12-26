@@ -27,34 +27,6 @@ use App\exceptions\DatabaseException;
  * - testGetOperatorInsertQuery [DONE]
  *
  * @covers \App\services\database\feedback\write\OperatorService
- *
- *------------------------------------------------------------------------------
- * Test Plan For OperatorService (Write Classes)
- *
- * This class contains one public method to test:
- *
- * - insertOperatorRecord
- *
- * And contains one protected method to test:
- *
- * - getOperatorInsertQuery
- *
- * Test Cases
- *
- * 1. Success case:
- *    - Verify that the method calls modifyDataWithQuery with the correct SQL query, parameters, and types.
- *    - Ensure it returns affectedRows.
- *
- * 2. Failure case:
- *    - Simulate an exception thrown by modifyDataWithQuery and verify the correct error message is handled.
- *
- * 3. getOperatorInsertQuery
- *    - Verify SQL query generation.
- *
- * Mocking
- *
- * Mock the modifyDataWithQuery method in the base OperatorService to simulate database
- * behavior for the tests.
  */
 class OperatorServiceWriteTest extends TestCase
 {

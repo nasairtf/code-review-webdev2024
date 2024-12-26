@@ -22,60 +22,17 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testFetchGuestAccountDataSucceeds
- * - testFetchGuestAccountDataFails
- * - testFetchProgramSessionDataSucceeds
- * - testFetchProgramSessionDataFails
- * - testFetchProgramValidationSucceeds
- * - testFetchProgramValidationFails
- * - testGetSemesterProgramsQuery
- * - testGetSingleProgramSessionQuery
- * - testGetValidateProgramQuery
+ * - testFetchGuestAccountDataSucceeds [DONE]
+ * - testFetchGuestAccountDataFails [DONE]
+ * - testFetchProgramSessionDataSucceeds [DONE]
+ * - testFetchProgramSessionDataFails [DONE]
+ * - testFetchProgramValidationSucceeds [DONE]
+ * - testFetchProgramValidationFails [DONE]
+ * - testGetSemesterProgramsQuery [DONE]
+ * - testGetSingleProgramSessionQuery [DONE]
+ * - testGetValidateProgramQuery [DONE]
  *
  * @covers \App\services\database\troublelog\read\GuestAcctsService
- *
- *------------------------------------------------------------------------------
- * Test Plan For GuestAcctsService (Read Class)
- *
- * This class contains three public methods to test:
- *
- * - fetchGuestAccountData
- * - fetchProgramSessionData
- * - fetchProgramValidation
- *
- * And contains three protected method to test:
- *
- * - getSemesterProgramsQuery
- * - getSingleProgramSessionQuery
- * - getValidateProgramQuery
- *
- * Test Cases
- *
- * 1. fetchGuestAccountData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 2. fetchProgramSessionData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 3. fetchProgramValidation
- *    - Success case: Query returns a count of 1.
- *    - Failure case: Query returns a count of 0.
- *
- * 4. getSemesterProgramsQuery
- *    - Verify SQL query generation.
- *
- * 5. getSingleProgramSessionQuery
- *    - Verify SQL query generation.
- *
- * 6. getValidateProgramQuery
- *    - Verify SQL query generation.
- *
- * Mocking
- *
- * Mock the fetchDataWithQuery method in the base GuestAcctsService to simulate database
- * responses for the tests.
  */
 class GuestAcctsServiceReadTest extends TestCase
 {

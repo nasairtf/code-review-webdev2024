@@ -22,38 +22,11 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testFetchProposalEngProgramDataSucceeds
- * - testFetchProposalEngProgramDataFails
- * - testGetProposalEngProgramDataQuery
+ * - testFetchProposalEngProgramDataSucceeds [DONE]
+ * - testFetchProposalEngProgramDataFails [DONE]
+ * - testGetProposalEngProgramDataQuery [DONE]
  *
  * @covers \App\services\database\troublelog\read\EngProgramService
- *
- *------------------------------------------------------------------------------
- * Test Plan For EngProgramService (Read Class)
- *
- * This class contains one public method to test:
- *
- * - fetchProposalEngProgramData
- *
- * And contains one protected method to test:
- *
- * - getProposalEngProgramDataQuery
- *
- * Test Cases
- *
- * 1. fetchProposalEngProgramData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *    - Verify correct SQL query generation.
- *    - Verify parameters binding and types (si).
- *
- * 4. getProposalEngProgramDataQuery
- *    - Verify SQL query generation.
- *
- * Mocking
- *
- * Mock the fetchDataWithQuery method in the base EngProgramService to simulate database
- * responses for the tests.
  */
 class EngProgramServiceReadTest extends TestCase
 {

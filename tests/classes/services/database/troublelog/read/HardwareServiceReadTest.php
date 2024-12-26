@@ -22,120 +22,37 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testFetchFullNotObsoleteInstrumentsListSucceeds
- * - testFetchFullNotObsoleteInstrumentsListFails
- * - testFetchFullInstrumentDataSucceeds
- * - testFetchFullInstrumentDataFails
- * - testFetchSecondariesDataSucceeds
- * - testFetchSecondariesDataFails
- * - testFetchFacilityInstrumentsDataSucceeds
- * - testFetchFacilityInstrumentsDataFails
- * - testFetchInstrumentsListDataByIndexSucceeds
- * - testFetchInstrumentsListDataByIndexFails
- * - testFetchInstrumentsListDataByNameSucceeds
- * - testFetchInstrumentsListDataByNameFails
- * - testFetchVisitorInstrumentsDataSucceeds
- * - testFetchVisitorInstrumentsDataFails
+ * - testFetchFullNotObsoleteInstrumentsListSucceeds [DONE]
+ * - testFetchFullNotObsoleteInstrumentsListFails [DONE]
+ * - testFetchFullInstrumentDataSucceeds [DONE]
+ * - testFetchFullInstrumentDataFails [DONE]
+ * - testFetchSecondariesDataSucceeds [DONE]
+ * - testFetchSecondariesDataFails [DONE]
+ * - testFetchFacilityInstrumentsDataSucceeds [DONE]
+ * - testFetchFacilityInstrumentsDataFails [DONE]
+ * - testFetchInstrumentsListDataByIndexSucceeds [DONE]
+ * - testFetchInstrumentsListDataByIndexFails [DONE]
+ * - testFetchInstrumentsListDataByNameSucceeds [DONE]
+ * - testFetchInstrumentsListDataByNameFails [DONE]
+ * - testFetchVisitorInstrumentsDataSucceeds [DONE]
+ * - testFetchVisitorInstrumentsDataFails [DONE]
  *
- * - testGetAllInstrumentsListQuerySortAscTrue
- * - testGetAllInstrumentsListQuerySortAscFalse
- * - testGetActiveSecondaryInstrumentsListSortAscTrue
- * - testGetActiveSecondaryInstrumentsListSortAscFalse
- * - testGetAllActiveFacilityInstrumentsListByIndexQuerySortAscTrue
- * - testGetAllActiveFacilityInstrumentsListByIndexQuerySortAscFalse
- * - testGetAllActiveInstrumentsListByIndexQuerySortAscTrue
- * - testGetAllActiveInstrumentsListByIndexQuerySortAscFalse
- * - testGetAllActiveInstrumentsListByNameQuerySortAscTrue
- * - testGetAllActiveInstrumentsListByNameQuerySortAscFalse
- * - testGetAllNotObsoleteInstrumentsListByNameQuerySortAscTrue
- * - testGetAllNotObsoleteInstrumentsListByNameQuerySortAscFalse
- * - testGetAllActiveVisitorInstrumentListQuerySortAscTrue
- * - testGetAllActiveVisitorInstrumentListQuerySortAscFalse
+ * - testGetAllInstrumentsListQuerySortAscTrue [DONE]
+ * - testGetAllInstrumentsListQuerySortAscFalse [DONE]
+ * - testGetActiveSecondaryInstrumentsListSortAscTrue [DONE]
+ * - testGetActiveSecondaryInstrumentsListSortAscFalse [DONE]
+ * - testGetAllActiveFacilityInstrumentsListByIndexQuerySortAscTrue [DONE]
+ * - testGetAllActiveFacilityInstrumentsListByIndexQuerySortAscFalse [DONE]
+ * - testGetAllActiveInstrumentsListByIndexQuerySortAscTrue [DONE]
+ * - testGetAllActiveInstrumentsListByIndexQuerySortAscFalse [DONE]
+ * - testGetAllActiveInstrumentsListByNameQuerySortAscTrue [DONE]
+ * - testGetAllActiveInstrumentsListByNameQuerySortAscFalse [DONE]
+ * - testGetAllNotObsoleteInstrumentsListByNameQuerySortAscTrue [DONE]
+ * - testGetAllNotObsoleteInstrumentsListByNameQuerySortAscFalse [DONE]
+ * - testGetAllActiveVisitorInstrumentListQuerySortAscTrue [DONE]
+ * - testGetAllActiveVisitorInstrumentListQuerySortAscFalse [DONE]
  *
  * @covers \App\services\database\troublelog\read\HardwareService
- *
- *------------------------------------------------------------------------------
- * Test Plan For HardwareService (Read Class)
- *
- * This class contains three public methods to test:
- *
- * - fetchFullNotObsoleteInstrumentsList
- * - fetchFullInstrumentData
- * - fetchSecondariesData
- * - fetchFacilityInstrumentsData
- * - fetchInstrumentsListData
- * - fetchVisitorInstrumentsData
- *
- * And contains three protected method to test:
- *
- * - getAllInstrumentsListQuery
- * - getActiveSecondaryInstrumentsListQuery
- * - getAllActiveFacilityInstrumentsListByIndexQuery
- * - getAllActiveInstrumentsListByIndexQuery
- * - getAllActiveInstrumentsListByNameQuery
- * - getAllNotObsoleteInstrumentsListByNameQuery
- * - getAllActiveVisitorInstrumentListQuery
- *
- * Test Cases
- *
- * 1. fetchFullNotObsoleteInstrumentsList
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 2. fetchFullInstrumentData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 3. fetchSecondariesData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 4. fetchFacilityInstrumentsData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 5. fetchInstrumentsListData
- *    - Success case: Query returns a valid by-index result array.
- *    - Failure case: Query returns no by-index results (empty array).
- *    - Success case: Query returns a valid by-name result array.
- *    - Failure case: Query returns no by-name results (empty array).
- *
- * 6. fetchVisitorInstrumentsData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 7. getAllInstrumentsListQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * 8. getActiveSecondaryInstrumentsListQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * 9. getAllActiveFacilityInstrumentsListByIndexQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * 10. getAllActiveInstrumentsListByIndexQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * 11. getAllActiveInstrumentsListByNameQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * 12. getAllNotObsoleteInstrumentsListByNameQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * 13. getAllActiveVisitorInstrumentListQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * Mocking
- *
- * Mock the fetchDataWithQuery method in the base HardwareService to simulate database
- * responses for the tests.
  */
 class HardwareServiceReadTest extends TestCase
 {

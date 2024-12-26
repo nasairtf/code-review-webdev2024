@@ -22,35 +22,12 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testDeleteInstrumentsSucceeds
- * - testDeleteInstrumentsFails
- * - testUpdateInstrumentsInfileSucceeds
- * - testUpdateInstrumentsInfileFails
+ * - testDeleteInstrumentsSucceeds [DONE]
+ * - testDeleteInstrumentsFails [DONE]
+ * - testUpdateInstrumentsInfileSucceeds [DONE]
+ * - testUpdateInstrumentsInfileFails [DONE]
  *
  * @covers \App\services\database\troublelog\write\DailyInstrumentService
- *
- *------------------------------------------------------------------------------
- * Test Plan For DailyInstrumentService (Write Classes)
- *
- * This class contains one public method to test:
- *
- * - deleteInstruments
- * - updateInstrumentsInfile
- *
- * Test Cases
- *
- * 1. deleteInstruments
- *    - Success case: Query returns a valid affected row count.
- *    - Failure case: Query returns a zero rows affected count.
- *
- * 2. updateInstrumentsInfile
- *    - Success case: Query returns a valid affected row count.
- *    - Failure case: Query returns a zero rows affected count.
- *
- * Mocking
- *
- * Mock the executeUpdateQuery method in the base DailyInstrumentService to simulate database
- * behavior for the tests.
  */
 class DailyInstrumentServiceWriteTest extends TestCase
 {

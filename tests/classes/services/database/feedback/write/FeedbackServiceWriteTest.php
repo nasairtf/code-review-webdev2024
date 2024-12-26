@@ -30,43 +30,6 @@ use App\exceptions\DatabaseException;
  * - testGetFeedbackInsertTypes [DONE]
  *
  * @covers \App\services\database\feedback\write\FeedbackService
- *
- *------------------------------------------------------------------------------
- * Test Plan For FeedbackService (Write Class)
- *
- * This class contains two public methods to test:
- *
- * - returnFeedbackRecordId
- * - insertFeedbackRecord
- *
- * And contains three protected methods to test:
- *
- * - getFeedbackInsertQuery
- * - getFeedbackInsertParams
- * - getFeedbackInsertTypes
- *
- * Test Cases
- *
- * 1. returnFeedbackRecordId
- *    - Verify that it calls getLastInsertId on the database connection and returns the correct value.
- *
- * 2. insertFeedbackRecord
- *    - Success case: Data is inserted successfully, returning affectedRows.
- *    - Failure case: An exception is thrown, and the error message is verified.
- *
- * 3. getFeedbackInsertQuery
- *    - Verify SQL query generation.
- *
- * 4. getFeedbackInsertParams
- *    - Verify param array generation.
- *
- * 5. getFeedbackInsertTypes
- *    - Verify param type string generation.
- *
- * Mocking
- *
- * Mock the modifyDataWithQuery method in the base FeedbackService to simulate database
- * behavior for the tests.
  */
 class FeedbackServiceWriteTest extends TestCase
 {

@@ -32,45 +32,6 @@ use App\exceptions\DatabaseException;
  * - testQueryErrorHandling [DONE]
  *
  * @covers \App\services\database\ishell\read\TemperaturesService
- *
- *------------------------------------------------------------------------------
- * Test Plan For TemperaturesService (Read Class)
- *
- * This class contains one public method to test:
- *
- * - fetchTemperatureData
- *
- * Test Cases
- *
- * 1. testQueryWithSensorIdOnly():
- *    - Default query setup
- * 2. testQueryWithSystemFilter():
- *    - Adds system filter
- * 3. testQueryWithTimestampFilter():
- *    - Adds timestamp filter
- * 4. testQueryWithSystemAndTimestampFilters():
- *    - Adds all filters
- * 5. testQueryWithLimitToOne():
- *    - Adds LIMIT 1
- * 6. testQueryWithSortDescending():
- *    - Changes sort order
- * 7. testQueryWithAllFilters():
- *    - Combines all cases
- * 8. testQueryWithNoResults():
- *    - Simulates no results
- * 9. testQueryErrorHandling():
- *    - Simulates query error
- *
- * Mocking
- *
- * Mock fetchDataWithQuery:
- *  Validate that the correct query, parameters, and types are passed.
- *
- * Mock getSortString:
- *  Ensure sorting logic is applied correctly.
- *
- * Use createTestQueryParts:
- *  Generate SQL strings, parameters, and types dynamically to avoid hardcoding them in multiple places.
  */
 class TemperaturesServiceReadTest extends TestCase
 {

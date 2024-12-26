@@ -22,62 +22,18 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testFetchScientificCategoryDataSucceeds
- * - testFetchScientificCategoryDataFails
- * - testFetchScientificCategoryIdSucceeds
- * - testFetchScientificCategoryIdFails
- * - testFetchScientificCategoryNameSucceeds
- * - testFetchScientificCategoryNameFails
- * - testGetScientificCategoryListQuerySortAscTrue
- * - testGetScientificCategoryListQuerySortAscFalse
- * - testGetScientificCategoryIdQuery
- * - testGetScientificCategoryNameQuery
+ * - testFetchScientificCategoryDataSucceeds [DONE]
+ * - testFetchScientificCategoryDataFails [DONE]
+ * - testFetchScientificCategoryIdSucceeds [DONE]
+ * - testFetchScientificCategoryIdFails [DONE]
+ * - testFetchScientificCategoryNameSucceeds [DONE]
+ * - testFetchScientificCategoryNameFails [DONE]
+ * - testGetScientificCategoryListQuerySortAscTrue [DONE]
+ * - testGetScientificCategoryListQuerySortAscFalse [DONE]
+ * - testGetScientificCategoryIdQuery [DONE]
+ * - testGetScientificCategoryNameQuery [DONE]
  *
  * @covers \App\services\database\troublelog\read\SciCategoryService
- *
- *------------------------------------------------------------------------------
- * Test Plan For SciCategoryService (Read Class)
- *
- * This class contains three public methods to test:
- *
- * - fetchScientificCategoryData
- * - fetchScientificCategoryId
- * - fetchScientificCategoryName
- *
- * And contains three protected method to test:
- *
- * - getScientificCategoryListQuery
- * - getScientificCategoryIdQuery
- * - getScientificCategoryNameQuery
- *
- * Test Cases
- *
- * 1. fetchScientificCategoryData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 2. fetchScientificCategoryId
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 3. fetchScientificCategoryName
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 4. getScientificCategoryListQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *
- * 5. getScientificCategoryIdQuery
- *    - Verify SQL query generation.
- *
- * 6. getScientificCategoryNameQuery
- *    - Verify SQL query generation.
- *
- * Mocking
- *
- * Mock the fetchDataWithQuery method in the base SciCategoryService to simulate database
- * responses for the tests.
  */
 class SciCategoryServiceReadTest extends TestCase
 {

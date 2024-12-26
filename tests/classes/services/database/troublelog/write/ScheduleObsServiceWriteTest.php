@@ -22,35 +22,12 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testDeleteScheduleSucceeds
- * - testDeleteScheduleFails
- * - testUpdateScheduleInfileSucceeds
- * - testUpdateScheduleInfileFails
+ * - testDeleteScheduleSucceeds [DONE]
+ * - testDeleteScheduleFails [DONE]
+ * - testUpdateScheduleInfileSucceeds [DONE]
+ * - testUpdateScheduleInfileFails [DONE]
  *
  * @covers \App\services\database\troublelog\write\ScheduleObsService
- *
- *------------------------------------------------------------------------------
- * Test Plan For ScheduleObsService (Write Classes)
- *
- * This class contains one public method to test:
- *
- * - deleteSchedule
- * - updateScheduleInfile
- *
- * Test Cases
- *
- * 1. deleteSchedule
- *    - Success case: Query returns a valid affected row count.
- *    - Failure case: Query returns a zero rows affected count.
- *
- * 2. updateScheduleInfile
- *    - Success case: Query returns a valid affected row count.
- *    - Failure case: Query returns a zero rows affected count.
- *
- * Mocking
- *
- * Mock the executeUpdateQuery method in the base ScheduleObsService to simulate database
- * behavior for the tests.
  */
 class ScheduleObsServiceWriteTest extends TestCase
 {

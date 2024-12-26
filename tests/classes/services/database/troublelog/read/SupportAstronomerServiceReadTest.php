@@ -22,49 +22,16 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testFetchFullSupportAstronomerDataSucceeds
- * - testFetchFullSupportAstronomerDataFails
- * - testFetchSupportAstronomerDataSucceeds
- * - testFetchSupportAstronomerDataFails
- * - testGetSupportAstronomersQuerySortAscStatusTrue
- * - testGetSupportAstronomersQuerySortAscStatusFalse
- * - testGetSupportAstronomersQuerySortDescStatusTrue
- * - testGetSupportAstronomersQuerySortDescStatusFalse
+ * - testFetchFullSupportAstronomerDataSucceeds [DONE]
+ * - testFetchFullSupportAstronomerDataFails [DONE]
+ * - testFetchSupportAstronomerDataSucceeds [DONE]
+ * - testFetchSupportAstronomerDataFails [DONE]
+ * - testGetSupportAstronomersQuerySortAscStatusTrue [DONE]
+ * - testGetSupportAstronomersQuerySortAscStatusFalse [DONE]
+ * - testGetSupportAstronomersQuerySortDescStatusTrue [DONE]
+ * - testGetSupportAstronomersQuerySortDescStatusFalse [DONE]
  *
  * @covers \App\services\database\troublelog\read\SupportAstronomerService
- *
- *------------------------------------------------------------------------------
- * Test Plan For SupportAstronomerService (Read Class)
- *
- * This class contains two public methods to test:
- *
- * - fetchFullSupportAstronomerData
- * - fetchSupportAstronomerData
- *
- * And contains one protected method to test:
- *
- * - getSupportAstronomersQuery
- *
- * Test Cases
- *
- * 1. fetchFullSupportAstronomerData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 2. fetchSupportAstronomerData
- *    - Success case: Query returns a valid result array.
- *    - Failure case: Query returns no results (empty array).
- *
- * 3. getSupportAstronomersQuery
- *    - Verify SQL query generation with sortAsc true.
- *    - Verify SQL query generation with sortAsc false.
- *    - Verify SQL query generation with status true.
- *    - Verify SQL query generation with status false.
- *
- * Mocking
- *
- * Mock the fetchDataWithQuery method in the base SupportAstronomerService to simulate database
- * responses for the tests.
  */
 class SupportAstronomerServiceReadTest extends TestCase
 {

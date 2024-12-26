@@ -22,35 +22,12 @@ use App\exceptions\DatabaseException;
  *
  * List of method tests:
  *
- * - testDeleteProgramsSucceeds
- * - testDeleteProgramsFails
- * - testUpdateProgramsInfileSucceeds
- * - testUpdateProgramsInfileFails
+ * - testDeleteProgramsSucceeds [DONE]
+ * - testDeleteProgramsFails [DONE]
+ * - testUpdateProgramsInfileSucceeds [DONE]
+ * - testUpdateProgramsInfileFails [DONE]
  *
  * @covers \App\services\database\troublelog\write\ProgramService
- *
- *------------------------------------------------------------------------------
- * Test Plan For ProgramService (Write Classes)
- *
- * This class contains one public method to test:
- *
- * - deletePrograms
- * - updateProgramsInfile
- *
- * Test Cases
- *
- * 1. deletePrograms
- *    - Success case: Query returns a valid affected row count.
- *    - Failure case: Query returns a zero rows affected count.
- *
- * 2. updateProgramsInfile
- *    - Success case: Query returns a valid affected row count.
- *    - Failure case: Query returns a zero rows affected count.
- *
- * Mocking
- *
- * Mock the executeUpdateQuery method in the base ProgramService to simulate database
- * behavior for the tests.
  */
 class ProgramServiceWriteTest extends TestCase
 {
