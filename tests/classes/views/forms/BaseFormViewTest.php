@@ -468,7 +468,7 @@ class BaseFormViewTest extends TestCase
     /**
      * Set up the test environment.
      *
-     * Initializes the Mockery Debug and DBConnection instances.
+     * Initializes the Mockery Debug instance.
      *
      * @return void
      */
@@ -480,13 +480,16 @@ class BaseFormViewTest extends TestCase
     }
 
     /**
-     * Clean up Mockery expectations and resources after each test.
+     * Cleans up the test environment after each unit test (method).
+     *
+     * - Verifies Mockery's expectations are met.
+     * - Clears resources and prevents leaks between tests.
+     * - Ensures necessary parent (PHPUnit) teardown logic runs as well.
      *
      * @return void
      */
     protected function tearDown(): void
     {
-        // Ensure Mockery's expectations are met and clear resources
         Mockery::close();
         parent::tearDown();
     }

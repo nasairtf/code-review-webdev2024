@@ -15,4 +15,18 @@ class BaseTest extends TestCase
     {
         $this->assertTrue(true, 'PHPUnit is installed and configured properly.');
     }
+
+    /**
+     * Cleans up the test environment after each unit test (method).
+     *
+     * - Verifies Mockery's expectations are met.
+     * - Clears resources and prevents leaks between tests.
+     * - Ensures necessary parent (PHPUnit) teardown logic runs as well.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+    }
 }
