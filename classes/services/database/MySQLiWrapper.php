@@ -18,6 +18,7 @@ namespace App\services\database;
  * @since    2024-12-13
  *
  * @uses \mysqli
+ * @uses \mysqli_result
  * @uses \mysqli_stmt
  */
 class MySQLiWrapper
@@ -106,5 +107,91 @@ class MySQLiWrapper
     {
         // Use the spread operator to pass arguments dynamically
         return $stmt->bind_param($types, ...$params);
+    }
+
+    /**
+     * Closes the database connection.
+     *
+     * @return bool True on success, false on failure.
+     */
+    public function close(): bool
+    {
+        return $this->mysqli->close();
+    }
+
+    /**
+     * Starts a transaction.
+     *
+     * @return bool True on success, false on failure.
+     */
+    public function begin_transaction(): bool
+    {
+        return $this->mysqli->begin_transaction();
+    }
+
+    /**
+     * Commits the current transaction.
+     *
+     * @return bool True on success, false on failure.
+     */
+    public function commit(): bool
+    {
+        return $this->mysqli->commit();
+    }
+
+    /**
+     * Rolls back the current transaction.
+     *
+     * @return bool True on success, false on failure.
+     */
+    public function rollback(): bool
+    {
+        return $this->mysqli->rollback();
+    }
+
+    /**
+     * Prepares a SQL statement.
+     *
+     * @param string $sql The SQL query to prepare.
+     *
+     * @return \mysqli_stmt|null The prepared statement object, or null on failure.
+     */
+    public function prepare(string $sql): ?\mysqli_stmt
+    {
+        return $this->mysqli->prepare($sql);
+    }
+
+    /**
+     * Executes a raw SQL query.
+     *
+     * @param string $sql The SQL query to execute.
+     *
+     * @return \mysqli_result|bool The result object for SELECT queries or true/false for non-SELECT queries.
+     */
+    public function query(string $sql): ?\mysqli_result
+    {
+        return $this->mysqli->query($sql);
+    }
+
+    /**
+     * Delegates method calls to the underlying MySQLi instance.
+     *
+     * This magic method intercepts calls to undefined methods and forwards them
+     * to the underlying MySQLi instance if they exist.
+     *
+     * @param string $name      The name of the method being called.
+     * @param array  $arguments The arguments passed to the method.
+     *
+     * @return mixed The result of the delegated method call.
+     *
+     * @throws \BadMethodCallException If the method does not exist on MySQLiWrapper or \mysqli.
+     */
+    public function __call(string $name, array $arguments)
+    {
+        if (method_exists($this->mysqli, $name)) {
+            return $this->mysqli->$name(...$arguments);
+        }
+
+        throw new \BadMethodCallException("Method {$name} does not exist on MySQLiWrapper or \mysqli.");
     }
 }
