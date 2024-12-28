@@ -6,9 +6,9 @@ namespace App\views\forms;
 
 use App\core\common\CustomDebug;
 use App\exceptions\HtmlBuilderException;
-use App\core\htmlbuilder\HtmlBuilder as HtmlBuilder;
+use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
-use App\legacy\IRTFLayout as IrtfBuilder;
+use App\legacy\IRTFLayout                 as IrtfBuilder;
 
 /**
  * Base class for rendering form views.
@@ -91,7 +91,7 @@ abstract class BaseFormView
      * if no specific instances or configurations are passed.
      *
      * @param bool|null        $formatHtml  Enable formatted HTML output. Defaults to false if not provided.
-     * @param Debug|null       $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
+     * @param CustomDebug|null $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
      * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new HtmlBuilder.
      * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new CompBuilder.
      * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for site meta. Defaults to a new IrtfBuilder.
@@ -99,9 +99,9 @@ abstract class BaseFormView
     public function __construct(
         ?bool $formatHtml = null,
         ?CustomDebug $debug = null,
-        ?HtmlBuilder $htmlBuilder = null,
-        ?CompBuilder $compBuilder = null,
-        ?IrtfBuilder $irtfBuilder = null
+        ?HtmlBuilder $htmlBuilder = null, // Dependency injection to simplify unit testing
+        ?CompBuilder $compBuilder = null, // Dependency injection to simplify unit testing
+        ?IrtfBuilder $irtfBuilder = null  // Dependency injection to simplify unit testing
     ) {
         // Initialize debugging
         $this->debug = $debug ?? new CustomDebug('default', false, 0);
@@ -116,11 +116,13 @@ abstract class BaseFormView
         $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder($this->formatHtml);
         $this->compBuilder = $compBuilder ?? new CompBuilder($this->formatHtml, $this->htmlBuilder);
         $this->irtfBuilder = $irtfBuilder ?? new IrtfBuilder();
-        $this->debug->log("{$debugHeading} -- HtmlBuilder, CompBuilder, IrtfBuilder successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- HtmlBuilder, CompBuilder, IrtfBuilder successfully initialised.");
 
         // Constructor completed
-        $this->debug->log("{$debugHeading} -- Parent View initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Parent View initialisation complete.");
     }
+
+    // Abstract methods: getFieldLabels(), getPageContents()
 
     /**
      * Abstract method to provide field labels for the form.
@@ -139,7 +141,8 @@ abstract class BaseFormView
      *
      * Each child class must implement this method to define the specific
      * content structure for its form. By default, data arrays are empty
-     * and padding is set to 0.
+     * and padding is set to 0. The BaseFormView parent method getContentsForm() passes the
+     * contents to renderFormPage(), etc., for rendering.
      *
      * @param array $dbData   Data arrays required to populate form options. Defaults to an empty array.
      * @param array $formData Default data for form fields. Defaults to an empty array.
