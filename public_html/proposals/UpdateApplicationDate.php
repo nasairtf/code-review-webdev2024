@@ -2,7 +2,7 @@
 
 require_once '/aux1/htdocs/inc/bootstrap.php';
 
-use App\core\common\Debug;
+use App\core\common\CustomDebug;
 
 use App\controllers\proposals\UpdateApplicationDateController as Controller;
 
@@ -33,7 +33,7 @@ use App\controllers\proposals\UpdateApplicationDateController as Controller;
 //$debug = new Debug('default', true, 1);
 $debugMode = false;
 $debugLevel = $debugMode ? 1 : 0;
-$debug = new Debug('default', $debugMode, $debugLevel);
+$debug = new CustomDebug('default', $debugMode, $debugLevel);
 
 // Enable html formatting for the entire page
 //$formatHtml = isset($_GET['formatHtml']) && $_GET['formatHtml'] === 'true';  // Optional flag for formatting

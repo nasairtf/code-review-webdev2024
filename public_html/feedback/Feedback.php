@@ -2,7 +2,7 @@
 
 require_once '/aux1/htdocs/inc/bootstrap.php';
 
-use App\core\common\Debug;
+use App\core\common\CustomDebug;
 
 use App\controllers\feedback\FeedbackController as Controller;
 
@@ -38,7 +38,7 @@ use App\controllers\feedback\FeedbackController as Controller;
 // Enable debug mode for the entire page
 $debugMode = false;
 $debugLevel = $debugMode ? 1 : 0;
-$debug = new Debug('default', $debugMode ?? false, $debugLevel); // entry point
+$debug = new CustomDebug('default', $debugMode ?? false, $debugLevel); // entry point
 
 // Enable html formatting for the entire page
 $formatHtml = $debugMode;

@@ -2,7 +2,7 @@
 
 require_once '/aux1/htdocs/inc/bootstrap.php';
 
-use App\core\common\Debug;
+use App\core\common\CustomDebug;
 
 use App\controllers\ishell\TemperaturesController as Controller;
 
@@ -18,7 +18,7 @@ use App\controllers\ishell\TemperaturesController as Controller;
 // Enable debug mode for the entire page
 $debugMode = false;
 $debugLevel = $debugMode ? 1 : 0;
-$debug = new Debug('default', $debugMode ?? false, $debugLevel); // entry point
+$debug = new CustomDebug('default', $debugMode ?? false, $debugLevel); // entry point
 
 // Output the start of debug logging
 $debug->log("Guider: Entry point debug|log mode is ON.");
