@@ -6,6 +6,7 @@ namespace Tests\classes\core\common;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use Tests\utilities\ConfigMockTrait;
 use App\core\common\Debug;
 
@@ -20,6 +21,7 @@ use App\core\common\Debug;
  */
 class DebugTest extends TestCase
 {
+    use UnitTestTeardownTrait;
     use ConfigMockTrait;
 
     /**
@@ -209,21 +211,5 @@ class DebugTest extends TestCase
             ],
         ];
         $this->createConfigMock($configData);
-    }
-
-    /**
-     * Cleans up the test environment after each test.
-     *
-     * - Verifies and closes Mockery expectations.
-     * - Ensures necessary parent teardown logic is executed.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        // Ensure Mockery is closed down
-        Mockery::close();
-        // Ensure PHPUnit's tearDown logic runs too
-        parent::tearDown();
     }
 }

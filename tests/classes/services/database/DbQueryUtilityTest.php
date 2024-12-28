@@ -6,6 +6,7 @@ namespace Tests\classes\services\database;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use Tests\utilities\CustomDebugMockTrait;
 use Tests\utilities\DBConnectionMockTrait;
 use App\services\database\DbQueryUtility;
@@ -45,6 +46,7 @@ use App\exceptions\DatabaseException;
  */
 class DbQueryUtilityTest extends TestCase
 {
+    use UnitTestTeardownTrait;
     use CustomDebugMockTrait;
     use DBConnectionMockTrait;
 
@@ -403,22 +405,5 @@ class DbQueryUtilityTest extends TestCase
     {
         // Assert the sort strings matches
         $this->assertSame('DESC', DbQueryUtility::getSortString(false));
-    }
-
-    /**
-     * HELPER METHODS -- TEST SETUP AND/OR CLEANUP
-     */
-
-    /**
-     * Cleans up after each test, closing Mockery expectations.
-     *
-     * Ensures Mockery expectations are met and prevents leaks between tests.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
     }
 }

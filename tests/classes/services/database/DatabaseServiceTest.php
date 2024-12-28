@@ -6,6 +6,7 @@ namespace Tests\classes\services\database;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use Tests\utilities\CustomDebugMockTrait;
 use Tests\utilities\DBConnectionMockTrait;
 use Tests\utilities\PrivatePropertyTrait;
@@ -53,6 +54,7 @@ use App\exceptions\DatabaseException;
  */
 class DatabaseServiceTest extends TestCase
 {
+    use UnitTestTeardownTrait;
     use PrivatePropertyTrait;
     use CustomDebugMockTrait;
     use DBConnectionMockTrait;
@@ -725,18 +727,5 @@ class DatabaseServiceTest extends TestCase
             $this->dbMock,
             $this->debugMock
         );
-    }
-
-    /**
-     * Cleans up after each test, closing Mockery expectations.
-     *
-     * Ensures Mockery expectations are met and prevents leaks between tests.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
     }
 }

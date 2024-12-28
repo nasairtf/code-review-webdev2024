@@ -220,10 +220,13 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Cleans up the test environment after each test.
+     * Cleans up the test environment after each unit test (method).
      *
      * - Removes temporary configuration files and directories.
      * - Asserts that the temporary directory is deleted.
+     * - Verifies Mockery's expectations are met.
+     * - Clears resources and prevents leaks between tests.
+     * - Ensures necessary parent (PHPUnit) teardown logic runs as well.
      *
      * @return void
      */
@@ -236,6 +239,8 @@ class ConfigTest extends TestCase
 
         // Assert that the directory no longer exists
         $this->assertFalse(is_dir($configDir), 'The directory should not exist.');
+
+        parent::tearDown();
     }
 
     /**

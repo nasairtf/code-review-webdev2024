@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\classes\core\common;
 
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use App\core\common\Config;
 
 /**
@@ -20,6 +21,8 @@ use App\core\common\Config;
  */
 class ConfigGettersTest extends TestCase
 {
+    use UnitTestTeardownTrait;
+
     /**
      * The following three test methods were written to test Config methods using
      * the values set in the bootstrap.php file under the 'development' branch.

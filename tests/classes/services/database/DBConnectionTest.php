@@ -6,6 +6,7 @@ namespace Tests\classes\services\database;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use Tests\utilities\ConfigMockTrait;
 use Tests\utilities\CustomDebugMockTrait;
 use Tests\utilities\PrivatePropertyTrait;
@@ -49,6 +50,7 @@ use App\exceptions\DatabaseException;
  */
 class DBConnectionTest extends TestCase
 {
+    use UnitTestTeardownTrait;
     use PrivatePropertyTrait;
     use ConfigMockTrait;
     use CustomDebugMockTrait;
@@ -758,19 +760,6 @@ class DBConnectionTest extends TestCase
 
         // Set up MySQLi Statement Mock
         $this->mysqliStatementMock = Mockery::mock('mysqli_stmt');
-    }
-
-    /**
-     * Cleans up after each test, closing Mockery expectations.
-     *
-     * Ensures Mockery expectations are met and prevents leaks between tests.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
     }
 
     /**

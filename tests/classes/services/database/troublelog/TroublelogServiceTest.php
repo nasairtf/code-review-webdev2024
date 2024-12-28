@@ -6,6 +6,7 @@ namespace Tests\classes\services\database\troublelog;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use Tests\utilities\CustomDebugMockTrait;
 use Tests\utilities\DBConnectionMockTrait;
 use App\services\database\troublelog\TroublelogService;
@@ -22,6 +23,7 @@ use App\services\database\DatabaseService;
  */
 class TroublelogServiceTest extends TestCase
 {
+    use UnitTestTeardownTrait;
     use CustomDebugMockTrait;
     use DBConnectionMockTrait;
 
@@ -57,16 +59,5 @@ class TroublelogServiceTest extends TestCase
         // Assert
         $this->assertInstanceOf(TroublelogService::class, $service);
         $this->assertInstanceOf(DatabaseService::class, $service);
-    }
-
-    /**
-     * Cleans up after each test, closing Mockery expectations.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
     }
 }

@@ -180,7 +180,12 @@ class FileParserTest extends TestCase
     }
 
     /**
-     * Cleans up the test environment by removing temporary files.
+     * Cleans up the test environment after each unit test (method).
+     *
+     * - Verifies Mockery's expectations are met.
+     * - Removes temporary files.
+     * - Clears resources and prevents leaks between tests.
+     * - Ensures necessary parent (PHPUnit) teardown logic runs as well.
      *
      * @return void
      */
@@ -191,7 +196,6 @@ class FileParserTest extends TestCase
             array_map('unlink', glob($this->tempDir . '/*'));
             rmdir($this->tempDir);
         }
-        // Ensure PHPUnit's teardown logic runs too
         parent::tearDown();
     }
 }

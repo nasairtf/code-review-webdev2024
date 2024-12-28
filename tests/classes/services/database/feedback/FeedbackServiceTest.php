@@ -6,6 +6,7 @@ namespace Tests\classes\services\database\feedback;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use Tests\utilities\CustomDebugMockTrait;
 use Tests\utilities\DBConnectionMockTrait;
 use Tests\utilities\PrivatePropertyTrait;
@@ -39,6 +40,7 @@ use App\exceptions\DatabaseException;
  */
 class FeedbackServiceTest extends TestCase
 {
+    use UnitTestTeardownTrait;
     use PrivatePropertyTrait;
     use CustomDebugMockTrait;
     use DBConnectionMockTrait;
@@ -839,17 +841,6 @@ class FeedbackServiceTest extends TestCase
         $this->instrumentWriteMock = Mockery::mock(\App\services\database\feedback\write\InstrumentService::class);
         $this->operatorWriteMock = Mockery::mock(\App\services\database\feedback\write\OperatorService::class);
         $this->supportWriteMock = Mockery::mock(\App\services\database\feedback\write\SupportService::class);
-    }
-
-    /**
-     * Cleans up after each test, closing Mockery expectations.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
     }
 
     /**

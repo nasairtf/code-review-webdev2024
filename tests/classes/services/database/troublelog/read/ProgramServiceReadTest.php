@@ -6,6 +6,7 @@ namespace Tests\classes\services\database\troublelog\read;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use Tests\utilities\CustomDebugMockTrait;
 use Tests\utilities\DBConnectionMockTrait;
 use Tests\utilities\DatabaseServiceMockTrait;
@@ -31,6 +32,7 @@ use App\exceptions\DatabaseException;
  */
 class ProgramServiceReadTest extends TestCase
 {
+    use UnitTestTeardownTrait;
     use CustomDebugMockTrait;
     use DBConnectionMockTrait;
     use DatabaseServiceMockTrait;
@@ -178,17 +180,6 @@ class ProgramServiceReadTest extends TestCase
             [false, $this->dbMock, $this->debugMock],
             ['fetchDataWithQuery']
         );
-    }
-
-    /**
-     * Cleans up after each test, closing Mockery expectations.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
     }
 
     /**
