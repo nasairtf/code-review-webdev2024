@@ -2,8 +2,7 @@
 
 require_once '/aux1/htdocs/inc/bootstrap.php';
 
-use App\core\common\Debug;
-
+use App\core\common\CustomDebug;
 use App\controllers\login\LoginController as Controller;
 
 /**
@@ -24,9 +23,9 @@ use App\controllers\login\LoginController as Controller;
  */
 
 // Enable debug mode for the entire page
-$debugMode = false;
+$debugMode = true;
 $debugLevel = $debugMode ? 1 : 0;
-$debug = new Debug('login', $debugMode, $debugLevel); // entry point
+$debug = new CustomDebug('login', $debugMode, $debugLevel); // entry point
 
 // Enable html formatting for the entire page
 $formatHtml = $debugMode;
