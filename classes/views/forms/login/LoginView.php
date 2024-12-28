@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\views\forms\login;
 
-use App\core\common\Debug;
-use App\core\htmlbuilder\HtmlBuilder as HtmlBuilder;
+use App\core\common\CustomDebug;
+use App\exceptions\HtmlBuilderException;
+use App\views\forms\BaseFormView          as BaseView;
+use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
-use App\legacy\IRTFLayout as IrtfBuilder;
+use App\legacy\IRTFLayout                 as IrtfBuilder;
 
 /**
  * View for rendering the Login form.
  *
  * This class is responsible for generating the HTML structure of the login form,
- * including any default instructions and formatting options. It utilizes various
- * HTML builder and composite builder classes to construct components and layout.
+ * including any default instructions and formatting options. It utilizes the shared
+ * functionality in the BaseFormView.
  *
  * @category Views
  * @package  IRTF
@@ -22,54 +24,95 @@ use App\legacy\IRTFLayout as IrtfBuilder;
  * @version  1.0.0
  */
 
-class LoginView
+class LoginView extends BaseView
 {
-    /**
-     * @var bool Whether to format HTML output.
-     */
-    private $formatHtml;
-
-    /**
-     * @var Debug Debugging utility instance.
-     */
-    private $debug;
-
-    /**
-     * @var HtmlBuilder Helper class for generating HTML elements.
-     */
-    private $htmlBuilder;
-
-    /**
-     * @var CompositeBuilder Utility for building composite HTML components.
-     */
-    private $compBuilder;
-
-    /**
-     * @var IRTFLayout Layout utility for IRTF-specific HTML structures.
-     */
-    private $irtfBuilder;
-
     /**
      * Constructor for initializing the LoginView.
      *
      * Sets up the necessary builders and layout utilities, and determines
      * whether HTML output should be formatted.
      *
-     * @param bool  $formatHtml Whether to format the HTML output.
-     * @param Debug $debug      [optional] Debugging utility instance.
+     * @param bool|null        $formatHtml  Enable formatted HTML output. Defaults to false if not provided.
+     * @param CustomDebug|null $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
+     * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new HtmlBuilder.
+     * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new CompBuilder.
+     * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for site meta. Defaults to a new IrtfBuilder.
      */
     public function __construct(
-        bool $formatHtml = false,
-        ?Debug $debug = null,
-        ?HtmlBuilder $htmlBuilder = null,
-        ?CompBuilder $compBuilder = null,
-        ?IrtfBuilder $irtfBuilder = null
+        ?bool $formatHtml = null,
+        ?CustomDebug $debug = null,
+        ?HtmlBuilder $htmlBuilder = null, // Dependency injection to simplify unit testing
+        ?CompBuilder $compBuilder = null, // Dependency injection to simplify unit testing
+        ?IrtfBuilder $irtfBuilder = null  // Dependency injection to simplify unit testing
     ) {
-        $this->formatHtml = $formatHtml;
-        $this->debug = $debug ?? new Debug('login', false, 0);
-        $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder($this->formatHtml);
-        $this->compBuilder = $compBuilder ?? new CompBuilder($this->formatHtml, $this->htmlBuilder);
-        $this->irtfBuilder = $irtfBuilder ?? new IrtfBuilder();
+        // Use parent class' constructor
+        parent::__construct($formatHtml, $debug, $htmlBuilder, $compBuilder, $irtfBuilder);
+        $debugHeading = $this->debug->debugHeading("View", "__construct");
+        $this->debug->debug($debugHeading);
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
+
+        // Class initialisation complete
+        $this->debug->debug("{$debugHeading} -- View initialisation complete.");
+    }
+
+    // Abstract methods: getFieldLabels(), getPageContents()
+
+    /**
+     * Provides field labels for the Login form.
+     *
+     * Maps internal field names to user-friendly labels.
+     *
+     * @return array An associative array mapping field names to labels.
+     */
+    public function getFieldLabels(): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "getFieldLabels");
+        $this->debug->debug($debugHeading);
+
+        // Map internal field names to user-friendly labels
+        return [
+            'program' => 'Program Number',
+            'session' => 'Session Code',
+        ];
+    }
+
+    /**
+     * Generates the main page content for the login form.
+     *
+     * This method defines the specific HTML structure for the login form,
+     * using the provided database and form data. The BaseFormView parent method
+     * getContentsForm() passes the contents to renderFormPage(), etc., for rendering.
+     *
+     * @param array $dbData   Data arrays required to populate form options. Defaults to an empty array.
+     * @param array $formData Default data for form fields. Defaults to an empty array.
+     * @param int   $pad      Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The HTML content for the form page.
+     */
+    protected function getPageContents(
+        array $dbData = [],
+        array $formData = [],
+        int $pad = 0
+    ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "getPageContents");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
+        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+        $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
+
+        // Build the page contents
+        $htmlParts = [
+            $this->buildPreamble($formData),
+            $this->buildBreak(),
+            $this->buildInputFields($formData),
+            $this->buildBreak(),
+            $this->buildButtons(),
+            $this->buildBreak(),
+        ];
+
+        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
     }
 
     // Public methods
@@ -82,11 +125,153 @@ class LoginView
     public function buildDefaultInstructions(): string
     {
         // Debug output
-        $this->debug->debug("Login View: buildDefaultInstructions()");
+        $debugHeading = $this->debug->debugHeading("View", "buildDefaultInstructions");
+        $this->debug->debug($debugHeading);
 
+        // Prep the section contents
         $instructions = 'Please log in using your program number and session code.';
         return $this->htmlBuilder->getParagraph($instructions, ['align' => 'justify'], 0);
     }
+
+    // Private methods
+
+    /**
+     * Builds a horizontal line break section for the form.
+     *
+     * This method returns a formatted HTML line element, which serves as a visual
+     * separator within the form.
+     *
+     * @return string The HTML for the section break, formatted as a horizontal line.
+     */
+    private function buildBreak(): string
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildBreak");
+        $this->debug->debug($debugHeading);
+
+        // Build the section contents
+        return $this->compBuilder->buildFormSectionBreak(0);
+    }
+
+    /**
+     * Builds the preamble section for the login form.
+     *
+     * @param array $formData The default form data for login fields.
+     *
+     * @return string The HTML for the preamble.
+     */
+    private function buildPreamble(array $formData): string
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildPreamble");
+        $this->debug->debug($debugHeading);
+
+        // Prep the section contents
+        $instructions = $formData['instructions'] ?? $this->buildDefaultInstructions();
+        $rowAttr = [];
+        $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'];
+
+        // Build the section contents
+        return $this->compBuilder->buildPreambleFormSection(
+            $instructions,
+            $rowAttr,
+            $tableAttr,
+            0
+        );
+    }
+
+    /**
+     * Builds the input fields section for the login form.
+     *
+     * @param array $formData The default form data for login fields.
+     *
+     * @return string The HTML for the input fields.
+     */
+    private function buildInputFields(array $formData): string
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildInputFields");
+        $this->debug->debug($debugHeading);
+
+        // Prep the section contents
+        $fields = $this->getFieldLabels();
+        $inputAttr = [];
+        //$cellAttr = ['style' => 'width: 150px;', 'align' => 'left'];
+        $rowAttr = [];
+        $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'];
+        $inputFields = [];
+
+        foreach ($fields as $name => $label) {
+            $inputFields[] = [
+                'label' => "{$label}:",
+                'name' => $name,
+                'value' => $formData[$name] ?? '',
+                'type' => 'text',
+                'attr' => $inputAttr
+            ];
+        }
+
+        // Build the section contents
+        return $this->compBuilder->buildInputFieldsFormSection(
+            $inputFields,
+            $rowAttr,
+            $tableAttr,
+            0
+        );
+    }
+
+    /**
+     * Builds the button section for the login form.
+     *
+     * @return string The HTML for the form buttons.
+     */
+    private function buildButtons(): string
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildButtons");
+        $this->debug->debug($debugHeading);
+
+        // Prep the section contents
+        $buttonAttr = ['style' => 'width: 135px;'];
+        $rowAttr = [];
+        $tableAttr = ['border' => '0', 'cellspacing' => '4'];
+
+        $buttons = [
+            $this->htmlBuilder->getResetButton('Clear Form', $buttonAttr),
+            $this->htmlBuilder->getSubmitButton('login', 'Log in', $buttonAttr),
+        ];
+
+        // Build the section contents
+        return $this->compBuilder->buildButtonsFormSection(
+            $buttons,
+            $rowAttr,
+            $tableAttr,
+            0
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Builds and returns the HTML for an embeddable login form.
@@ -100,7 +285,7 @@ class LoginView
      * @param string $instructions Instructions or guidance text to display above the form.
      *
      * @return string              The complete HTML for the embeddable login form.
-     */
+     *//*
     public function buildEmbeddableLoginForm(
         string $action,
         array $data,
@@ -110,7 +295,7 @@ class LoginView
         $this->debug->debug("Login View: buildEmbeddableLoginForm()");
 
         return $this->buildLoginForm($action, $data, $instructions);
-    }
+    }*/
 
     /**
      * Renders the complete login form page with layout.
@@ -125,7 +310,7 @@ class LoginView
      * @param string $instructions Instructions or guidance text displayed above the form.
      *
      * @return string              The complete HTML for the login form page.
-     */
+     *//*
     public function renderLoginFormPage(
         $title,
         $formAction,
@@ -137,7 +322,7 @@ class LoginView
 
         $content = $this->buildLoginForm($formAction, $formData, $instructions);
         return $this->renderPage($title, $content);
-    }
+    }*/
 
     // Private helper methods
 
@@ -151,7 +336,7 @@ class LoginView
      * @param string $content [optional] The main content of the page.
      *
      * @return string The fully constructed and formatted HTML page.
-     */
+     *//*
     private function renderPage(
         string $title = '',
         string $content = ''
@@ -165,7 +350,7 @@ class LoginView
             $this->irtfBuilder->myFooter(__FILE__, false),
         ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
-    }
+    }*/
 
     /**
      * Constructs the login form with the specified action, form data, and instructions.
@@ -178,7 +363,7 @@ class LoginView
      * @param string $instructions Instructions or guidance text for display.
      *
      * @return string The complete HTML for the login form.
-     */
+     *//*
     private function buildLoginForm(
         string $action,
         array $formData,
@@ -197,7 +382,7 @@ class LoginView
             [$this->htmlBuilder->getForm($action, $method, $content, $formAttr, 0, true)],
             $this->formatHtml
         );
-    }
+    }*/
 
     /**
      * Builds the complete login form content with the input fields and instructions.
@@ -209,11 +394,15 @@ class LoginView
      * @param string $instructions Instructions or guidance text to be displayed.
      *
      * @return string The HTML content of the login form.
-     */
+     *//*
     private function buildLoginFormContents(
         array $formData,
         string $instructions
     ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildLoginFormContents");
+        $this->debug->debug($debugHeading);
+
         // Debug output
         $this->debug->debug("Login View: buildLoginFormContents()");
         $this->debug->debugVariable($formData, "formData");
@@ -228,7 +417,7 @@ class LoginView
             $this->buildSectionBreak(),
         ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
-    }
+    }*/
 
     /**
      * Builds a horizontal line break section for the form.
@@ -237,9 +426,13 @@ class LoginView
      * separator within the form.
      *
      * @return string The HTML for the section break, formatted as a horizontal line.
-     */
+     *//*
     private function buildSectionBreak(): string
     {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildSectionBreak");
+        $this->debug->debug($debugHeading);
+
         // Debug output
         $this->debug->debug("Login View: buildSectionBreak()");
 
@@ -249,7 +442,7 @@ class LoginView
             '',
         ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
-    }
+    }*/
 
     /**
      * Builds the preamble section for the login form, displaying the provided instructions.
@@ -257,9 +450,13 @@ class LoginView
      * @param string $instructions Instructions or guidance text for display.
      *
      * @return string The HTML for the preamble section.
-     */
+     *//*
     private function buildPreambleSection(string $instructions): string
     {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildPreambleSection");
+        $this->debug->debug($debugHeading);
+
         // Debug output
         $this->debug->debug("Login View: buildPreambleSection()");
 
@@ -292,7 +489,7 @@ class LoginView
             '',
         ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
-    }
+    }*/
 
     /**
      * Builds the error message section for the login form if an error exists.
@@ -307,7 +504,7 @@ class LoginView
      *
      * @return string         The HTML for the error message section, or an empty string
      *                        if no error exists.
-     */
+     *//*
     private function buildErrorMessage(array $formData): string
     {
         // Debug output
@@ -352,7 +549,7 @@ class LoginView
         ];
 
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
-    }
+    }*/
 
     /**
      * Builds the input fields section for the login form.
@@ -363,9 +560,13 @@ class LoginView
      * @param array $formData The form data to prefill into the fields.
      *
      * @return string The HTML for the input fields section.
-     */
+     *//*
     private function buildInputFields(array $formData): string
     {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildInputFields");
+        $this->debug->debug($debugHeading);
+
         // Debug output
         $this->debug->debug("Login View: buildInputFields()");
         $this->debug->debugVariable($formData, "formData");
@@ -414,7 +615,7 @@ class LoginView
             '',
         ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
-    }
+    }*/
 
     /**
      * Builds the button section for the login form.
@@ -422,9 +623,13 @@ class LoginView
      * This section includes reset and submit buttons, and centers them on the page.
      *
      * @return string The HTML for the buttons section.
-     */
+     *//*
     private function buildButtons(): string
     {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildButtons");
+        $this->debug->debug($debugHeading);
+
         // Debug output
         $this->debug->debug("Login View: buildButtons()");
 
@@ -461,5 +666,5 @@ class LoginView
             '',
         ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
-    }
+    }*/
 }
