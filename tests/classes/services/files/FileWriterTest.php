@@ -6,6 +6,7 @@ namespace Tests\classes\services\files;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use Tests\utilities\PrivatePropertyTrait;
 use App\services\files\FileWriter;
 
@@ -21,17 +22,8 @@ use App\services\files\FileWriter;
  */
 class FileWriterTest extends TestCase
 {
+    use UnitTestTeardownTrait;
     use PrivatePropertyTrait;
-
-    /**
-     * @var string Temporary directory for test files.
-     */
-    private $tempDir;
-
-    /**
-     * @var string Path to a temporary test file.
-     */
-    private $testFilePath;
 
     /**
      * @var FileWriter Instance of FileWriter for testing.
@@ -256,28 +248,5 @@ class FileWriterTest extends TestCase
         }
         $this->testFilePath = $this->tempDir . DIRECTORY_SEPARATOR . 'test_file.csv';
         $this->fileWriter = new FileWriter('csv', $this->testFilePath, false);
-    }
-
-    /**
-     * Cleans up the test environment after each unit test (method).
-     *
-     * - Verifies Mockery's expectations are met.
-     * - Removes temporary files and directories created during testing.
-     * - Clears resources and prevents leaks between tests.
-     * - Ensures necessary parent (PHPUnit) teardown logic runs as well.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        // Run the teardown logic for this class
-        if (file_exists($this->testFilePath)) {
-            unlink($this->testFilePath);
-        }
-        if (is_dir($this->tempDir)) {
-            array_map('unlink', glob($this->tempDir . '/*'));
-            rmdir($this->tempDir);
-        }
-        parent::tearDown();
     }
 }

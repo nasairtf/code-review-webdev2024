@@ -6,6 +6,7 @@ namespace Tests\classes\services\files;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use Tests\utilities\PrivatePropertyTrait;
 use App\services\files\FileParser;
 
@@ -20,12 +21,8 @@ use App\services\files\FileParser;
  */
 class FileParserTest extends TestCase
 {
+    use UnitTestTeardownTrait;
     use PrivatePropertyTrait;
-
-    /**
-     * @var string Temporary directory for test files.
-     */
-    private $tempDir;
 
     /**
      * Tests the constructor and default configuration of the FileParser class.
@@ -177,25 +174,5 @@ class FileParserTest extends TestCase
         if (!is_dir($this->tempDir)) {
             mkdir($this->tempDir);
         }
-    }
-
-    /**
-     * Cleans up the test environment after each unit test (method).
-     *
-     * - Verifies Mockery's expectations are met.
-     * - Removes temporary files.
-     * - Clears resources and prevents leaks between tests.
-     * - Ensures necessary parent (PHPUnit) teardown logic runs as well.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        // Run the teardown logic for this class
-        if (is_dir($this->tempDir)) {
-            array_map('unlink', glob($this->tempDir . '/*'));
-            rmdir($this->tempDir);
-        }
-        parent::tearDown();
     }
 }

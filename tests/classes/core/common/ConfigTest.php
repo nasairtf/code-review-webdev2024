@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\classes\core\common;
 
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\UnitTestTeardownTrait;
 use App\core\common\Config;
 
 /**
@@ -17,10 +18,12 @@ use App\core\common\Config;
  */
 class ConfigTest extends TestCase
 {
+    use UnitTestTeardownTrait;
+
     /**
      * @var string Path to the temporary directory for test configurations.
      */
-    private $tmpDir;
+    //private $tempDir;
 
     /**
      * Tests that the default environment is 'test'.
@@ -172,27 +175,27 @@ class ConfigTest extends TestCase
      */
     public function testCleanupRemovesTemporaryConfigs(): void
     {
-        $configDir = $this->tmpDir . '/configs';
+        $this->configDir = $this->tempDir . '/configs';
 
         // Cleanup first to ensure the directory is not present
-        if (is_dir($configDir)) {
+        if (is_dir($this->configDir)) {
             $this->cleanTemporaryConfigs();
         }
 
         // Create temporary files to mimic test setup
-        mkdir($configDir, 0777, true);
-        file_put_contents($configDir . '/dummy.php', "<?php return [];");
+        mkdir($this->configDir, 0777, true);
+        file_put_contents($this->configDir . '/dummy.php', "<?php return [];");
 
         // Ensure the file and directory exist before cleanup
-        $this->assertFileExists($configDir . '/dummy.php');
-        $this->assertDirectoryExists($configDir);
+        $this->assertFileExists($this->configDir . '/dummy.php');
+        $this->assertDirectoryExists($this->configDir);
 
         // Perform cleanup
         $this->cleanTemporaryConfigs();
 
         // Assert that the directory and files are removed
-        $this->assertFalse(file_exists($configDir . '/dummy.php'), 'The file should not exist.');
-        $this->assertFalse(is_dir($configDir), 'The directory should not exist.');
+        $this->assertFalse(file_exists($this->configDir . '/dummy.php'), 'The file should not exist.');
+        $this->assertFalse(is_dir($this->configDir), 'The directory should not exist.');
     }
 
     /**
@@ -207,7 +210,7 @@ class ConfigTest extends TestCase
     protected function setUp(): void
     {
         // Fetch the temporary directory from environment variables
-        $this->tmpDir = getenv('TEST_TMP_DIR') ?: '/tmp';
+        $this->tempDir = getenv('TEST_TMP_DIR') ?: '/tmp';
 
         // Ensure the directory is clean before each test
         $this->cleanTemporaryConfigs();
@@ -217,30 +220,6 @@ class ConfigTest extends TestCase
 
         // Set the rest of the test configuration
         $this->prepareTemporaryConfigs();
-    }
-
-    /**
-     * Cleans up the test environment after each unit test (method).
-     *
-     * - Removes temporary configuration files and directories.
-     * - Asserts that the temporary directory is deleted.
-     * - Verifies Mockery's expectations are met.
-     * - Clears resources and prevents leaks between tests.
-     * - Ensures necessary parent (PHPUnit) teardown logic runs as well.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        $configDir = $this->tmpDir . '/configs';
-
-        // Cleanup the temporary configs
-        $this->cleanTemporaryConfigs();
-
-        // Assert that the directory no longer exists
-        $this->assertFalse(is_dir($configDir), 'The directory should not exist.');
-
-        parent::tearDown();
     }
 
     /**
@@ -255,7 +234,7 @@ class ConfigTest extends TestCase
     {
         // Verify the BASE_PATH and set if necessary
         if (!defined('BASE_PATH')) {
-            define('BASE_PATH', $this->tmpDir . '/');
+            define('BASE_PATH', $this->tempDir . '/');
         }
 
         // Verify the TEST_APP_ENV and set if necessary
@@ -265,7 +244,7 @@ class ConfigTest extends TestCase
 
         // Verify the TEST_BASE_PATH and set if necessary
         if (!defined('TEST_BASE_PATH')) {
-            define('TEST_BASE_PATH', $this->tmpDir . '/');
+            define('TEST_BASE_PATH', $this->tempDir . '/');
         }
 
         // Verify the TEST_BASE_URL and set if necessary
@@ -284,26 +263,12 @@ class ConfigTest extends TestCase
      */
     private function prepareTemporaryConfigs(): void
     {
-        $configDir = $this->tmpDir . '/configs';
-        if (!is_dir($configDir)) {
-            mkdir($configDir, 0777, true);
+        $this->configDir = $this->tempDir . '/configs';
+        if (!is_dir($this->configDir)) {
+            mkdir($this->configDir, 0777, true);
         }
 
-        file_put_contents($configDir . '/valid.php', "<?php return ['key1' => 'value1', 'key2' => 'value2'];");
-        file_put_contents($configDir . '/invalid.php', "<?php return 'not an array';");
-    }
-
-    /**
-     * Removes temporary configuration files and directories.
-     *
-     * @return void
-     */
-    private function cleanTemporaryConfigs(): void
-    {
-        $configDir = $this->tmpDir . '/configs';
-        if (is_dir($configDir)) {
-            array_map('unlink', glob($configDir . '/*.php'));
-            rmdir($configDir);
-        }
+        file_put_contents($this->configDir . '/valid.php', "<?php return ['key1' => 'value1', 'key2' => 'value2'];");
+        file_put_contents($this->configDir . '/invalid.php', "<?php return 'not an array';");
     }
 }
