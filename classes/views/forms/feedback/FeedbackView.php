@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\views\forms\feedback;
 
-use App\core\common\Debug;
+use App\core\common\CustomDebug;
+use App\exceptions\HtmlBuilderException;
+use App\views\forms\BaseFormView          as BaseView;
+use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
+use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
+use App\legacy\IRTFLayout                 as IrtfBuilder;
 use App\core\irtf\IrtfLinks;
-use App\views\forms\BaseFormView as BaseView;
 
 /**
  * View for rendering the Feedback form and its sections.
@@ -26,28 +30,44 @@ class FeedbackView extends BaseView
     /**
      * Initializes the FeedbackView with core builders and configurations.
      *
-     * @param bool  $formatHtml Whether to format the HTML output.
-     * @param Debug $debug      Optional. Debugging utility instance.
+     * @param bool|null        $formatHtml  Enable formatted HTML output. Defaults to false if not provided.
+     * @param CustomDebug|null $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
+     * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new HtmlBuilder.
+     * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new CompBuilder.
+     * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for site meta. Defaults to a new IrtfBuilder.
+     * @param IrtfLinks|null   $irtfLinks   Links utiltiy getter for site.
      */
     public function __construct(
         ?bool $formatHtml = null,
-        ?Debug $debug = null,
-        ?IrtfLinks $irtfLinks = null
+        ?CustomDebug $debug = null,
+        ?HtmlBuilder $htmlBuilder = null, // Dependency injection to simplify unit testing
+        ?CompBuilder $compBuilder = null, // Dependency injection to simplify unit testing
+        ?IrtfBuilder $irtfBuilder = null, // Dependency injection to simplify unit testing
+        ?IrtfLinks $irtfLinks = null      // Dependency injection to simplify unit testing
     ) {
         // Use parent class' constructor
-        parent::__construct($formatHtml ?? false, $debug);
+        parent::__construct($formatHtml, $debug, $htmlBuilder, $compBuilder, $irtfBuilder);
         $debugHeading = $this->debug->debugHeading("View", "__construct");
         $this->debug->debug($debugHeading);
-        $this->debug->log("{$debugHeading} -- Parent class is successfully constructed.");
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
 
         // Set up the links instance
         $this->irtfLinks = $irtfLinks ?? new IrtfLinks();
-        $this->debug->log("{$debugHeading} -- Links class is successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Links class is successfully initialised.");
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- View initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- View initialisation complete.");
     }
 
+    // Abstract methods: getFieldLabels(), getPageContents()
+
+    /**
+     * Provides field labels for the Feedback form.
+     *
+     * Maps internal field names to user-friendly labels.
+     *
+     * @return array An associative array mapping field names to labels.
+     */
     public function getFieldLabels(): array
     {
         // Debug output
@@ -76,13 +96,17 @@ class FeedbackView extends BaseView
     }
 
     /**
-     * Constructs the complete page content for the feedback form.
+     * Generates the main page content for the feedback form.
      *
-     * @param array $dbData   Data arrays for form fields.
-     * @param array $formData Default values for form fields.
-     * @param int   $pad      Optional padding level for formatted output.
+     * This method defines the specific HTML structure for the login form,
+     * using the provided database and form data. The BaseFormView parent method
+     * getContentsForm() passes the contents to renderFormPage(), etc., for rendering.
      *
-     * @return string HTML content for the feedback form.
+     * @param array $dbData   Data arrays required to populate form options. Defaults to an empty array.
+     * @param array $formData Default data for form fields. Defaults to an empty array.
+     * @param int   $pad      Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The HTML content for the form page.
      */
     protected function getPageContents(
         array $dbData = [],
@@ -92,12 +116,17 @@ class FeedbackView extends BaseView
         // Debug output
         $debugHeading = $this->debug->debugHeading("View", "getPageContents");
         $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
+        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+        $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
+        // Build the page contents
         $line = $this->htmlBuilder->getLine([], $pad);
         $htmlParts = [
             $this->getPreamble($pad),
             $line,
-            $this->getButtons($pad),
+            //$this->getButtons($pad),
+            $this->buildButtons($pad),
             $line,
             //$this->getSecurity($pad),
             //$line,
@@ -202,15 +231,18 @@ class FeedbackView extends BaseView
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
     }
 
-    private function getButtons(
-        int $pad = 0
-    ): string {
+    /**
+     * Builds the button section for the feedback form.
+     *
+     * @return string The HTML for the form buttons.
+     */
+    private function buildButtons(int $pad = 0): string
+    {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "getButtons");
+        $debugHeading = $this->debug->debugHeading("View", "buildButtons");
         $this->debug->debug($debugHeading);
-        $tablePad = $pad;
-        $tableRowPad = $pad + 2;
 
+        // Prep the section contents
         $buttonAttr = ['style' => 'width: 135px;'];
         $rowAttr = [];
         $tableAttr = ['border' => '0', 'cellspacing' => '4'];
@@ -219,30 +251,14 @@ class FeedbackView extends BaseView
             $this->htmlBuilder->getResetButton('Clear Form', $buttonAttr),
             $this->htmlBuilder->getSubmitButton('submit', 'Send Form', $buttonAttr),
         ];
-        $tableHtml = $this->htmlBuilder->getTableFromRows(
-            [
-                $this->htmlBuilder->getTableRowFromArray(
-                    $buttons,
-                    false,
-                    [true, true],
-                    $rowAttr,
-                    $tableRowPad,
-                    true
-                )
-            ],
+
+        // Build the section contents
+        return $this->compBuilder->buildButtonsFormSection(
+            $buttons,
+            $rowAttr,
             $tableAttr,
-            $tablePad
+            $pad
         );
-        $htmlParts = [
-            '',
-            '<!--  Clear/Submit Buttons  -->',
-            '',
-            '<center>',
-            $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
     }
 
     //$htmlParts[] = $this->getSecurity($pad);
@@ -466,7 +482,7 @@ class FeedbackView extends BaseView
         $site = $this->compBuilder->buildLabeledRemoteObsTable(
             'location',
             'Did you use remote or onsite observing?',
-            $formData['location'],
+            (string) $formData['location'],
             $colors[1],
             true,
             $subcellPad
@@ -474,7 +490,7 @@ class FeedbackView extends BaseView
         $rating = $this->compBuilder->buildLabeledRatingTable(
             'experience',
             'Please rate your overall experience with the telescope and instrument(s) during this run:',
-            $formData['experience'],
+            (string) $formData['experience'],
             $colors[0],
             false,
             true,
@@ -567,7 +583,7 @@ class FeedbackView extends BaseView
         $rateSupport = $this->compBuilder->buildLabeledRatingTable(
             'scientificstaff',
             'Support Staff',
-            $formData['scientificstaff'],
+            (string) $formData['scientificstaff'],
             $colors[0],
             true,
             false,
@@ -576,7 +592,7 @@ class FeedbackView extends BaseView
         $rateOperator = $this->compBuilder->buildLabeledRatingTable(
             'operators',
             'Telescope Operators',
-            $formData['operators'],
+            (string) $formData['operators'],
             $colors[1],
             true,
             false,
@@ -585,7 +601,7 @@ class FeedbackView extends BaseView
         $rateDaycrew = $this->compBuilder->buildLabeledRatingTable(
             'daycrew',
             'Daycrew',
-            $formData['daycrew'],
+            (string) $formData['daycrew'],
             $colors[0],
             true,
             false,
