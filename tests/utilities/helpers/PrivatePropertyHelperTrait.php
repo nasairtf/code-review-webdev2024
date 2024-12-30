@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\utilities;
+namespace Tests\utilities\helpers;
 
 /**
  * Trait for accessing private/protected properties in unit tests.
@@ -10,7 +10,7 @@ namespace Tests\utilities;
  * NOTE: This trait is intended exclusively for use in test classes and
  * should never be used in production code.
  */
-trait PrivatePropertyTrait
+trait PrivatePropertyHelperTrait
 {
     /**
      * Accesses a private or protected property of an object for testing purposes.
@@ -43,20 +43,5 @@ trait PrivatePropertyTrait
         $prop = $reflection->getProperty($property);
         $prop->setAccessible(true);
         $prop->setValue($object, $value);
-    }
-
-    /**
-     * Helper method to assert a mocked dependency is correctly set as a private property.
-     *
-     * @param mixed  $expected  The expected mock object.
-     * @param string $property  The private property name to check.
-     * @param object $instance  The instance containing the private property.
-     *
-     * @return void
-     */
-    public function assertDependency($expected, string $property, $instance): void
-    {
-        $actual = $this->getPrivateProperty($instance, $property);
-        $this->assertSame($expected, $actual, "Failed asserting that '{$property}' is correctly set.");
     }
 }
