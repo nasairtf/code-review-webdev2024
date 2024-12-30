@@ -36,7 +36,7 @@ use App\controllers\feedback\FeedbackController as Controller;
  */
 
 // Enable debug mode for the entire page
-$debugMode = false;
+$debugMode = true;
 $debugLevel = $debugMode ? 1 : 0;
 $debug = new CustomDebug('default', $debugMode ?? false, $debugLevel); // entry point
 
@@ -48,7 +48,7 @@ $debug->log("Feedback: Entry point debug|log mode is ON.");
 
 // Start the session for the feedback form
 if (session_status() === PHP_SESSION_NONE) {
-    $debug->log("Feedback: Starting the session.");
+    $debug->debug("Feedback: Starting the session.");
     session_start();
 }
 // Output the SESSION values
