@@ -19,7 +19,7 @@ $debug = new Debug('default', $debugMode, $debugLevel);
 $formatHtml = $debugMode;
 
 // Log the start of logout module operation
-$debug->log("Logout: Entry point debug|log mode is ON.");
+$debug->debug("Logout: Entry point debug|log mode is ON.");
 
 // Output the SESSION values
 $debug->debugVariable($_SESSION, "_SESSION");
@@ -33,9 +33,9 @@ if (session_status() === PHP_SESSION_NONE) {
 $debug->debugVariable($_SESSION, "_SESSION before unset");
 
 // Clear and destroy the session if it is active
-$debug->log("Logout: Unset and destroy session.");
+$debug->debug("Logout: Unset and destroy session.");
 session_unset();
 session_destroy();
 
 // Log session status after clearing for confirmation
-$debug->log("Logout: Session successfully cleared.");
+$debug->debug("Logout: Session successfully cleared.");
