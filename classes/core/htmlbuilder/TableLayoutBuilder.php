@@ -1416,10 +1416,10 @@ class TableLayoutBuilder
         $rowAttributes = ['bgcolor' => $bgColor];
         $programNumber = HtmlBuildUtility::escape((string) $proposal, false);
         $investigator = HtmlBuildUtility::escape('(' . $program['n'] . ')', false);
-        $hiddenProgram = $this->htmlBuilder->getHiddenInput('a', $program['a'], [], 0, false);
-        $hiddenObsAppId = $this->htmlBuilder->getHiddenInput('i', $program['i'], [], 0, false);
-        $hiddenPIName = $this->htmlBuilder->getHiddenInput('n', $program['n'], [], 0, false);
-        $hiddenSemester = $this->htmlBuilder->getHiddenInput('s', $program['s'], [], 0, false);
+        $hiddenProgram = $this->htmlBuilder->getHiddenInput('a', (string) $program['a'], [], 0, false);
+        $hiddenObsAppId = $this->htmlBuilder->getHiddenInput('i', (string) $program['i'], [], 0, false);
+        $hiddenPIName = $this->htmlBuilder->getHiddenInput('n', (string) $program['n'], [], 0, false);
+        $hiddenSemester = $this->htmlBuilder->getHiddenInput('s', (string) $program['s'], [], 0, false);
         $output = $programNumber . ' ' . $investigator;
         $cells = [
             $this->htmlBuilder->getTableCell('&nbsp;', false, true, [], $tableCellPad, true),

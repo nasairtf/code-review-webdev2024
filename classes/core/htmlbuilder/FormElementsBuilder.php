@@ -524,9 +524,9 @@ class FormElementsBuilder
         $currentYear = date('Y');
         $startYear = $startYear ?? $currentYear - 5;
         $endYear = $endYear ?? 0;
-        $selectedYear = $options['year'] ?? date('Y');
-        $selectedMonth = $options['month'] ?? date('n');
-        $selectedDay = $options['day'] ?? date('j');
+        $selectedYear = (string) ($options['year'] ?? date('Y'));
+        $selectedMonth = (string) ($options['month'] ?? date('n'));
+        $selectedDay = (string) ($options['day'] ?? date('j'));
 
         $yearPulldown = $this->htmlBuilder->getYearsPulldown(
             $names['year'],
