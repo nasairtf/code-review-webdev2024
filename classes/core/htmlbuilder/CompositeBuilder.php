@@ -116,6 +116,115 @@ class CompositeBuilder
     }
 
     /**
+     * Builds a horizontal line break section for the form.
+     *
+     * This method returns a formatted HTML line element, which serves as a visual
+     * separator within the form.
+     *
+     * @return string The HTML for the section break, formatted as a horizontal line.
+     */
+    public function buildFormSectionBreak(
+        int $pad = 0
+    ): string {
+        return $this->elemBuilder->buildFormSectionBreak($pad);
+    }
+
+    /**
+     * Generates a section containing form buttons.
+     *
+     * This method creates a table to render form buttons (e.g., submit, reset) in a
+     * single centered row. It supports customizable attributes for the table and row,
+     * as well as padding for formatting.
+     *
+     * @param array $buttons   An array of HTML strings representing the buttons.
+     *                         Each button should be generated using a helper method,
+     *                         such as `getSubmitButton` or `getResetButton`.
+     * @param array $rowAttr   Optional attributes for the table row.
+     * @param array $tableAttr Optional attributes for the table element.
+     *                         Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param int   $pad       Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The HTML for the buttons section.
+     */
+    public function buildButtonsFormSection(
+        array $buttons,
+        array $rowAttr = [],
+        array $tableAttr = ['border' => '0', 'cellspacing' => '4'],
+        int $pad = 0
+    ): string {
+        return $this->elemBuilder->buildButtonsFormSection(
+            $buttons,
+            $rowAttr,
+            $tableAttr,
+            $pad
+        );
+    }
+
+    /**
+     * Builds a preamble section for a form or page.
+     *
+     * This method generates a section containing the provided preamble HTML, wrapped in
+     * a table for layout. Attributes for the table and row can be customized, along
+     * with padding for formatting.
+     *
+     * @param string $preambleHtml HTML content for the preamble (e.g., instructions or guidance text).
+     * @param array  $rowAttr      Optional attributes for the table row.
+     * @param array  $tableAttr    Optional attributes for the table element.
+     *                             Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param int    $pad          Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The complete HTML for the preamble section.
+     */
+    public function buildPreambleFormSection(
+        string $preambleHtml,
+        array $rowAttr = [],
+        array $tableAttr = ['border' => '0', 'cellspacing' => '4'],
+        int $pad = 0
+    ): string {
+        return $this->elemBuilder->buildPreambleFormSection(
+            $preambleHtml,
+            $rowAttr,
+            $tableAttr,
+            $pad
+        );
+    }
+
+    /**
+     * Builds the input fields section for a form.
+     *
+     * This method generates a table containing input fields with their corresponding labels.
+     * The fields are dynamically created based on the provided configuration array.
+     *
+     * Each row configuration should include:
+     * - 'label' (string): The label text for the input field.
+     * - 'name' (string): The name attribute for the input field.
+     * - 'value' (mixed): The default value for the input field (optional, defaults to an empty string).
+     * - 'type' (string): The input type (e.g., 'text', 'password') (optional, defaults to 'text').
+     * - 'attr' (array): Additional attributes for the input field (optional).
+     *
+     * @param array $fieldConfigs An array of field configurations for the rows.
+     * @param array $rowAttr      Optional attributes for the table row.
+     * @param array $tableAttr    Optional attributes for the table element.
+     *                            Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param int   $pad          Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The HTML for the input fields section.
+     */
+    public function buildInputFieldsFormSection(
+        array $fieldConfigs,
+        array $rowAttr = [],
+        array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+        int $pad = 0
+    ): string {
+        return $this->elemBuilder->buildInputFieldsFormSection(
+            $fieldConfigs,
+            $rowAttr,
+            $tableAttr,
+            $pad
+        );
+    }
+
+    /**
      * Generates a set of semester chooser action buttons using FormElementsBuilder.
      *
      * @param string $button  The action label for the submit button.
