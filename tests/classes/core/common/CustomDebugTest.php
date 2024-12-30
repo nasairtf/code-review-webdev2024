@@ -6,8 +6,8 @@ namespace Tests\classes\core\common;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\ConfigMockTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\mocks\MockConfigTrait;
 use App\core\common\CustomDebug;
 use App\exceptions\DatabaseException;
 use App\exceptions\EmailException;
@@ -25,7 +25,7 @@ use App\exceptions\ValidationException;
 class CustomDebugTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use ConfigMockTrait;
+    use MockConfigTrait;
 
     /**
      * Validates that the failValidation method logs a message and throws a ValidationException.

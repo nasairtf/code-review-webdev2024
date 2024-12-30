@@ -6,10 +6,10 @@ namespace Tests\classes\services\database\troublelog\write;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\CustomDebugMockTrait;
-use Tests\utilities\DBConnectionMockTrait;
-use Tests\utilities\DatabaseServiceMockTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\mocks\MockDebugTrait;
+use Tests\utilities\mocks\MockDBConnectionTrait;
+use Tests\utilities\mocks\MockDatabaseServiceExecuteUpdateQueryTrait;
 use Tests\classes\services\database\troublelog\write\TestScheduleObsService;
 use App\services\database\troublelog\write\ScheduleObsService;
 use App\exceptions\DatabaseException;
@@ -33,9 +33,9 @@ use App\exceptions\DatabaseException;
 class ScheduleObsServiceWriteTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use CustomDebugMockTrait;
-    use DBConnectionMockTrait;
-    use DatabaseServiceMockTrait;
+    use MockDebugTrait;
+    use MockDBConnectionTrait;
+    use MockDatabaseServiceExecuteUpdateQueryTrait;
 
     /**
      * Mock instance of DBConnection.
@@ -157,6 +157,7 @@ class ScheduleObsServiceWriteTest extends TestCase
      */
     protected function setUp(): void
     {
+        // Ensure parent setup runs if necessary
         parent::setUp();
 
         $this->debugMock = $this->createCustomDebugMock();

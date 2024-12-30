@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\classes\core\common;
 
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
 use App\core\common\Config;
 
 /**

@@ -6,8 +6,8 @@ namespace Tests\classes\services\files;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\PrivatePropertyTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\helpers\PrivatePropertyHelperTrait;
 use App\services\files\FileParser;
 
 /**
@@ -22,7 +22,7 @@ use App\services\files\FileParser;
 class FileParserTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use PrivatePropertyTrait;
+    use PrivatePropertyHelperTrait;
 
     /**
      * Tests the constructor and default configuration of the FileParser class.

@@ -6,8 +6,8 @@ namespace Tests\classes\core\common;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\ConfigMockTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\mocks\MockConfigTrait;
 use App\core\common\Debug;
 
 /**
@@ -22,7 +22,7 @@ use App\core\common\Debug;
 class DebugTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use ConfigMockTrait;
+    use MockConfigTrait;
 
     /**
      * Test that the Debug constructor initializes properties correctly.

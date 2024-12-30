@@ -6,9 +6,9 @@ namespace Tests\classes\services\database;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\CustomDebugMockTrait;
-use Tests\utilities\DBConnectionMockTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\mocks\MockDebugTrait;
+use Tests\utilities\mocks\MockDBConnectionTrait;
 use App\services\database\DbQueryUtility;
 use App\exceptions\DatabaseException;
 
@@ -47,8 +47,8 @@ use App\exceptions\DatabaseException;
 class DbQueryUtilityTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use CustomDebugMockTrait;
-    use DBConnectionMockTrait;
+    use MockDebugTrait;
+    use MockDBConnectionTrait;
 
     /**
      * TEST METHOD 1: executeSelectQueryWithDebug

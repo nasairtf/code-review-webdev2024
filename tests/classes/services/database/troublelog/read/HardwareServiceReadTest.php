@@ -6,10 +6,10 @@ namespace Tests\classes\services\database\troublelog\read;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\CustomDebugMockTrait;
-use Tests\utilities\DBConnectionMockTrait;
-use Tests\utilities\DatabaseServiceMockTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\mocks\MockDebugTrait;
+use Tests\utilities\mocks\MockDBConnectionTrait;
+use Tests\utilities\mocks\MockDatabaseServiceFetchDataWithQueryTrait;
 use Tests\classes\services\database\troublelog\read\TestHardwareService;
 use App\services\database\troublelog\read\HardwareService;
 use App\exceptions\DatabaseException;
@@ -58,9 +58,9 @@ use App\exceptions\DatabaseException;
 class HardwareServiceReadTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use CustomDebugMockTrait;
-    use DBConnectionMockTrait;
-    use DatabaseServiceMockTrait;
+    use MockDebugTrait;
+    use MockDBConnectionTrait;
+    use MockDatabaseServiceFetchDataWithQueryTrait;
 
     /**
      * Mock instance of DBConnection.

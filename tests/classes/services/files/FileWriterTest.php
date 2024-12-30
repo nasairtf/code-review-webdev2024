@@ -6,8 +6,8 @@ namespace Tests\classes\services\files;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\PrivatePropertyTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\helpers\PrivatePropertyHelperTrait;
 use App\services\files\FileWriter;
 
 /**
@@ -23,7 +23,7 @@ use App\services\files\FileWriter;
 class FileWriterTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use PrivatePropertyTrait;
+    use PrivatePropertyHelperTrait;
 
     /**
      * @var FileWriter Instance of FileWriter for testing.

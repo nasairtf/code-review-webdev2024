@@ -6,10 +6,10 @@ namespace Tests\classes\services\database;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\CustomDebugMockTrait;
-use Tests\utilities\DBConnectionMockTrait;
-use Tests\utilities\PrivatePropertyTrait;
+use Tests\utilities\assertions\AssertPrivateDependenciesTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\mocks\MockDebugTrait;
+use Tests\utilities\mocks\MockDBConnectionTrait;
 use Tests\classes\services\database\TestDatabaseService;
 use App\services\database\DatabaseService;
 use App\exceptions\DatabaseException;
@@ -55,9 +55,9 @@ use App\exceptions\DatabaseException;
 class DatabaseServiceTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use PrivatePropertyTrait;
-    use CustomDebugMockTrait;
-    use DBConnectionMockTrait;
+    use AssertPrivateDependenciesTrait;
+    use MockDebugTrait;
+    use MockDBConnectionTrait;
 
     /**
      * Mock instance of CustomDebug.
@@ -102,8 +102,8 @@ class DatabaseServiceTest extends TestCase
 
         // Assert
         $this->assertInstanceOf(TestDatabaseService::class, $service);
-        $this->assertDependency($dbMock, 'db', $service);
-        $this->assertDependency($debugMock, 'debug', $service);
+        $this->assertPrivateDependency($dbMock, 'db', $service);
+        $this->assertPrivateDependency($debugMock, 'debug', $service);
     }
 
     /**
@@ -291,22 +291,18 @@ class DatabaseServiceTest extends TestCase
             ->with($sql, $params, $types, MYSQLI_ASSOC)
             ->andReturn([]);
 
-        // Mock CustomDebug behavior
-        $errorMsg = 'No data found';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-
-        $errorMsg = 'Empty result error: No data found';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
+        // Mock CustomDebug failDatabase() calls and exception throws
+        $failures = [
+            [
+                'message' => 'No data found',
+                'method'  => 'failDatabase',
+            ],
+            [
+                'message' => 'Empty result error: No data found',
+                'method'  => 'failDatabase',
+            ],
+        ];
+        $this->mockMultipleFails($this->debugMock, $failures);
 
         // Expect exception
         $this->expectException(DatabaseException::class);
@@ -365,14 +361,14 @@ class DatabaseServiceTest extends TestCase
         $this->dbMock->shouldReceive('executeQuery')
             ->andThrow(new DatabaseException('Query failed'));
 
-        // Mock CustomDebug behavior
-        $errorMsg = 'Error executing SELECT query: Query failed';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
+        // Mock CustomDebug failDatabase() calls and exception throws
+        $failures = [
+            [
+                'message' => 'Error executing SELECT query: Query failed',
+                'method'  => 'failDatabase',
+            ],
+        ];
+        $this->mockMultipleFails($this->debugMock, $failures);
 
         // Expect exception
         $this->expectException(DatabaseException::class);
@@ -414,21 +410,18 @@ class DatabaseServiceTest extends TestCase
      */
     public function testEnsureNotEmptyThrowsExceptionOnEmptyResults(): void
     {
-        // Mock CustomDebug behavior
-        $errorMsg = 'No data found';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        $errorMsg = 'Empty result error: No data found';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
+        // Mock CustomDebug failDatabase() calls and exception throws
+        $failures = [
+            [
+                'message' => 'No data found',
+                'method'  => 'failDatabase',
+            ],
+            [
+                'message' => 'Empty result error: No data found',
+                'method'  => 'failDatabase',
+            ],
+        ];
+        $this->mockMultipleFails($this->debugMock, $failures);
 
         // Expect exception
         $this->expectException(DatabaseException::class);
@@ -487,21 +480,19 @@ class DatabaseServiceTest extends TestCase
             ->with($sql, $params, $types)
             ->andReturn(0);
 
-        // Mock CustomDebug behavior
+        // Mock CustomDebug failDatabase() calls and exception throws
         $errorMsg = 'No rows were affected No rows were affected.';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        $errorMsg = "Unexpected row-count error: {$errorMsg}";
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
+        $failures = [
+            [
+                'message' => $errorMsg,
+                'method'  => 'failDatabase',
+            ],
+            [
+                'message' => 'Unexpected row-count error: ' . $errorMsg,
+                'method'  => 'failDatabase',
+            ],
+        ];
+        $this->mockMultipleFails($this->debugMock, $failures);
 
         // Expect exception
         $this->expectException(DatabaseException::class);
@@ -559,14 +550,14 @@ class DatabaseServiceTest extends TestCase
         $this->dbMock->shouldReceive('executeQuery')
             ->andThrow(new DatabaseException('Query failed'));
 
-        // Mock CustomDebug behavior
-        $errorMsg = 'Error executing INSERT/UPDATE/DELETE query: Query failed';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
+        // Mock CustomDebug failDatabase() calls and exception throws
+        $failures = [
+            [
+                'message' => 'Error executing INSERT/UPDATE/DELETE query: Query failed',
+                'method'  => 'failDatabase',
+            ],
+        ];
+        $this->mockMultipleFails($this->debugMock, $failures);
 
         // Expect exception
         $this->expectException(DatabaseException::class);
@@ -605,21 +596,19 @@ class DatabaseServiceTest extends TestCase
      */
     public function testEnsureValidRowCountThrowsExceptionOnZeroRowCount(): void
     {
-        // Mock CustomDebug behavior
+        // Mock CustomDebug failDatabase() calls and exception throws
         $errorMsg = 'Unexpected row count No rows were affected.';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        $errorMsg = "Unexpected row-count error: {$errorMsg}";
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
+        $failures = [
+            [
+                'message' => $errorMsg,
+                'method'  => 'failDatabase',
+            ],
+            [
+                'message' => 'Unexpected row-count error: ' . $errorMsg,
+                'method'  => 'failDatabase',
+            ],
+        ];
+        $this->mockMultipleFails($this->debugMock, $failures);
 
         // Expect exception
         $this->expectException(DatabaseException::class);
@@ -638,21 +627,19 @@ class DatabaseServiceTest extends TestCase
      */
     public function testEnsureValidRowCountThrowsExceptionOnUnexpectedRowCount(): void
     {
-        // Mock CustomDebug behavior
+        // Mock CustomDebug failDatabase() calls and exception throws
         $errorMsg = 'Unexpected row count Unexpected number of affected rows.';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        $errorMsg = "Unexpected row-count error: {$errorMsg}";
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
+        $failures = [
+            [
+                'message' => $errorMsg,
+                'method'  => 'failDatabase',
+            ],
+            [
+                'message' => 'Unexpected row-count error: ' . $errorMsg,
+                'method'  => 'failDatabase',
+            ],
+        ];
+        $this->mockMultipleFails($this->debugMock, $failures);
 
         // Expect exception
         $this->expectException(DatabaseException::class);

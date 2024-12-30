@@ -6,11 +6,12 @@ namespace Tests\classes\services\database\feedback;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\CustomDebugMockTrait;
-use Tests\utilities\DBConnectionMockTrait;
-use Tests\utilities\PrivatePropertyTrait;
-use Tests\utilities\MockBehaviorTrait;
+use Tests\utilities\assertions\ArrangeBehaviorTrait;
+use Tests\utilities\assertions\AssertPrivateDependenciesTrait;
+//use Tests\utilities\helpers\PrivatePropertyHelperTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\mocks\MockDBConnectionTrait;
+use Tests\utilities\mocks\MockDebugTrait;
 use App\services\database\feedback\FeedbackService;
 use App\services\database\DatabaseService;
 use App\exceptions\DatabaseException;
@@ -41,10 +42,11 @@ use App\exceptions\DatabaseException;
 class FeedbackServiceTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use PrivatePropertyTrait;
-    use CustomDebugMockTrait;
-    use DBConnectionMockTrait;
-    use MockBehaviorTrait;
+    //use PrivatePropertyHelperTrait;
+    use MockDebugTrait;
+    use MockDBConnectionTrait;
+    use ArrangeBehaviorTrait;
+    use AssertPrivateDependenciesTrait;
 
     /**
      * Mock instance of DBConnection.
@@ -129,12 +131,12 @@ class FeedbackServiceTest extends TestCase
         // Assert
         $this->assertInstanceOf(DatabaseService::class, $service);
         $this->assertInstanceOf(FeedbackService::class, $service);
-        $this->assertDependency($this->feedbackWriteMock, 'feedbackWrite', $service);
-        $this->assertDependency($this->instrumentWriteMock, 'instrumentWrite', $service);
-        $this->assertDependency($this->operatorWriteMock, 'operatorWrite', $service);
-        $this->assertDependency($this->supportWriteMock, 'supportWrite', $service);
-        $this->assertDependency($this->dbMock, 'db', $service);
-        $this->assertDependency($this->debugMock, 'debug', $service);
+        $this->assertPrivateDependency($this->feedbackWriteMock, 'feedbackWrite', $service);
+        $this->assertPrivateDependency($this->instrumentWriteMock, 'instrumentWrite', $service);
+        $this->assertPrivateDependency($this->operatorWriteMock, 'operatorWrite', $service);
+        $this->assertPrivateDependency($this->supportWriteMock, 'supportWrite', $service);
+        $this->assertPrivateDependency($this->dbMock, 'db', $service);
+        $this->assertPrivateDependency($this->debugMock, 'debug', $service);
     }
 
     /**
@@ -906,20 +908,19 @@ class FeedbackServiceTest extends TestCase
      */
     private function arrangeFailureExpectations(string $error): void
     {
-        // Mock the CustomDebug method(s) and expected return(s)
-        $transactionError = "Transaction failed: {$error}";
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $error,
-            new DatabaseException($error)
-        );
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $transactionError,
-            new DatabaseException($transactionError)
-        );
+        // Mock CustomDebug failDatabase() calls and exception throws
+        $transactionError = "Transaction failed: " . $error;
+        $failures = [
+            [
+                'message' => $error,
+                'method'  => 'failDatabase',
+            ],
+            [
+                'message' => $transactionError,
+                'method'  => 'failDatabase',
+            ],
+        ];
+        $this->mockMultipleFails($this->debugMock, $failures);
 
         // Expect exception
         $this->expectException(DatabaseException::class);
