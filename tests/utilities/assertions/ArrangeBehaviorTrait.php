@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\utilities;
+namespace Tests\utilities\assertions;
 
 use Mockery;
 
@@ -25,11 +25,11 @@ use Mockery;
  *
  * Example usage:
  * ```
- * use Tests\utilities\MockBehaviorTrait;
+ * use Tests\utilities\assertions\ArrangeBehaviorTrait;
  *
  * class MyTest extends TestCase
  * {
- *     use MockBehaviorTrait;
+ *     use ArrangeBehaviorTrait;
  *
  *     public function testSomething()
  *     {
@@ -58,7 +58,7 @@ use Mockery;
  * **Important**: This trait is intended exclusively for use in test classes and
  * should never be used in production code.
  */
-trait MockBehaviorTrait
+trait ArrangeBehaviorTrait
 {
     /**
      * Configures the behavior of mocked objects based on the provided expectations array.
