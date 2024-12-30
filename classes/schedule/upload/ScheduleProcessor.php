@@ -39,7 +39,7 @@ class ScheduleProcessor
 
         // Initialise the additional classes needed by this processor
         $this->model = $model ?? new Model($this->debug);
-        $this->writer = $writer ?? new Writer('schedulesql', null, $this->debug->isDebugMode());
+        $this->writer = $writer ?? new Writer('infilesql', null, $this->debug->isDebugMode());
         $this->debug->log("{$debugHeading} -- Model, Writer classes successfully initialised.");
 
         // Class initialisation complete
@@ -232,9 +232,9 @@ IGNORE 1 LINES
             $this->buildOperatorSQL($row, $operators, $operatorSQL, $filemode);
         }
         // sort some of the data
-        sort( $operatorSQL );
-        ksort( $tacProgramSQL );
-        ksort( $engProgramSQL );
+        sort($operatorSQL);
+        ksort($tacProgramSQL);
+        ksort($engProgramSQL);
 
         return [
             'tacprogram' => $tacProgramSQL,
@@ -298,7 +298,9 @@ IGNORE 1 LINES
                 $comments
             ]
             : sprintf(
-                "INSERT INTO `ScheduleObs` SET logID=%d, startTime=%d, semesterID='%s', endTime=%d, remoteObs=%d, daytimeObs=%d, firstTime=%d, facilityOpen=%d, facilityClose=%d, instrumentChange=%d, facilityShutdown=%d, supportAstronomerID='%s', programID=%d%s;",
+                "INSERT INTO `ScheduleObs` SET logID=%d, startTime=%d, semesterID='%s', endTime=%d, remoteObs=%d, "
+                    . "daytimeObs=%d, firstTime=%d, facilityOpen=%d, facilityClose=%d, instrumentChange=%d, "
+                    . "facilityShutdown=%d, supportAstronomerID='%s', programID=%d%s;",
                 $logID,
                 $startTime,
                 $semesterID,
@@ -381,7 +383,8 @@ IGNORE 1 LINES
                     $rank
                 ]
                 : sprintf(
-                    "INSERT INTO `DailyInstrument` SET logID=%d, startTime=%d, semesterID='%s', programID=%d, hardwareID='%s', rank=%d;",
+                    "INSERT INTO `DailyInstrument` SET logID=%d, startTime=%d, semesterID='%s', programID=%d, "
+                        . "hardwareID='%s', rank=%d;",
                     $logID,
                     $startTime,
                     $semesterID,
@@ -453,7 +456,8 @@ IGNORE 1 LINES
                     $overlap
                 ]
                 : sprintf(
-                    "INSERT INTO `DailyOperator` SET logID=%d, startTime=%d, semesterID='%s', programID=%d, operatorID='%s', arrive=%d, depart=%d, overlap=%d;",
+                    "INSERT INTO `DailyOperator` SET logID=%d, startTime=%d, semesterID='%s', programID=%d, "
+                        . "operatorID='%s', arrive=%d, depart=%d, overlap=%d;",
                     $logID,
                     $startTime,
                     $semesterID,
@@ -520,7 +524,8 @@ IGNORE 1 LINES
                 $formattedPIEmail
             ]
             : sprintf(
-                "INSERT INTO `Program` SET programID=%d, semesterID='%s', projectPI='%s', projectMembers=%s, otherInfo=%s, PIName=%s, PIEmail=%s;",
+                "INSERT INTO `Program` SET programID=%d, semesterID='%s', projectPI='%s', projectMembers=%s, "
+                    . "otherInfo=%s, PIName=%s, PIEmail=%s;",
                 $programID,
                 $semesterID,
                 $projectPI,
@@ -541,7 +546,8 @@ IGNORE 1 LINES
                     $projectPI
                 ]
                 : sprintf(
-                    "INSERT INTO `EngProgram` SET programID=%d, semesterID='%s', projectPI='%s' ON DUPLICATE KEY UPDATE projectPI='%s';",
+                    "INSERT INTO `EngProgram` SET programID=%d, semesterID='%s', projectPI='%s' "
+                        . "ON DUPLICATE KEY UPDATE projectPI='%s';",
                     $programID,
                     $semesterID,
                     $projectPI,
@@ -592,7 +598,8 @@ IGNORE 1 LINES
         }
     }
 
-    private function prepareHeaders(): array {
+    private function prepareHeaders(): array
+    {
         // Debug output
         $debugHeading = $this->debug->debugHeading("Processor", "prepareHeaders");
         $this->debug->debug($debugHeading);
@@ -705,7 +712,14 @@ IGNORE 1 LINES
         $parsedRows = [];
         foreach ($rows as $key => $row) {
             // Parse the row
-            $parsedRow = $this->parseRow($row, $prep['headmap'], $prep['programs'], $prep['semester'], $prep['logID'], $prep['comments']);
+            $parsedRow = $this->parseRow(
+                $row,
+                $prep['headmap'],
+                $prep['programs'],
+                $prep['semester'],
+                $prep['logID'],
+                $prep['comments']
+            );
             $this->debug->debugVariable($parsedRow, "{$debugHeading} -- parsedRow[{$key}]");
             $parsedRows[] = $parsedRow;
         }
@@ -733,8 +747,14 @@ IGNORE 1 LINES
         $programID = $this->extractProgramID($row[$headerMap['Program']['csv']]);
         $projectPI = ScheduleUtility::escape($row[$headerMap['PI']['csv']]);
         $instrumentID = explode('/', $row[$headerMap['Instrument']['csv']]);
-        $startTime = $this->calculateUnixTime($row[$headerMap['Start Date']['csv']], $row[$headerMap['Start Time']['csv']]);
-        $endTime = $this->calculateUnixTime($row[$headerMap['Finish Date']['csv']], $row[$headerMap['Finish Time']['csv']]);
+        $startTime = $this->calculateUnixTime(
+            $row[$headerMap['Start Date']['csv']],
+            $row[$headerMap['Start Time']['csv']]
+        );
+        $endTime = $this->calculateUnixTime(
+            $row[$headerMap['Finish Date']['csv']],
+            $row[$headerMap['Finish Time']['csv']]
+        );
         $daytimeObs = $this->parseBoolean($row[$headerMap['DayTime']['csv']]);
         $remoteObs = $this->parseBoolean($row[$headerMap['Remote']['csv']]);
         $facilityOpen = $this->parseBoolean($row[$headerMap['Facility Open']['csv']]);
@@ -826,7 +846,7 @@ IGNORE 1 LINES
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($startTime, "{$debugHeading} -- startTime");
         // Calculate the value for logID
-        $cutoffTime = mktime( 6, 0, 0, date('n', $startTime), date('j', $startTime), date('Y', $startTime));
+        $cutoffTime = mktime(6, 0, 0, date('n', $startTime), date('j', $startTime), date('Y', $startTime));
         // if the start is < the cutoff time, the logID is the previous day's date
         // if the start is > the cutoff time, the logID is the current day's date
         return $startTime <= $cutoffTime
@@ -879,8 +899,8 @@ IGNORE 1 LINES
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($program, "{$debugHeading} -- program");
         // Fetch program information from database
-        $year = (int) substr($program,0,4);
-        $semester = substr($program,4,1);
+        $year = (int) substr($program, 0, 4);
+        $semester = substr($program, 4, 1);
         return $this->model->fetchProgramList($year, $semester);
     }
 
