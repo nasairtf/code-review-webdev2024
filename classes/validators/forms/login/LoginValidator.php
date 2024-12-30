@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\validators\forms\login;
 
-use App\core\common\Debug;
+use App\core\common\CustomDebug;
 
 /**
  * Validator for login form input.
@@ -34,9 +34,9 @@ class LoginValidator
      * @param Debug|null $debug Optional debugging utility instance.
      */
     public function __construct(
-        ?Debug $debug = null
+        ?CustomDebug $debug = null
     ) {
-        $this->debug = $debug ?? new Debug('login', false, 0);
+        $this->debug = $debug ?? new CustomDebug('login', false, 0);
     }
 
     /**
