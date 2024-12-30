@@ -137,9 +137,9 @@ class FeedbackModel
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($program, "program");
         // Return the data
-        $year = substr($program, 0, 4);
+        $year = (int) substr($program, 0, 4);
         $sem = substr($program, 4, 1);
-        $num = ltrim(substr($program, -3), '0');
+        $num = (int) ltrim(substr($program, -3), '0');
         if ($num >= 900) {
             // Engineering programs
             $data = $this->engProgRead->fetchProposalEngProgramData($year . $sem, $num);
@@ -248,9 +248,9 @@ class FeedbackModel
         $debugHeading = $this->debug->debugHeading("Model", "initializeDefaultFormData");
         $this->debug->debug($debugHeading);
         // Calcualte necessary fields
-        $year = date('Y');
-        $month = date('m');
-        $day = date('j');
+        $year = (int) date('Y');
+        $month = (int) date('m');
+        $day = (int) date('j');
         $date = IrtfUtilities::returnUnixDate($month, $day, $year);
         $semester = IrtfUtilities::returnSemester($month, $day, $year);
         $program = $this->returnProgramFromLogin();
