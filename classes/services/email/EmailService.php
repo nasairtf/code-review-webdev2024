@@ -7,7 +7,8 @@ namespace App\services\email;
 use Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
-use App\core\common\Debug;
+use App\core\common\Config;
+use App\core\common\CustomDebug;
 
 /**
  * EmailService class that provides core functionality for all email services.
@@ -45,23 +46,23 @@ class EmailService
         ?PHPMailer $mailer = null
     ) {
         // Debug output
-        $this->debug = new Debug('email', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
+        $this->debug = new CustomDebug('email', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
         $debugHeading = $this->debug->debugHeading("Service", "__construct");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($smtpName, "{$debugHeading} -- smtpName");
 
         // Fetch the SMTP config from Config
         $config = Config::get('smtp_config', $smtpName);
-        $this->debug->log("{$debugHeading} -- Config successfully fetched.");
+        $this->debug->debug("{$debugHeading} -- Config successfully fetched.");
 
         // Establish the SMTP setup
         $this->mailer = $mailer ?? new PHPMailer(true); // Enable exceptions for error handling
         $this->applyMailerDebug();                      // Set PHPMailer debug levels
         $this->applySmtpSettings($config);              // Apply the chosen SMTP configuration
-        $this->debug->log("{$debugHeading} -- PHPMailer class successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- PHPMailer class successfully initialised.");
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- EmailService initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- EmailService initialisation complete.");
     }
 
     /**
@@ -258,7 +259,7 @@ class EmailService
     {
         try {
             $success = $this->mailer->send();
-            $this->debug->log('Email sent successfully.');
+            $this->debug->debug('Email sent successfully.');
             return $success;
         } catch (PHPMailerException $e) {
             $this->debug->log("Error sending email: {$e->getMessage()}", 'red');
