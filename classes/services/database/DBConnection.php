@@ -123,9 +123,9 @@ class DBConnection
      *
      * @return DBConnection Database connection instance.
      *
-     * @uses \mysqli
      * @uses \App\core\common\Config
      * @uses \App\core\common\CustomDebug
+     * @uses \App\services\database\MySQLiWrapper
      */
     public static function getInstance(
         string $dbName,
