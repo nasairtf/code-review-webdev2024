@@ -6,8 +6,9 @@ namespace Tests\classes\views\forms;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\CustomDebugMockTrait;
-use Tests\utilities\PrivatePropertyTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\mocks\MockDebugTrait;
+use Tests\utilities\assertions\AssertPrivateDependenciesTrait;
 use Tests\classes\views\forms\TestBaseFormView;
 use App\views\forms\BaseFormView;
 use App\exceptions\HtmlBuilderException;
@@ -56,8 +57,9 @@ use App\exceptions\HtmlBuilderException;
  */
 class BaseFormViewTest extends TestCase
 {
-    use CustomDebugMockTrait;
-    use PrivatePropertyTrait;
+    use UnitTestTeardownTrait;
+    use MockDebugTrait;
+    use AssertPrivateDependenciesTrait;
 
     /**
      * Mock instance of CustomDebug.
@@ -130,7 +132,7 @@ class BaseFormViewTest extends TestCase
         );
 
         // Assert
-        $this->assertDependency($this->debugMock, 'debug', $view);
+        $this->assertPrivateDependency($this->debugMock, 'debug', $view);
         $this->assertTrue($this->getPrivateProperty($view, 'formatHtml'), 'HTML formatting should be enabled.');
     }
 
@@ -474,23 +476,9 @@ class BaseFormViewTest extends TestCase
      */
     protected function setUp(): void
     {
+        // Ensure parent setup runs if necessary
         parent::setUp();
 
         $this->debugMock = $this->createCustomDebugMock();
-    }
-
-    /**
-     * Cleans up the test environment after each unit test (method).
-     *
-     * - Verifies Mockery's expectations are met.
-     * - Clears resources and prevents leaks between tests.
-     * - Ensures necessary parent (PHPUnit) teardown logic runs as well.
-     *
-     * @return void
-     */
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
     }
 }
