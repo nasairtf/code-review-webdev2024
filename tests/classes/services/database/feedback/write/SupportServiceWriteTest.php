@@ -6,6 +6,7 @@ namespace Tests\classes\services\database\feedback\write;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\helpers\UnitTestSetupTrait;
 use Tests\utilities\helpers\UnitTestTeardownTrait;
 use Tests\utilities\mocks\MockDebugTrait;
 use Tests\utilities\mocks\MockDBConnectionTrait;
@@ -31,6 +32,7 @@ use App\exceptions\DatabaseException;
  */
 class SupportServiceWriteTest extends TestCase
 {
+    use UnitTestSetupTrait;
     use UnitTestTeardownTrait;
     use MockDebugTrait;
     use MockDBConnectionTrait;
@@ -140,11 +142,10 @@ class SupportServiceWriteTest extends TestCase
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->debugMock = $this->createCustomDebugMock();
-        $this->dbMock = $this->createDBConnectionMock();
-        $this->srvMock = $this->createPartialDatabaseServiceMock(
+        // Ensure the standard test setup is executed
+        $this->setUpForStandardTests();
+        // Build the DatabaseService partial mock
+        $this->setUpForDatabaseServiceTests(
             SupportService::class,
             [false, null, null, null, null, $this->dbMock, $this->debugMock],
             ['modifyDataWithQuery']

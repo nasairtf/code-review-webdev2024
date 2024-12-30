@@ -6,6 +6,7 @@ namespace Tests\classes\services\database\ishell\read;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\helpers\UnitTestSetupTrait;
 use Tests\utilities\helpers\UnitTestTeardownTrait;
 use Tests\utilities\mocks\MockDebugTrait;
 use Tests\utilities\mocks\MockDBConnectionTrait;
@@ -36,6 +37,7 @@ use App\exceptions\DatabaseException;
  */
 class TemperaturesServiceReadTest extends TestCase
 {
+    use UnitTestSetupTrait;
     use UnitTestTeardownTrait;
     use MockDebugTrait;
     use MockDBConnectionTrait;
@@ -408,11 +410,10 @@ class TemperaturesServiceReadTest extends TestCase
      */
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->debugMock = $this->createCustomDebugMock();
-        $this->dbMock = $this->createDBConnectionMock();
-        $this->srvMock = $this->createPartialDatabaseServiceMock(
+        // Ensure the standard test setup is executed
+        $this->setUpForStandardTests();
+        // Build the DatabaseService partial mock
+        $this->setUpForDatabaseServiceTests(
             TemperaturesService::class,
             [false, $this->dbMock, $this->debugMock],
             ['fetchDataWithQuery', 'getSortString']

@@ -6,6 +6,7 @@ namespace Tests\classes\services\database\troublelog;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\helpers\UnitTestSetupTrait;
 use Tests\utilities\helpers\UnitTestTeardownTrait;
 use Tests\utilities\mocks\MockDebugTrait;
 use Tests\utilities\mocks\MockDBConnectionTrait;
@@ -23,6 +24,7 @@ use App\services\database\DatabaseService;
  */
 class TroublelogServiceTest extends TestCase
 {
+    use UnitTestSetupTrait;
     use UnitTestTeardownTrait;
     use MockDebugTrait;
     use MockDBConnectionTrait;
@@ -49,8 +51,7 @@ class TroublelogServiceTest extends TestCase
     public function testTroublelogServiceConstructorInitializesBaseService(): void
     {
         // Arrange
-        $this->debugMock = $this->createCustomDebugMock();
-        $this->dbMock = $this->createDBConnectionMock();
+        $this->setUpForStandardTests();
         $this->mockGetInstance($this->dbMock, 'troublelog');
 
         // Act

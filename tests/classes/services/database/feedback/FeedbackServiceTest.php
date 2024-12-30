@@ -8,7 +8,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 use Tests\utilities\assertions\ArrangeBehaviorTrait;
 use Tests\utilities\assertions\AssertPrivateDependenciesTrait;
-//use Tests\utilities\helpers\PrivatePropertyHelperTrait;
+use Tests\utilities\helpers\UnitTestSetupTrait;
 use Tests\utilities\helpers\UnitTestTeardownTrait;
 use Tests\utilities\mocks\MockDBConnectionTrait;
 use Tests\utilities\mocks\MockDebugTrait;
@@ -41,8 +41,8 @@ use App\exceptions\DatabaseException;
  */
 class FeedbackServiceTest extends TestCase
 {
+    use UnitTestSetupTrait;
     use UnitTestTeardownTrait;
-    //use PrivatePropertyHelperTrait;
     use MockDebugTrait;
     use MockDBConnectionTrait;
     use ArrangeBehaviorTrait;
@@ -826,14 +826,8 @@ class FeedbackServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        // Ensure parent setup runs if necessary
-        parent::setUp();
-
-        // Set up CustomDebug Mock
-        $this->debugMock = $this->createCustomDebugMock();
-
-        // Set up DBConnection Mock
-        $this->dbMock = $this->createDBConnectionMock();
+        // Ensure the standard test setup is executed
+        $this->setUpForStandardTests();
 
         // Mock the DBConnection getInstance method
         $this->mockGetInstance($this->dbMock, 'feedback');

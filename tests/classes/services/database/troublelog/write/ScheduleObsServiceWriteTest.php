@@ -6,6 +6,7 @@ namespace Tests\classes\services\database\troublelog\write;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\helpers\UnitTestSetupTrait;
 use Tests\utilities\helpers\UnitTestTeardownTrait;
 use Tests\utilities\mocks\MockDebugTrait;
 use Tests\utilities\mocks\MockDBConnectionTrait;
@@ -32,6 +33,7 @@ use App\exceptions\DatabaseException;
  */
 class ScheduleObsServiceWriteTest extends TestCase
 {
+    use UnitTestSetupTrait;
     use UnitTestTeardownTrait;
     use MockDebugTrait;
     use MockDBConnectionTrait;
@@ -157,12 +159,10 @@ class ScheduleObsServiceWriteTest extends TestCase
      */
     protected function setUp(): void
     {
-        // Ensure parent setup runs if necessary
-        parent::setUp();
-
-        $this->debugMock = $this->createCustomDebugMock();
-        $this->dbMock = $this->createDBConnectionMock();
-        $this->srvMock = $this->createPartialDatabaseServiceMock(
+        // Ensure the standard test setup is executed
+        $this->setUpForStandardTests();
+        // Build the DatabaseService partial mock
+        $this->setUpForDatabaseServiceTests(
             ScheduleObsService::class,
             [false, $this->dbMock, $this->debugMock],
             ['executeUpdateQuery']

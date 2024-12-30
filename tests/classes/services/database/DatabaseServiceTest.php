@@ -7,6 +7,7 @@ namespace Tests\classes\services\database;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Tests\utilities\assertions\AssertPrivateDependenciesTrait;
+use Tests\utilities\helpers\UnitTestSetupTrait;
 use Tests\utilities\helpers\UnitTestTeardownTrait;
 use Tests\utilities\mocks\MockDebugTrait;
 use Tests\utilities\mocks\MockDBConnectionTrait;
@@ -54,6 +55,7 @@ use App\exceptions\DatabaseException;
  */
 class DatabaseServiceTest extends TestCase
 {
+    use UnitTestSetupTrait;
     use UnitTestTeardownTrait;
     use AssertPrivateDependenciesTrait;
     use MockDebugTrait;
@@ -698,14 +700,8 @@ class DatabaseServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        // Ensure parent setup runs if necessary
-        parent::setUp();
-
-        // Set up CustomDebug Mock
-        $this->debugMock = $this->createCustomDebugMock();
-
-        // Set up DBConnection Mock
-        $this->dbMock = $this->createDBConnectionMock();
+        // Ensure the standard test setup is executed
+        $this->setUpForStandardTests();
 
         // Instantiate TestDatabaseService
         $this->service = new TestDatabaseService(

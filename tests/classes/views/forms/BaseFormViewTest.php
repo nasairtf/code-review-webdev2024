@@ -6,6 +6,7 @@ namespace Tests\classes\views\forms;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Tests\utilities\helpers\UnitTestSetupTrait;
 use Tests\utilities\helpers\UnitTestTeardownTrait;
 use Tests\utilities\mocks\MockDebugTrait;
 use Tests\utilities\assertions\AssertPrivateDependenciesTrait;
@@ -57,6 +58,7 @@ use App\exceptions\HtmlBuilderException;
  */
 class BaseFormViewTest extends TestCase
 {
+    use UnitTestSetupTrait;
     use UnitTestTeardownTrait;
     use MockDebugTrait;
     use AssertPrivateDependenciesTrait;
@@ -476,9 +478,7 @@ class BaseFormViewTest extends TestCase
      */
     protected function setUp(): void
     {
-        // Ensure parent setup runs if necessary
-        parent::setUp();
-
-        $this->debugMock = $this->createCustomDebugMock();
+        // Ensure the standard test setup is executed
+        $this->setUpForStandardTests();
     }
 }
