@@ -306,7 +306,8 @@ trait MockDebugTrait
      * $map = $this->getMethodExceptionMap();
      * ```
      */
-    protected function getMethodExceptionMap(): array {
+    protected function getMethodExceptionMap(): array
+    {
         // Map fail()/failXXX() methods to their corresponding exception classes
         return [
             'fail' => \Exception::class,
