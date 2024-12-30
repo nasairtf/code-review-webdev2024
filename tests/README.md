@@ -6,12 +6,12 @@
     - [`PHPUnit`](https://github.com/sebastianbergmann/phpunit)
     - `Mockery`
     - [tests/utilities](https://github.com/ifauh/webdev2024/tree/main/tests/utilities)
-        - [`ConfigMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/ConfigMockTrait.php)
-        - [`DebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DebugMockTrait.php), [`CustomDebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/CustomDebugMockTrait.php)
-        - [`DBConnectionMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DBConnectionMockTrait.php), [`MySQLiWrapperMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MySQLiWrapperMockTrait.php)
-        - [`DatabaseServiceMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DatabaseServiceMockTrait.php)
-        - [`MockBehaviorTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MockBehaviorTrait.php), [`PrivatePropertyTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/PrivatePropertyTrait.php)
-    - Note: use [`DebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DebugMockTrait.php) or [`CustomDebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/CustomDebugMockTrait.php) depending on the version of the [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) class used in the class under test. [`CustomDebug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/CustomDebug.php) extends [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) with additional exception types and `fail*()` methods.
+        - [`MockConfigTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockConfigTrait.php)
+        - [`MockDebugTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDebugTrait.php), [`MockDebugTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDebugTrait.php)
+        - [`MockDBConnectionTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDBConnectionTrait.php), [`MockMySQLiWrapperTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockMySQLiWrapperTrait.php)
+        - [`MockDatabaseServiceCoreTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceCoreTrait.php), [`MockDatabaseServiceExecuteSelectQueryTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceExecuteSelectQueryTrait.php), [`MockDatabaseServiceExecuteUpdateQueryTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceExecuteUpdateQueryTrait.php), [`MockDatabaseServiceFetchDataWithQueryTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceFetchDataWithQueryTrait.php), [`MockDatabaseServiceModifyDataWithQueryTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceModifyDataWithQueryTrait.php)
+        - [`ArrangeBehaviorTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MockBehaviorTrait.php), [`PrivatePropertyHelperTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/helpers/PrivatePropertyHelperTrait.php)
+    - Note: use [`MockDebugTrait::createDebugMock`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDebugTrait.php) or [`MockDebugTrait::createCustomDebugMock`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDebugTrait.php) depending on the version of the [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) class used in the class under test. [`CustomDebug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/CustomDebug.php) extends [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) with additional exception types and `fail*()` methods.
 
 2. **Test Methodology**:
     - Ensure protected methods are tested via derived class proxy method exposure.
@@ -35,38 +35,50 @@
     - There is a collection of assorted Traits in [`tests/utilities`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities).
     - The Traits contain code used to standardize Mocking of certain oft-used classes.
     - Here is a non-inclusive list of the key traits and mocks:
-        - [`ConfigMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/ConfigMockTrait.php) -- Mocks the core [`Config`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Config.php) class.
+        - [`MockConfigTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MockConfigTrait.php) -- Mocks the core [`Config`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Config.php) class.
             - createConfigMock()
             - loadMockConfig()
-        - [`DebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DebugMockTrait.php) -- Mocks the core [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) class.
+        - [`MockDebugTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDebugTrait.php) -- Mocks the core [`Debug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/Debug.php) class and the [`CustomDebug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/CustomDebug.php) class.
             - createDebugMock()
-            - mockDebug()
-            - mockFail()
-        - [`CustomDebugMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/CustomDebugMockTrait.php) -- Mocks the core [`CustomDebug`](https://github.com/ifauh/webdev2024/tree/main/classes/core/common/CustomDebug.php) class.
             - createCustomDebugMock()
             - mockDebug()
             - mockFail()
-        - [`MySQLiWrapperMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MySQLiWrapperMockTrait.php) -- Mocks the [`MySQLiWrapper`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/MySQLiWrapper.php) class used by [`DBConnection`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/DBConnection.php).
+            - mockMultipleFails()
+        - [`MockMySQLiWrapperTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockMySQLiWrapperTrait.php) -- Mocks the [`MySQLiWrapper`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/MySQLiWrapper.php) class used by [`DBConnection`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/DBConnection.php).
             - createMySQLiWrapperMock()
-        - [`DBConnectionMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DBConnectionMockTrait.php) -- Mocks the core database interface [`DBConnection`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/DBConnection.php) class.
+        - [`MockDBConnectionTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDBConnectionTrait.php) -- Mocks the core database interface [`DBConnection`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/DBConnection.php) class.
             - createDBConnectionMock()
             - mockGetInstance()
-        - [`DatabaseServiceMockTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/DatabaseServiceMockTrait.php) -- Partially mocks the core database ancestor [`DatabaseService`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/DatabaseService.php) class.
+        - [`MockDatabaseServiceCoreTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceCoreTrait.php) -- Partially mocks the core database ancestor [`DatabaseService`](https://github.com/ifauh/webdev2024/tree/main/classes/services/database/DatabaseService.php) class.
             - createPartialDatabaseServiceMock()
-            - mockFetchDataWithQuery()
-            - mockModifyDataWithQuery()
-            - mockExecuteSelectQuery()
-            - mockExecuteUpdateQuery()
+            - arrangeQueryExpectationBehavior()
             - mockGetSortString()
-        - [`MockBehaviorTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/MockBehaviorTrait.php) -- Mocks method expectations and assertions.
+        - [`MockDatabaseServiceExecuteSelectQueryTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceExecuteSelectQueryTrait.php) -- Handles mocking of the executeSelectQuery method and its associated expectations and assertions.
+            - arrangeExecuteSelectQueryExpectations()
+            - assertExecuteSelectQueryExpectations()
+            - mockExecuteSelectQuery()
+        - [`MockDatabaseServiceExecuteUpdateQueryTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceExecuteUpdateQueryTrait.php) -- Handles mocking of the executeUpdateQuery method and its associated expectations and assertions.
+            - arrangeExecuteUpdateQueryExpectations()
+            - assertExecuteUpdateQueryExpectations()
+            - mockExecuteUpdateQuery()
+        - [`MockDatabaseServiceFetchDataWithQueryTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceFetchDataWithQueryTrait.php) -- Handles mocking of the fetchDataWithQuery method and its associated expectations and assertions.
+            - arrangeFetchDataWithQueryExpectations()
+            - assertFetchDataWithQueryExpectations()
+            - mockFetchDataWithQuery()
+        - [`MockDatabaseServiceModifyDataWithQueryTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/mocks/MockDatabaseServiceModifyDataWithQueryTrait.php) -- Handles mocking of the fetchDataWithQuery method and its associated expectations and assertions.
+            - arrangeModifyDataWithQueryExpectations()
+            - assertModifyDataWithQueryExpectations()
+            - mockModifyDataWithQuery()
+        - [`ArrangeBehaviorTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/assertions/ArrangeBehaviorTrait.php) -- Mocks method expectations and assertions.
             - arrangeMockBehavior()
             - assertMockBehavior()
             - arrangeTransactions()
             - assertTransactions()
-        - [`PrivatePropertyTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/PrivatePropertyTrait.php) -- Allows access to private and protected properties.
+        - [`PrivatePropertyHelperTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/helpers/PrivatePropertyHelperTrait.php) -- Allows access to private and protected properties.
             - getPrivateProperty()
             - setPrivateProperty()
-            - assertDependency()
+        - [`AssertPrivateDependenciesTrait`](https://github.com/ifauh/webdev2024/tree/main/tests/utilities/assertions/AssertPrivateDependenciesTrait.php) -- Allows assertions on private and protected properties.
+            - assertPrivateDependency()
 
 5. **Examples**:
 
@@ -85,4 +97,5 @@ Example Output for `createTestQueryParts()`:
 |---------|------------|-------------|-----------------------------------|
 | 1.0     | 2024-12-10 | Miranda H-O | Initial draft of readme.md        |
 | 1.1     | 2024-12-20 | Miranda H-O | Added additional information      |
-| 1.2     | YYYY-MM-DD | Author Name | Description of changes            |
+| 1.2     | 2024-12-29 | Miranda H-O | Updated info from trait refactors |
+| 1.3     | YYYY-MM-DD | Author Name | Description of changes            |
