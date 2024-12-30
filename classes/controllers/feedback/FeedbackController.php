@@ -60,20 +60,20 @@ class FeedbackController
 
         // Fetch the Feedback form config from Config
         $this->redirect = Config::get('feedback_config', 'redirect')['login'] ?? '';
-        $this->debug->log("{$debugHeading} -- Config successfully fetched.");
+        $this->debug->debug("{$debugHeading} -- Config successfully fetched.");
 
         // Initialise dependencies with fallbacks
         $this->model = $model ?? new Model($this->debug);
         $this->view = $view ?? new View($this->formatHtml, $this->debug);
         $this->valid = $valid ?? new Validator($this->debug);
-        $this->debug->log("{$debugHeading} -- Model, View, Validator classes successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Model, View, Validator classes successfully initialised.");
 
         // Initialise the additional classes needed by this controller
         $this->email = $email ?? new Email($this->debug->isDebugMode());
-        $this->debug->log("{$debugHeading} -- Email class successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Email class successfully initialised.");
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- Controller initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Controller initialisation complete.");
     }
 
     public function handleRequest(): void
@@ -188,7 +188,7 @@ class FeedbackController
 
         try {
             $this->email->prepareFeedbackEmail($data)->send();
-            $this->debug->log('Feedback email sent successfully.');
+            $this->debug->debug('Feedback email sent successfully.');
         } catch (Exception $e) {
             $this->debug->log("Error sending feedback email: {$e->getMessage()}", 'red');
         }
@@ -204,12 +204,12 @@ class FeedbackController
         $this->debug->debugVariable($_SESSION, "_SESSION before unset");
 
         // Clear and destroy the session if it is active
-        $this->debug->log("Logout: Unset and destroy session.");
+        $this->debug->debug("Logout: Unset and destroy session.");
         session_unset();
         session_destroy();
 
         // Log session status after clearing for confirmation
-        $this->debug->log("Logout: Session successfully cleared.");
+        $this->debug->debug("Logout: Session successfully cleared.");
     }
 
     /**
