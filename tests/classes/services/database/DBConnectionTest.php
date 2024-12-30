@@ -6,11 +6,11 @@ namespace Tests\classes\services\database;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Tests\utilities\UnitTestTeardownTrait;
-use Tests\utilities\ConfigMockTrait;
-use Tests\utilities\CustomDebugMockTrait;
-use Tests\utilities\PrivatePropertyTrait;
-use Tests\utilities\MySQLiWrapperMockTrait;
+use Tests\utilities\assertions\AssertPrivateDependenciesTrait;
+use Tests\utilities\helpers\UnitTestTeardownTrait;
+use Tests\utilities\mocks\MockConfigTrait;
+use Tests\utilities\mocks\MockDebugTrait;
+use Tests\utilities\mocks\MockMySQLiWrapperTrait;
 use App\services\database\DBConnection;
 use App\exceptions\DatabaseException;
 
@@ -51,10 +51,10 @@ use App\exceptions\DatabaseException;
 class DBConnectionTest extends TestCase
 {
     use UnitTestTeardownTrait;
-    use PrivatePropertyTrait;
-    use ConfigMockTrait;
-    use CustomDebugMockTrait;
-    use MySQLiWrapperMockTrait;
+    use AssertPrivateDependenciesTrait;
+    use MockConfigTrait;
+    use MockDebugTrait;
+    use MockMySQLiWrapperTrait;
 
     /**
      * Mock instance of CustomDebug.
@@ -111,7 +111,7 @@ class DBConnectionTest extends TestCase
 
         // Assert the two instances are the same
         $this->assertSame($dbInstance1, $dbInstance2);
-        $this->assertDependency($this->mysqliWrapperMock, 'connection', $dbInstance1);
+        $this->assertPrivateDependency($this->mysqliWrapperMock, 'connection', $dbInstance1);
     }
 
     /**
@@ -128,7 +128,7 @@ class DBConnectionTest extends TestCase
         $db = DBConnection::getInstance($dbName, false, $this->mysqliWrapperMock, $this->debugMock);
 
         // Assert connection is established and matches mysqliMock
-        $this->assertDependency($this->mysqliWrapperMock, 'connection', $db);
+        $this->assertPrivateDependency($this->mysqliWrapperMock, 'connection', $db);
     }
 
     /**
@@ -199,11 +199,8 @@ class DBConnectionTest extends TestCase
         // Clear the instance
         DBConnection::clearInstance($dbName);
 
-        // Use ReflectionClass to access the static property
-        $reflection = new \ReflectionClass(DBConnection::class);
-        $instancesProperty = $reflection->getProperty('instances');
-        $instancesProperty->setAccessible(true);
-        $instances = $instancesProperty->getValue();
+        // Access the static property
+        $instances = $this->getPrivateProperty($db, 'instances');
 
         // Assert that the instance is no longer in the pool
         $this->assertArrayNotHasKey($dbName, $instances);
@@ -697,63 +694,45 @@ class DBConnectionTest extends TestCase
         // Set up CustomDebug Mock
         $this->debugMock = $this->createCustomDebugMock('database', false, 0, 'red');
 
-        // Mock CustomDebug fail() calls and exception throws
-        // For testGetInstanceThrowsExceptionOnMissingConfig():
-        $errorMsg = "Database configuration for 'invalid_db' not found.";
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        // For testGetInstanceHandlesConnectionFailure():
-        $errorMsg = 'Database connection failed.';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        // For testEnsureConnectionThrowsExceptionWhenConnectionIsInvalid():
-        $errorMsg = 'Database connection is not established.';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        // For testExecuteQueryThrowsExceptionOnExecuteFailure():
-        $errorMsg = 'Execute failed for query: SELECT * FROM test_table';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        // For testExecuteRawQueryThrowsExceptionOnExecutionFailure():
-        $errorMsg = 'Query failed: SELECT * FROM test_table';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        // For testExecuteQueryThrowsExceptionOnPrepareFailure():
-        $errorMsg = 'Prepare failed for query: SELECT * FROM test_table';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
-        // For testExecuteQueryThrowsExceptionOnBindParamsFailure():
-        $errorMsg = 'Failed to bind parameters for query: SELECT * FROM test_table';
-        $this->mockFail(
-            $this->debugMock,
-            'failDatabase',
-            $errorMsg,
-            new DatabaseException($errorMsg)
-        );
+        // Mock CustomDebug failDatabase() calls and exception throws
+        $failures = [
+            // For testGetInstanceThrowsExceptionOnMissingConfig():
+            [
+                'message' => "Database configuration for 'invalid_db' not found.",
+                'method'  => 'failDatabase',
+            ],
+            // For testGetInstanceHandlesConnectionFailure():
+            [
+                'message' => 'Database connection failed.',
+                'method'  => 'failDatabase',
+            ],
+            // For testEnsureConnectionThrowsExceptionWhenConnectionIsInvalid():
+            [
+                'message' => 'Database connection is not established.',
+                'method'  => 'failDatabase',
+            ],
+            // For testExecuteQueryThrowsExceptionOnExecuteFailure():
+            [
+                'message' => 'Execute failed for query: SELECT * FROM test_table',
+                'method'  => 'failDatabase',
+            ],
+            // For testExecuteRawQueryThrowsExceptionOnExecutionFailure():
+            [
+                'message' => 'Query failed: SELECT * FROM test_table',
+                'method'  => 'failDatabase',
+            ],
+            // For testExecuteQueryThrowsExceptionOnPrepareFailure():
+            [
+                'message' => 'Prepare failed for query: SELECT * FROM test_table',
+                'method'  => 'failDatabase',
+            ],
+            // For testExecuteQueryThrowsExceptionOnBindParamsFailure():
+            [
+                'message' => 'Failed to bind parameters for query: SELECT * FROM test_table',
+                'method'  => 'failDatabase',
+            ],
+        ];
+        $this->mockMultipleFails($this->debugMock, $failures);
 
         // MySQLiWrapper mock
         $this->mysqliWrapperMock = $this->createMySQLiWrapperMock();
