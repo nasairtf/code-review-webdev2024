@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\classes\models\login;
+namespace Tests\classes\validators\forms\proposals;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Tests\utilities\helpers\UnitTestTeardownTrait;
 
-class LoginModelTest extends TestCase
+class UploadScheduleFileValidatorTest extends TestCase
 {
     use UnitTestTeardownTrait;
 
