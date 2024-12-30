@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\views\forms\proposals;
 
-use App\core\common\Debug;
+use App\core\common\CustomDebug;
+use App\exceptions\HtmlBuilderException;
+use App\views\forms\BaseFormView          as BaseView;
+use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
+use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
+use App\legacy\IRTFLayout                 as IrtfBuilder;
 use App\core\irtf\IrtfLinks;
-use App\views\forms\BaseFormView as BaseView;
 
 /**
  * View for rendering the schedule upload form.
@@ -21,25 +25,47 @@ class UploadScheduleFileView extends BaseView
 {
     private $irtfLinks;
 
+    /**
+     * Initializes the UpdateApplicationDateView with core builders and configurations.
+     *
+     * @param bool|null        $formatHtml  Enable formatted HTML output. Defaults to false if not provided.
+     * @param CustomDebug|null $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
+     * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new HtmlBuilder.
+     * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new CompBuilder.
+     * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for site meta. Defaults to a new IrtfBuilder.
+     * @param IrtfLinks|null   $irtfLinks   Links utiltiy getter for site.
+     */
     public function __construct(
         ?bool $formatHtml = null,
-        ?Debug $debug = null,
-        ?IrtfLinks $irtfLinks = null
+        ?CustomDebug $debug = null,
+        ?HtmlBuilder $htmlBuilder = null, // Dependency injection to simplify unit testing
+        ?CompBuilder $compBuilder = null, // Dependency injection to simplify unit testing
+        ?IrtfBuilder $irtfBuilder = null, // Dependency injection to simplify unit testing
+        ?IrtfLinks $irtfLinks = null      // Dependency injection to simplify unit testing
     ) {
         // Use parent class' constructor
-        parent::__construct($formatHtml ?? false, $debug);
+        parent::__construct($formatHtml, $debug, $htmlBuilder, $compBuilder, $irtfBuilder);
         $debugHeading = $this->debug->debugHeading("View", "__construct");
         $this->debug->debug($debugHeading);
-        $this->debug->log("{$debugHeading} -- Parent class is successfully constructed.");
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
 
         // Set up the links instance
         $this->irtfLinks = $irtfLinks ?? new IrtfLinks();
-        $this->debug->log("{$debugHeading} -- Links class is successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Links class is successfully initialised.");
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- View initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- View initialisation complete.");
     }
 
+    // Abstract methods: getFieldLabels(), getPageContents()
+
+    /**
+     * Provides field labels for the Login form.
+     *
+     * Maps internal field names to user-friendly labels.
+     *
+     * @return array An associative array mapping field names to labels.
+     */
     public function getFieldLabels(): array
     {
         // Debug output
@@ -55,9 +81,18 @@ class UploadScheduleFileView extends BaseView
     }
 
     /**
-     * Form helper method that builds the common parts for the form
+     * Generates the main page content for the Schedule Upload form.
+     *
+     * This method defines the specific HTML structure for the login form,
+     * using the provided database and form data. The BaseFormView parent method
+     * getContentsForm() passes the contents to renderFormPage(), etc., for rendering.
+     *
+     * @param array $dbData   Data arrays required to populate form options. Defaults to an empty array.
+     * @param array $formData Default data for form fields. Defaults to an empty array.
+     * @param int   $pad      Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The HTML content for the form page.
      */
-
     protected function getPageContents(
         array $dbData = [],
         array $formData = [],
@@ -66,7 +101,11 @@ class UploadScheduleFileView extends BaseView
         // Debug output
         $debugHeading = $this->debug->debugHeading("View", "getPageContents");
         $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
+        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+        $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
+        // Build the page contents
         // Use provided pageInfo or default to the config values
         $code  = "";
         $color = "";
@@ -119,10 +158,16 @@ class UploadScheduleFileView extends BaseView
         $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' >\n";
         $code .= "     <td>\n";
-        $code .= "       <p>A full schedule load will remove all of the entries for the current semester from the database and then load all entries in the schedule file uploaded here.</p>\n";
-        $code .= "       <p>A partial schedule load will remove only entries in the future (data from " . date("m/d/Y") . " and later) and will leave all historical data in the database.</p>\n";
-        $code .= "       <p>Generally a full schedule load should occur at the beginning of the semester and updates done over the course of the semester can use the partial schedule load. Partial schedule loading is the default behavior.</p>\n";
-        $code .= "       <p><strong>Pease note</strong>: check the instrument and operator/night attendant listing <a href='EditDatabase.php'>here</a> and add any instruments or personnel not already listed on the page.</p>\n";
+        $code .= "       <p>A full schedule load will remove all of the entries for the current semester from "
+            . "the database and then load all entries in the schedule file uploaded here.</p>\n";
+        $code .= "       <p>A partial schedule load will remove only entries in the future (data from "
+            . date("m/d/Y") . " and later) and will leave all historical data in the database.</p>\n";
+        $code .= "       <p>Generally a full schedule load should occur at the beginning of the semester and "
+            . "updates done over the course of the semester can use the partial schedule load. Partial schedule "
+            . "loading is the default behavior.</p>\n";
+        $code .= "       <p><strong>Pease note</strong>: check the instrument and operator/night attendant listing "
+            . "<a href='EditDatabase.php'>here</a> and add any instruments or personnel not already listed on the "
+            . "page.</p>\n";
         $code .= "     </td>\n";
         $code .= "  </tr>\n";
 
