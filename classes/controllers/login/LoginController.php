@@ -6,7 +6,7 @@ namespace App\controllers\login;
 
 use Exception;
 use App\core\common\Config;
-use App\core\common\Debug;
+use App\core\common\CustomDebug;
 use App\models\login\LoginModel as Model;
 use App\views\forms\login\LoginView as View;
 use App\validators\forms\login\LoginValidator as Validator;
@@ -34,7 +34,7 @@ use App\validators\forms\login\LoginValidator as Validator;
  * @package  IRTF
  * @version  1.0.0
  *
- * @property Debug         $debug           Debugging utility for logging.
+ * @property CustomDebug   $debug           Debugging utility for logging.
  * @property LoginModel    $model           Model handling database interactions for login.
  * @property LoginView     $view            View managing form rendering.
  * @property LoginValidator $valid          Validator managing data validation.
@@ -79,18 +79,18 @@ class LoginController
      */
     public function __construct(
         bool $formatHtml = false,
-        ?Debug $debug = null
+        ?CustomDebug $debug = null
     ) {
         // Start the session for the login form
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         // internal login-form specific properties
-        $this->debug = $debug ?? new Debug('login', false, 0);
+        $this->debug = $debug ?? new CustomDebug('login', false, 0);
         $this->model = new Model($this->debug);
         $this->view = new View($formatHtml, $this->debug);
         $this->valid = new Validator($this->debug);
-        $this->debug->log("Login Controller: Controller, Model, View, Validator constructed.");
+        $this->debug->debug("Login Controller: Controller, Model, View, Validator constructed.");
         // calling form settable properties
         $this->title = 'IRTF Form Login';
         $this->formAction = $_SERVER['PHP_SELF'];
@@ -115,7 +115,9 @@ class LoginController
     public function setTitle(string $title): self
     {
         // Debug output
-        $this->debug->debug("Login Controller: setTitle()");
+        $debugHeading = $this->debug->debugHeading("Controller", "setTitle");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($title, "{$debugHeading} -- title");
 
         $this->title = $title;
         return $this;
@@ -130,7 +132,9 @@ class LoginController
     public function setFormAction(string $formAction): self
     {
         // Debug output
-        $this->debug->debug("Login Controller: setFormAction()");
+        $debugHeading = $this->debug->debugHeading("Controller", "setFormAction");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($formAction, "{$debugHeading} -- formAction");
 
         $this->formAction = $formAction;
         return $this;
@@ -145,7 +149,9 @@ class LoginController
     public function setInstructions(string $instructions): self
     {
         // Debug output
-        $this->debug->debug("Login Controller: setInstructions()");
+        $debugHeading = $this->debug->debugHeading("Controller", "setInstructions");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($instructions, "{$debugHeading} -- instructions");
 
         $this->instructions = $instructions;
         return $this;
@@ -162,7 +168,9 @@ class LoginController
     public function setRedirect(string $redirect): self
     {
         // Debug output
-        $this->debug->debug("Login Controller: setRedirect()");
+        $debugHeading = $this->debug->debugHeading("Controller", "setRedirect");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($redirect, "{$debugHeading} -- redirect");
 
         if ($this->validateRedirect($redirect)) {
             $this->redirect = $redirect;
@@ -178,7 +186,8 @@ class LoginController
     public function getRedirect(): string
     {
         // Debug output
-        $this->debug->debug("Login Controller: getRedirect()");
+        $debugHeading = $this->debug->debugHeading("Controller", "getRedirect");
+        $this->debug->debug($debugHeading);
 
         return $this->redirect ?? 'default';
     }
@@ -191,7 +200,8 @@ class LoginController
     public function getRedirectURL(): string
     {
         // Debug output
-        $this->debug->debug("Login Controller: getRedirectURL()");
+        $debugHeading = $this->debug->debugHeading("Controller", "getRedirectURL");
+        $this->debug->debug($debugHeading);
 
         return $this->allowedRedirects[$this->redirect] ?? $this->allowedRedirects['default'];
     }
@@ -204,7 +214,8 @@ class LoginController
     public function getLoginData(): ?array
     {
         // Debug output
-        $this->debug->debug("Login Controller: getLoginData()");
+        $debugHeading = $this->debug->debugHeading("Controller", "getLoginData");
+        $this->debug->debug($debugHeading);
 
         return $_SESSION['login_data'] ?? null;
     }
@@ -221,11 +232,12 @@ class LoginController
      * @param string $instructions [optional] Custom instructions displayed above the form. Empty by default.
      *
      * @return string The HTML output for the embeddable login form.
-     */
+     *//*
     public function buildEmbeddableLoginForm(string $action = '', array $data = [], string $instructions = ''): string
     {
         // Debug output
-        $this->debug->debug("Login Controller: buildEmbeddableLoginForm()");
+        $debugHeading = $this->debug->debugHeading("Controller", "buildEmbeddableLoginForm");
+        $this->debug->debug($debugHeading);
 
         if (empty($action)) {
             $action = $_SERVER['PHP_SELF'];
@@ -234,7 +246,7 @@ class LoginController
             $data = $this->model->initializeDefaultFormData();
         }
         return $this->view->buildEmbeddableLoginForm($action, $data, $instructions);
-    }
+    }*/
 
     /**
      * Manages login requests, including form submission handling and rendering.
@@ -245,17 +257,18 @@ class LoginController
     public function handleRequest(): void
     {
         // Debug output
-        $this->debug->debug("Login Controller: handleRequest()");
+        $debugHeading = $this->debug->debugHeading("Controller", "handleRequest");
+        $this->debug->debug($debugHeading);
 
         // Handle redirect parameter via GET if provided
         if (isset($_GET['redirect'])) {
             $this->setRedirect($_GET['redirect']);
         }
         // Output the SESSION values
-        $this->debug->debugVariable($_SESSION, "_SESSION");
+        $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
         // Output the redirection values
-        $this->debug->debugVariable($this->allowedRedirects, "allowedRedirects");
-        $this->debug->debugVariable($this->redirect, "redirect");
+        $this->debug->debugVariable($this->allowedRedirects, "{$debugHeading} -- allowedRedirects");
+        $this->debug->debugVariable($this->redirect, "{$debugHeading} -- redirect");
 
         // Check for existing session authentication
         if (isset($_SESSION['login_data']['session'])) {
@@ -281,12 +294,13 @@ class LoginController
     private function handleLoginLink(array $formData): void
     {
         // Debug output
-        $this->debug->debug("Login Controller: handleLoginLink()");
-        $this->debug->debugVariable($formData, "_GET");
+        $debugHeading = $this->debug->debugHeading("Controller", "handleLoginLink");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($formData, "{$debugHeading} -- _GET");
         // Output the redirection values
         $this->debug->debug("Starting login link handling.");
-        $this->debug->debugVariable($this->redirect, "redirect");
-        $this->debug->debugVariable($this->allowedRedirects, "allowedRedirects");
+        $this->debug->debugVariable($this->redirect, "{$debugHeading} -- redirect");
+        $this->debug->debugVariable($this->allowedRedirects, "{$debugHeading} -- allowedRedirects");
 
         try {
             // Validate form inputs
@@ -300,7 +314,7 @@ class LoginController
 
             // If login is successful, save login data in session
             $_SESSION['login_data'] = compact('program', 'session');
-            $this->debug->debugVariable($_SESSION, "_SESSION");
+            $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
             $this->debug->debug("getRedirectURL: " . $this->getRedirectURL());
 
             // Redirect to the validated URL
@@ -324,12 +338,13 @@ class LoginController
     private function handleLoginSubmit(array $formData): void
     {
         // Debug output
-        $this->debug->debug("Login Controller: handleLoginSubmit()");
-        $this->debug->debugVariable($formData, "_POST");
+        $debugHeading = $this->debug->debugHeading("Controller", "handleLoginSubmit");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($formData, "{$debugHeading} -- _POST");
         // Output the redirection values
         $this->debug->debug("Starting login submission handling.");
-        $this->debug->debugVariable($this->redirect, "redirect");
-        $this->debug->debugVariable($this->allowedRedirects, "allowedRedirects");
+        $this->debug->debugVariable($this->redirect, "{$debugHeading} -- redirect");
+        $this->debug->debugVariable($this->allowedRedirects, "{$debugHeading} -- allowedRedirects");
 
         try {
             // Validate form inputs
@@ -343,7 +358,7 @@ class LoginController
 
             // If login is successful, save login data in session
             $_SESSION['login_data'] = compact('program', 'session');
-            $this->debug->debugVariable($_SESSION, "_SESSION");
+            $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
             $this->debug->debug("getRedirectURL: " . $this->getRedirectURL());
 
             // Redirect to the validated URL
@@ -368,8 +383,9 @@ class LoginController
     private function renderLoginForm(array $formData = []): void
     {
         // Debug output
-        $this->debug->debug("Login Controller: renderLoginForm()");
-        $this->debug->debugVariable($formData, "formData");
+        $debugHeading = $this->debug->debugHeading("Controller", "renderLoginForm");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
 
         $formAction = $this->formAction;
         if ($this->redirect) {
@@ -378,11 +394,13 @@ class LoginController
         if (empty($formData)) {
             $formData = $this->model->initializeDefaultFormData();
         }
-        echo $this->view->renderLoginFormPage(
-            $this->title,
-            $formAction,
-            $formData,
-            $this->instructions
+        $formData['instructions'] = $this->instructions;
+        echo $this->view->renderFormPage(
+            $this->title, // title
+            $formAction,  // action
+            [],           // dbData
+            $formData,    // formData
+            0             // pad
         );
     }
 
@@ -398,7 +416,9 @@ class LoginController
     private function validateRedirect(string $redirect): bool
     {
         // Debug output
-        $this->debug->debug("Login Controller: validateRedirect()");
+        $debugHeading = $this->debug->debugHeading("Controller", "validateRedirect");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($redirect, "{$debugHeading} -- redirect");
 
         return array_key_exists($redirect, $this->allowedRedirects);
     }
@@ -409,7 +429,8 @@ class LoginController
     private function redirectUser(): void
     {
         // Debug output
-        $this->debug->debug("Login Controller: redirectUser()");
+        $debugHeading = $this->debug->debugHeading("Controller", "redirectUser");
+        $this->debug->debug($debugHeading);
         // Handle the redirection
         $url = $this->getRedirectURL();
         if ($this->debug->isDebugMode()) {
