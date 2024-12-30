@@ -124,7 +124,7 @@ class MySQLiWrapper
      *
      * @return bool True on success, false on failure.
      */
-    public function begin_transaction(): bool
+    public function beginTransaction(): bool
     {
         return $this->mysqli->begin_transaction();
     }

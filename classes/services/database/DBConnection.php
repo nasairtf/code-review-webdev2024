@@ -170,7 +170,7 @@ class DBConnection
     {
         $this->ensureConnection();
         $this->debug->debug("Starting transaction.");
-        $this->connection->begin_transaction();
+        $this->connection->beginTransaction();
     }
 
     /**
