@@ -89,6 +89,212 @@ class FormElementsBuilder
     }
 
     /**
+     * Builds a horizontal line break section for the form.
+     *
+     * This method returns a formatted HTML line element, which serves as a visual
+     * separator within the form.
+     *
+     * @return string The HTML for the section break, formatted as a horizontal line.
+     */
+    public function buildFormSectionBreak(
+        int $pad = 0
+    ): string {
+        $htmlParts = [
+            '',
+            $this->htmlBuilder->getLine([], $pad),
+            '',
+        ];
+        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+    }
+
+    /**
+     * Generates a section containing form buttons.
+     *
+     * This method creates a table to render form buttons (e.g., submit, reset) in a
+     * single centered row. It supports customizable attributes for the table and row,
+     * as well as padding for formatting.
+     *
+     * @param array $buttons   An array of HTML strings representing the buttons.
+     *                         Each button should be generated using a helper method,
+     *                         such as `getSubmitButton` or `getResetButton`.
+     * @param array $rowAttr   Optional attributes for the table row.
+     * @param array $tableAttr Optional attributes for the table element.
+     *                         Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param int   $pad       Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The HTML for the buttons section.
+     */
+    public function buildButtonsFormSection(
+        array $buttons,
+        array $rowAttr = [],
+        array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+        int $pad = 0
+    ): string {
+        // Validate the buttons array
+        $this->validateButtons($buttons);
+
+        // Render the buttons table
+        $tablePad = $pad;
+        $tableRowPad = $tablePad + 2;
+
+        // Create inline display indicators for each button
+        $inline = array_fill(0, count($buttons), true);
+
+        // Generate the HTML for the buttons table
+        $tableHtml = $this->htmlBuilder->getTableFromRows(
+            [
+                $this->htmlBuilder->getTableRowFromArray(
+                    $buttons,
+                    false,
+                    $inline,
+                    $rowAttr,
+                    $tableRowPad,
+                    true
+                )
+            ],
+            $tableAttr,
+            $tablePad
+        );
+
+        // Wrap the table in additional markup for centering and styling
+        $htmlParts = [
+            '',
+            '<!--  Buttons Section  -->',
+            '',
+            '<center>',
+            $tableHtml,
+            '</center>',
+            '',
+        ];
+
+        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+    }
+
+    /**
+     * Builds a preamble section for a form or page.
+     *
+     * This method generates a section containing the provided preamble HTML, wrapped in
+     * a table for layout. Attributes for the table and row can be customized, along
+     * with padding for formatting.
+     *
+     * @param string $preambleHtml HTML content for the preamble (e.g., instructions or guidance text).
+     * @param array  $rowAttr      Optional attributes for the table row.
+     * @param array  $tableAttr    Optional attributes for the table element.
+     *                             Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param int    $pad          Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The complete HTML for the preamble section.
+     */
+    public function buildPreambleFormSection(
+        string $preamble,
+        array $rowAttr = [],
+        array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+        int $pad = 0
+    ): string {
+        // Render the preamble table
+        $tablePad = $pad;
+        $tableRowPad = $tablePad + 2;
+
+        // Generate the HTML for the preamble table
+        $tableHtml = $this->htmlBuilder->getTableFromRows(
+            [
+                $this->htmlBuilder->getTableRowFromArray(
+                    [$preamble],
+                    false,
+                    [false],
+                    $rowAttr,
+                    $tableRowPad,
+                    true
+                )
+            ],
+            $tableAttr,
+            $tablePad
+        );
+
+        // Wrap the table in additional markup for centering and styling
+        $htmlParts = [
+            '',
+            '<!--  Preamble  -->',
+            '',
+            '<center>',
+            $tableHtml,
+            '</center>',
+            '',
+        ];
+        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+    }
+
+    /**
+     * Builds the input fields section for a form.
+     *
+     * This method generates a table containing input fields with their corresponding labels.
+     * The fields are dynamically created based on the provided configuration array.
+     *
+     * Each row configuration should include:
+     * - 'label' (string): The label text for the input field.
+     * - 'name' (string): The name attribute for the input field.
+     * - 'value' (mixed): The default value for the input field (optional, defaults to an empty string).
+     * - 'type' (string): The input type (e.g., 'text', 'password') (optional, defaults to 'text').
+     * - 'attr' (array): Additional attributes for the input field (optional).
+     *
+     * @param array $fieldConfigs An array of field configurations for the rows.
+     * @param array $rowAttr      Optional attributes for the table row.
+     * @param array $tableAttr    Optional attributes for the table element.
+     *                            Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param int   $pad          Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The HTML for the input fields section.
+     */
+    public function buildInputFieldsFormSection(
+        array $fieldConfigs,
+        array $rowAttr = [],
+        array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+        int $pad = 0
+    ): string {
+        $tablePad = $pad;
+        $tableRowPad = $tablePad + 2;
+
+        // Generate rows based on field configurations
+        $rows = [];
+        foreach ($fieldConfigs as $fieldConfig) {
+            // Extract field details with defaults
+            $label = $fieldConfig['label'] ?? '';
+            $name = $fieldConfig['name'] ?? '';
+            $value = $fieldConfig['value'] ?? '';
+            $type = $fieldConfig['type'] ?? 'text';
+            $inputAttr = $fieldConfig['attr'] ?? [];
+
+            // Generate input field and row
+            $inputField = $this->htmlBuilder->getTextInput($name, $value, 10, $inputAttr, 0, false);
+            $cells = ['&nbsp;', $label, '&nbsp;', $inputField, '&nbsp;'];
+            $rows[] = $this->htmlBuilder->getTableRowFromArray(
+                $cells,
+                false,
+                [true, true, true, true, true],
+                $rowAttr,
+                $tableRowPad,
+                true
+            );
+        }
+
+        // Generate the table HTML
+        $tableHtml = $this->htmlBuilder->getTableFromRows($rows, $tableAttr, $tablePad);
+
+        // Wrap the table in additional markup for centering and styling
+        $htmlParts = [
+            '',
+            '<!--  Input Fields Section  -->',
+            '',
+            '<center>',
+            $tableHtml,
+            '</center>',
+            '',
+        ];
+
+        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+    }
+
+    /**
      * Generates reset and submit buttons for a form, with a customizable submit button label.
      *
      * @param string $button The label for the submit button.
