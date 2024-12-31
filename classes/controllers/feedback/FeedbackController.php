@@ -6,11 +6,12 @@ namespace App\controllers\feedback;
 
 use Exception;
 use App\exceptions\ValidationException;
+use App\core\traits\LoginHelperTrait;
 use App\core\common\Config;
-use App\core\common\Debug;
-use App\services\email\feedback\FeedbackService as Email;
-use App\models\feedback\FeedbackModel as Model;
-use App\views\forms\feedback\FeedbackView as View;
+use App\core\common\CustomDebug                     as Debug;
+use App\services\email\feedback\FeedbackService     as Email;
+use App\models\feedback\FeedbackModel               as Model;
+use App\views\forms\feedback\FeedbackView           as View;
 use App\validators\forms\feedback\FeedbackValidator as Validator;
 
 /**
@@ -24,6 +25,8 @@ use App\validators\forms\feedback\FeedbackValidator as Validator;
 
 class FeedbackController
 {
+    use LoginHelperTrait;
+
     private $formatHtml;
     private $debug;
     private $model;
@@ -36,7 +39,7 @@ class FeedbackController
      * Constructs the Controller, initializing all required dependencies.
      *
      * @param bool|null      $formatHtml Enable or disable HTML formatting (default: false).
-     * @param Debug|null     $debug      Debug instance for logging and debugging (default: new Debug instance).
+     * @param Debug|null     $debug      Debug instance for logging and debugging (default: new instance).
      * @param Model|null     $model      Model instance (default: new Model).
      * @param View|null      $view       View instance (default: new View).
      * @param Validator|null $valid      Validator instance (default: new Validator).
@@ -59,8 +62,11 @@ class FeedbackController
         $this->formatHtml = $formatHtml ?? false;
 
         // Fetch the Feedback form config from Config
-        $this->redirect = Config::get('feedback_config', 'redirect')['login'] ?? '';
+        //$redirectConfig = Config::get('login_config', 'formRedirects');
+        $config = $this->fetchLoginConfig('formRedirects');
+        $this->redirect = $config['feedback'] ?? '';
         $this->debug->debug("{$debugHeading} -- Config successfully fetched.");
+        $this->debug->debugVariable($this->redirect, "{$debugHeading} -- this->redirect");
 
         // Initialise dependencies with fallbacks
         $this->model = $model ?? new Model($this->debug);
@@ -83,7 +89,7 @@ class FeedbackController
         $this->debug->debug($debugHeading);
 
         // Logic to check login status and redirect to login page if needed
-        $this->checkLogin();
+        $this->checkLoginStatus($this->redirect);
 
         if (isset($_POST['submit'])) {
             // Handle feedback form
@@ -194,24 +200,6 @@ class FeedbackController
         }
     }
 
-    private function sessionCleanup(): void
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Controller", "sessionCleanup");
-        $this->debug->debug($debugHeading);
-
-        // Log the current session data for debugging
-        $this->debug->debugVariable($_SESSION, "_SESSION before unset");
-
-        // Clear and destroy the session if it is active
-        $this->debug->debug("Logout: Unset and destroy session.");
-        session_unset();
-        session_destroy();
-
-        // Log session status after clearing for confirmation
-        $this->debug->debug("Logout: Session successfully cleared.");
-    }
-
     /**
      * Page rendering methods that interface with View Class
      *
@@ -297,20 +285,6 @@ class FeedbackController
 
         // Render the errors
         echo $this->view->renderErrorPage($errorTitle, $errorMessage);
-    }
-
-    private function checkLogin(): bool
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Controller", "checkLogin");
-        $this->debug->debug($debugHeading);
-
-        // Verify session status and redirect to login if unset
-        if (!isset($_SESSION['login_data'])) {
-            header('Location: ' . BASE_URL . '/Login.php?redirect=feedback');
-            exit();
-        }
-        return true;
     }
 
     /**
