@@ -6,8 +6,8 @@ namespace App\validators\forms\feedback;
 
 use Exception;
 use App\exceptions\ValidationException;
-use App\core\common\Debug;
 use App\core\irtf\IrtfUtilities;
+use App\core\common\CustomDebug            as Debug;
 use App\validators\forms\BaseFormValidator as BaseValidator;
 
 /**
@@ -30,7 +30,7 @@ class FeedbackValidator extends BaseValidator
      *
      * @param Debug|null $debug Optional. An instance of Debug for logging; defaults to null.
      */
-    public function __construct(Debug $debug = null)
+    public function __construct(?Debug $debug = null)
     {
         // Use parent class' constructor
         parent::__construct($debug);
