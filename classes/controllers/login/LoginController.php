@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\controllers\login;
 
 use Exception;
+use App\exceptions\ValidationException;
+use App\core\traits\LoginHelperTrait;
 use App\core\common\Config;
-use App\core\common\CustomDebug;
-use App\models\login\LoginModel as Model;
-use App\views\forms\login\LoginView as View;
+use App\core\common\CustomDebug               as Debug;
+use App\models\login\LoginModel               as Model;
+use App\views\forms\login\LoginView           as View;
 use App\validators\forms\login\LoginValidator as Validator;
 
 /**
@@ -28,21 +30,21 @@ use App\validators\forms\login\LoginValidator as Validator;
  * - `LoginModel`: Provides methods to check login credentials against the database.
  * - `LoginView`: Manages HTML generation for the login form.
  * - `LoginValidator`: Handles validation of form input data.
- * - `Debug`: Logs information for debugging purposes, especially useful during development.
+ * - `CustomDebug`: Logs information for debugging purposes, especially useful during development.
  *
  * @category Controllers
  * @package  IRTF
  * @version  1.0.0
  *
- * @property CustomDebug   $debug           Debugging utility for logging.
- * @property LoginModel    $model           Model handling database interactions for login.
- * @property LoginView     $view            View managing form rendering.
- * @property LoginValidator $valid          Validator managing data validation.
- * @property array         $allowedRedirects Configured allowed redirect URLs.
- * @property string        $title           Title for the login form page.
- * @property string        $formAction      URL for form submission.
- * @property string        $instructions    Instructions displayed on the login form.
- * @property string        $redirect        Redirect path after successful login.
+ * @property Debug     $debug            Debugging utility for logging.
+ * @property Model     $model            Model handling database interactions for login.
+ * @property View      $view             View managing form rendering.
+ * @property Validator $valid            Validator managing data validation.
+ * @property array     $allowedRedirects Configured allowed redirect URLs.
+ * @property string    $title            Title for the login form page.
+ * @property string    $formAction       URL for form submission.
+ * @property string    $instructions     Instructions displayed on the login form.
+ * @property string    $redirect         Redirect path after successful login.
  *
  * @see LoginModel
  * @see LoginView
@@ -52,7 +54,10 @@ use App\validators\forms\login\LoginValidator as Validator;
 
 class LoginController
 {
+    use LoginHelperTrait;
+
     // internal login-form specific properties
+    private $formatHtml;
     private $debug;
     private $model;
     private $view;
@@ -72,38 +77,56 @@ class LoginController
      * It also retrieves allowed redirects from a configuration file, providing
      * a safe list for post-login redirection.
      *
-     * @param bool  $formatHtml Optional. Whether HTML output should be formatted.
-     *                          Defaults to false for inline HTML.
-     * @param Debug $debug      Optional. Debugging utility for logging purposes. If not provided,
-     *                          a default Debug instance is created.
+     * @param bool|null      $formatHtml Whether HTML output should be formatted (default: false).
+     * @param Debug|null     $debug      Debug instance for logging and debugging (default: new instance).
+     * @param Model|null     $model      Model instance (default: new Model).
+     * @param View|null      $view       View instance (default: new View).
+     * @param Validator|null $valid      Validator instance (default: new Validator).
      */
     public function __construct(
-        bool $formatHtml = false,
-        ?CustomDebug $debug = null
+        ?bool $formatHtml = null,
+        ?Debug $debug = null,
+        ?Model $model = null,
+        ?View $view = null,
+        ?Validator $valid = null
     ) {
         // Start the session for the login form
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        // internal login-form specific properties
-        $this->debug = $debug ?? new CustomDebug('login', false, 0);
-        $this->model = new Model($this->debug);
-        $this->view = new View($formatHtml, $this->debug);
-        $this->valid = new Validator($this->debug);
-        $this->debug->debug("Login Controller: Controller, Model, View, Validator constructed.");
+        $this->sessionSetup();
+
+        // Debug output
+        $this->debug = $debug ?? new Debug('login', false, 0);
+        $debugHeading = $this->debug->debugHeading("Controller", "__construct");
+        $this->debug->debug($debugHeading);
+
+        // Set the global html formatting
+        $this->formatHtml = $formatHtml ?? false;
+
+        // Initialise dependencies with fallbacks
+        $this->model = $model ?? new Model($this->debug);
+        $this->view = $view ?? new View($formatHtml, $this->debug);
+        $this->valid = $valid ?? new Validator($this->debug);
+        $this->debug->debug("{$debugHeading} -- Model, View, Validator classes successfully initialised.");
+
         // calling form settable properties
         $this->title = 'IRTF Form Login';
         $this->formAction = $_SERVER['PHP_SELF'];
         $this->instructions = $this->view->buildDefaultInstructions();
         $this->redirect = 'default';
-        // Load the config file for Login form
-        $config = require CONFIG_PATH . 'login_config.php';
-        $this->allowedRedirects = $config['allowedRedirects'] ?? [];
+
+        // Fetch allowed redirects from Config
+        $this->allowedRedirects = $this->fetchLoginConfig('allowedRedirects');
+
         // Output the SESSION values
-        $this->debug->debugVariable($_SESSION, "_SESSION");
-        // Output the redirection values
-        $this->debug->debugVariable($config['allowedRedirects'], "config['allowedRedirects']");
-        $this->debug->debugVariable($this->redirect, "this->redirect");
+        $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
+        // Output default class values
+        $this->debug->debugVariable($this->title, "{$debugHeading} -- this->title");
+        $this->debug->debugVariable($this->formAction, "{$debugHeading} -- this->formAction");
+        $this->debug->debugVariable($this->instructions, "{$debugHeading} -- this->instructions");
+        $this->debug->debugVariable($this->redirect, "{$debugHeading} -- this->redirect");
+        $this->debug->debugVariable($this->allowedRedirects, "{$debugHeading} -- this->allowedRedirects");
+
+        // Class initialisation complete
+        $this->debug->debug("{$debugHeading} -- Controller initialisation complete.");
     }
 
     /**
@@ -272,7 +295,7 @@ class LoginController
 
         // Check for existing session authentication
         if (isset($_SESSION['login_data']['session'])) {
-            $this->redirectUser();
+            $this->redirectLoggedInUser($this->getRedirectURL());
             return;
         }
 
@@ -302,28 +325,26 @@ class LoginController
         $this->debug->debugVariable($this->redirect, "{$debugHeading} -- redirect");
         $this->debug->debugVariable($this->allowedRedirects, "{$debugHeading} -- allowedRedirects");
 
+        // Prepare form inputs
+        $formData['program'] = $formData['p'] ?? '';
+        $formData['session'] = $formData['s'] ?? '';
+
         try {
-            // Validate form inputs
-            $program = $this->valid->validateProgram($formData['p'] ?? '');
-            $session = $this->valid->validateSession($formData['s'] ?? '');
+            // Validate form inputs, store session, and redirect user
+            $this->handleDataValidation($formData);
+        } catch (ValidationException $e) {
+            // Debug output
+            $this->debug->debugVariable($e->getMessages(), "Validation Errors");
 
-            // Check credentials with model
-            if (!$this->model->checkCredentials($program, $session)) {
-                $this->debug->fail("Login failed: Invalid program number or session code.");
-            }
-
-            // If login is successful, save login data in session
-            $_SESSION['login_data'] = compact('program', 'session');
-            $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
-            $this->debug->debug("getRedirectURL: " . $this->getRedirectURL());
-
-            // Redirect to the validated URL
-            $this->redirectUser();
+            // Render the form with errors and user input if validation fails
+            $this->renderFormWithErrors(
+                $formData,
+                $e->getMessages()
+            );
         } catch (Exception $e) {
-            // Show error page or log the error as appropriate
+            // If validation fails, render error page
             $this->debug->log("Error in link login: " . $e->getMessage());
-            $formData['error'] = $e->getMessage();
-            $this->renderLoginForm($formData);
+            $this->renderErrorPage('Error in link login: ', $e->getMessage());
         }
     }
 
@@ -347,28 +368,72 @@ class LoginController
         $this->debug->debugVariable($this->allowedRedirects, "{$debugHeading} -- allowedRedirects");
 
         try {
-            // Validate form inputs
-            $program = $this->valid->validateProgram($formData['program'] ?? '');
-            $session = $this->valid->validateSession($formData['session'] ?? '');
+            // Validate form inputs, store session, and redirect user
+            $this->handleDataValidation($formData);
+        } catch (ValidationException $e) {
+            // Debug output
+            $this->debug->debugVariable($e->getMessages(), "Validation Errors");
 
-            // Check credentials with model
-            if (!$this->model->checkCredentials($program, $session)) {
-                $this->debug->fail("Login failed: Invalid program number or session code.");
-            }
-
-            // If login is successful, save login data in session
-            $_SESSION['login_data'] = compact('program', 'session');
-            $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
-            $this->debug->debug("getRedirectURL: " . $this->getRedirectURL());
-
-            // Redirect to the validated URL
-            $this->redirectUser();
+            // Render the form with errors and user input if validation fails
+            $this->renderFormWithErrors(
+                $formData,
+                $e->getMessages()
+            );
         } catch (Exception $e) {
-            // Show error page or log the error as appropriate
-            $this->debug->log("Error in login submission: " . $e->getMessage());
-            $formData['error'] = $e->getMessage();
-            $this->renderLoginForm($formData);
+            // If validation fails, render error page
+            $this->renderErrorPage('Unexpected error: ', $e->getMessage());
         }
+    }
+
+    private function handleDataValidation(array $formData): void
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Controller", "handleDataValidation");
+        $this->debug->debug($debugHeading);
+
+        // Validate form inputs
+        $validData = $this->valid->validateFormData($formData);
+        $this->debug->debugVariable($validData, "{$debugHeading} -- validData");
+
+        // Check credentials with model
+        if (!$this->model->checkCredentials($validData['program'], $validData['session'])) {
+            throw new ValidationException("Login failed.", ['program' => 'Invalid program number or session code.']);
+        }
+
+        // If login is successful, save login data in session
+        $program = $validData['program'];
+        $session = $validData['session'];
+        $_SESSION['login_data'] = compact('program', 'session');
+        $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
+        $this->debug->debug("getRedirectURL: " . $this->getRedirectURL());
+
+        // Redirect to the validated URL
+        $this->redirectLoggedInUser($this->getRedirectURL());
+    }
+
+    private function renderFormWithErrors(
+        array $formData,
+        array $dataErrors
+    ): void {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Controller", "renderFormWithErrors");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+        $this->debug->debugVariable($dataErrors, "{$debugHeading} -- dataErrors");
+
+        // Logic to generate the first page form
+        $formAction = $this->validateFormAction();
+        $fieldLabels = $this->view->getFieldLabels();
+
+        // Render the errors section and the form
+        echo $this->view->renderFormWithErrors(
+            $this->title, // title
+            $formAction,  // action
+            [],           // dbData
+            $formData,    // formData
+            $dataErrors,  // validation errors
+            $fieldLabels  // field labels
+        );
     }
 
     /**
@@ -387,10 +452,7 @@ class LoginController
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
 
-        $formAction = $this->formAction;
-        if ($this->redirect) {
-            $formAction .= "?redirect=" . urlencode($this->getRedirect());
-        }
+        $formAction = $this->validateFormAction();
         if (empty($formData)) {
             $formData = $this->model->initializeDefaultFormData();
         }
@@ -423,29 +485,18 @@ class LoginController
         return array_key_exists($redirect, $this->allowedRedirects);
     }
 
-    /**
-     * Redirects the user to the designated redirect path if set and valid.
-     */
-    private function redirectUser(): void
+    private function validateFormAction(): string
     {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Controller", "redirectUser");
+        $debugHeading = $this->debug->debugHeading("Controller", "validateFormAction");
         $this->debug->debug($debugHeading);
-        // Handle the redirection
-        $url = $this->getRedirectURL();
-        if ($this->debug->isDebugMode()) {
-            // Open redirect url in a new tab/window
-            echo "<script>window.open('" . htmlspecialchars($url) . "', '_blank');</script>";
-        } else {
-            if ($url) {
-                // Redirect to the validated URL
-                header("Location: " . $url);
-                exit;
-            } else {
-                // Redirect to the default destination
-                header("Location: /");
-            }
+        // Validate formAction
+        $formAction = $this->formAction;
+        $this->debug->debugVariable($formAction, "{$debugHeading} -- formAction");
+        if ($this->redirect) {
+            $formAction .= "?redirect=" . urlencode($this->getRedirect());
         }
-        exit;
+        $this->debug->debugVariable($formAction, "{$debugHeading} -- formAction");
+        return $formAction;
     }
 }
