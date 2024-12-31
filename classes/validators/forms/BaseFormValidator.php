@@ -80,13 +80,16 @@ class BaseFormValidator
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
         $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
         $this->debug->debugVariable($validateByKey, "{$debugHeading} -- validateByKey");
+
         // Check if selection is required and no options were selected
         if ($required && empty($options)) {
             $this->errors[$fieldKey] = "Please make a selection for this field.";
             return null;
         }
+
         // Determine allowed set (keys or values)
         $allowedSet = $validateByKey ? array_keys($allowed) : array_values($allowed);
+
         // Validate individual options
         $validatedOptions = [];
         foreach ($options as $option) {
@@ -121,6 +124,7 @@ class BaseFormValidator
         $this->debug->debugVariable($name, "{$debugHeading} -- name");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
         // Validate fields
         if ($required && empty($name)) {
             $this->errors[$fieldKey] = "Name is required.";
@@ -154,7 +158,8 @@ class BaseFormValidator
         $this->debug->debugVariable($email, "{$debugHeading} -- email");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
-        // Validate fields
+
+        // Validate field
         if ($required && empty($email)) {
             $this->errors[$fieldKey] = "Email is required.";
             return null;
@@ -163,6 +168,118 @@ class BaseFormValidator
             return null;
         }
         return $email;
+    }
+
+    /**
+     * Validates the program number format.
+     *
+     * The program number must follow the YYYY[A|B]NNN format, where:
+     * - YYYY is a year between 2000 and the next calendar year.
+     * - A or B represents the semester.
+     * - NNN is a zero-padded number from 001 to 999.
+     *
+     * @param string $program   Program number to validate.
+     * @param string $fieldKey  Key to associate errors with this field.
+     * @param bool   $required  Whether the field is required.
+     *
+     * @return string|null Validated program number, or null if validation fails.
+     *
+     * @throws ValidationException If the program number is invalid and the field is required.
+     */
+    protected function validateProgramNumber(
+        string $program,
+        string $fieldKey = 'program',
+        bool $required = false
+    ): ?string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateProgramNumber");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($program, "{$debugHeading} -- program");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate fields
+
+        $pattern = '/^\d{4}[AB]\d{3}$/'; // Matches YYYY[A|B]NNN format
+        if (!preg_match($pattern, $program)) {
+            $this->errors[$fieldKey] = "Invalid program format: '{$program}'. "
+                . "Expected format: YYYY[A|B]NNN.";
+            return null;
+        }
+
+        $year = intval(substr($program, 0, 4));
+        $semester = $program[4];
+        $number = intval(substr($program, 5, 3));
+
+        if ($year < 2000 || $year > intval(date('Y')) + 1) {
+            $this->errors[$fieldKey] = "Invalid year in program number '{$program}'. "
+                . "Year must be between 2000 and next calendar year.";
+            return null;
+        }
+
+        if (!in_array($semester, ['A', 'B'])) {
+            $this->errors[$fieldKey] = "Invalid semester in program number '{$program}'. "
+                . "Semester must be 'A' or 'B'.";
+            return null;
+        }
+
+        if ($number < 1 || $number > 999) {
+            $this->errors[$fieldKey] = "Invalid program number in '{$program}'. "
+                . "Number must be between 001 and 999.";
+            return null;
+        }
+
+        return IrtfUtilities::escape($program);
+    }
+
+    /**
+     * Validates the session code format.
+     *
+     * The session code must be exactly 10 characters in length and
+     * contain only alphanumeric characters.
+     *
+     * @param string $session Session code to validate.
+     * @param string $fieldKey  Key to associate errors with this field.
+     * @param bool   $required  Whether the field is required.
+     *
+     * @return string|null Validated session code, or null if validation fails.
+     *
+     * @throws ValidationException If the session code is invalid and the field is required.
+     */
+    protected function validateProgramSession(
+        string $session,
+        string $fieldKey = 'session',
+        bool $required = false
+    ): ?string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateProgramSession");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($session, "{$debugHeading} -- session");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate fields
+
+        // Engineering/project accounts
+        $engineeringCodes = $this->getEngineeringCodes();
+        if (in_array($session, $engineeringCodes, true)) {
+            return IrtfUtilities::escape($session);
+        }
+
+        // Guest program accounts
+        if (strlen($session) !== 10 || !ctype_alnum($session)) {
+            $this->errors[$fieldKey] = "Invalid session code '{$session}'. Must be a 10-character alphanumeric code.";
+            return null;
+        }
+        return IrtfUtilities::escape($session);
+    }
+
+    protected function getEngineeringCodes(): array
+    {
+        return [
+            'tisanpwd',
+            'wbtcorar'
+        ];
     }
 
     /**
@@ -205,6 +322,7 @@ class BaseFormValidator
         $this->debug->debugVariable($semester, "{$debugHeading} -- semester");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
         // Prepare values for validation
         $startDate = sprintf('%04d-%02d-%02d', $startYear, $startMonth, $startDay);
         $endDate = sprintf('%04d-%02d-%02d', $endYear, $endMonth, $endDay);
@@ -214,6 +332,7 @@ class BaseFormValidator
         $this->debug->debugVariable($endDate, "{$debugHeading} -- endDate");
         $this->debug->debugVariable($startSemester, "{$debugHeading} -- startSemester");
         $this->debug->debugVariable($endSemester, "{$debugHeading} -- endSemester");
+
         // Validate fields
         if (!checkdate($startMonth, $startDay, $startYear) || !checkdate($endMonth, $endDay, $endYear)) {
             $this->errors[$fieldKey] = "Invalid start or end date.";
@@ -255,6 +374,7 @@ class BaseFormValidator
         $this->debug->debugVariable($textLength, "{$debugHeading} -- textLength");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
         // Validate fields
         if ($required && empty($text)) {
             $this->errors[$fieldKey] = "Content is required.";
@@ -291,6 +411,7 @@ class BaseFormValidator
         $this->debug->debugVariable($addNA, "{$debugHeading} -- addNA");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
         // Validate fields
         $allowed = $addNA ? [0 => 0, 1, 2, 3, 4, 5] : [1 => 1, 2, 3, 4, 5];
         $starter = $addNA ? 0 : 1;
@@ -320,6 +441,7 @@ class BaseFormValidator
         $this->debug->debugVariable($location, "{$debugHeading} -- location");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
         // Validate fields
         $allowed = [0, 1];
         $errorMsg = "Invalid location. Must be 0 or 1.";
@@ -351,6 +473,7 @@ class BaseFormValidator
         $this->debug->debugVariable($allowed, "{$debugHeading} -- allowed");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
         // Validate fields
         $errorMsg = "Invalid visitor instrument selected.";
         return $this->validateSelection([$instrument], $allowed, $fieldKey, $required, $errorMsg);
@@ -387,20 +510,23 @@ class BaseFormValidator
         $this->debug->debugVariable($mimeTypes, "{$debugHeading} -- mimeTypes");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
         // Check for upload errors
         if ($fileData['error'] !== UPLOAD_ERR_OK) {
-            $this->errors['file'] = "File upload error code: {$fileData['error']}.";
+            $this->errors[$fieldKey] = "File upload error code: {$fileData['error']}.";
             return null;
         }
+
         // Validate MIME type
         if (!empty($mimeTypes) && !in_array($fileData['type'], $mimeTypes, true)) {
-            $this->errors['file'] = "Invalid file type: {$fileData['type']}.";
+            $this->errors[$fieldKey] = "Invalid file type: {$fileData['type']}.";
             return null;
         }
+
         // Move uploaded file
         $targetPath = rtrim($uploadPath, '/') . '/' . basename($fileData['name']);
         if (!move_uploaded_file($fileData['tmp_name'], $targetPath)) {
-            $this->errors['file'] = "Failed to move uploaded file to {$targetPath}.";
+            $this->errors[$fieldKey] = "Failed to move uploaded file to {$targetPath}.";
             return null;
         }
         return $targetPath;
