@@ -7,10 +7,10 @@ namespace App\controllers\ishell;
 use Exception;
 use App\exceptions\ValidationException;
 use App\core\common\Config;
-use App\core\common\Debug;
-use App\services\graphs\GraphService as Graph;
-use App\models\ishell\TemperaturesModel as Model;
-use App\views\ishell\TemperaturesView as View;
+use App\core\common\CustomDebug                 as Debug;
+use App\services\graphs\GraphService            as Graph;
+use App\models\ishell\TemperaturesModel         as Model;
+use App\views\ishell\TemperaturesView           as View;
 use App\validators\ishell\TemperaturesValidator as Validator;
 
 /**
@@ -35,8 +35,8 @@ class TemperaturesController
     /**
      * Initializes the controller with specified type and optional debugging.
      *
-     * @param string $ishell_type The specific type of configuration to load (e.g., 'monitor')
-     * @param Debug|null $debug   Optional. Debugging utility instance.
+     * @param string     $ishell_type The specific type of configuration to load (e.g., 'monitor')
+     * @param Debug|null $debug       Optional. Debugging utility instance.
      */
     public function __construct(
         string $ishell_type = 'monitor',
@@ -47,8 +47,8 @@ class TemperaturesController
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
 
-        // Load the config file for ishell temperatures
-        $this->config = require CONFIG_PATH . 'ishelltemps_config.php';
+        // Load the config for ishell temperatures
+        $this->config = Config::get('ishelltemps_config');
         $this->debug->debugVariable($this->config, "{$debugHeading} -- this->config");
 
         // Check if the requested controller exists in the config

@@ -6,7 +6,7 @@ namespace App\services\database\troublelog;
 
 use App\exceptions\DatabaseException;
 use App\services\database\DBConnection;
-use App\core\common\CustomDebug;
+use App\core\common\CustomDebug           as Debug;
 use App\services\database\DatabaseService as BaseService;
 
 /**
@@ -23,7 +23,7 @@ class TroublelogService extends BaseService
     public function __construct(
         bool $debugMode = false,
         ?DBConnection $db = null,
-        ?CustomDebug $debug = null
+        ?Debug $debug = null
     ) {
         parent::__construct('troublelog', $debugMode, $db, $debug);
     }

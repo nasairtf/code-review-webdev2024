@@ -6,7 +6,7 @@ namespace App\services\database;
 
 use App\exceptions\DatabaseException;
 use App\services\database\DBConnection;
-use App\core\common\CustomDebug;
+use App\core\common\CustomDebug as Debug;
 
 /**
  * DatabaseService class that provides core functionality for all database services.
@@ -26,9 +26,9 @@ class DatabaseService
         string $dbName,
         ?bool $debugMode = null,
         ?DBConnection $db = null,
-        ?CustomDebug $debug = null
+        ?Debug $debug = null
     ) {
-        $this->debug = $debug ?? new CustomDebug('database', $debugMode ?? false, $debugMode ? 1 : 0);
+        $this->debug = $debug ?? new Debug('database', $debugMode ?? false, $debugMode ? 1 : 0);
         $this->db = $db ?? DBConnection::getInstance($dbName, $debugMode ?? false);
     }
 

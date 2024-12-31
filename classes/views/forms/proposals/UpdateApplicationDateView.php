@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\views\forms\proposals;
 
-use App\core\common\CustomDebug;
 use App\exceptions\HtmlBuilderException;
+use App\core\common\CustomDebug           as Debug;
 use App\views\forms\BaseFormView          as BaseView;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
@@ -26,14 +26,14 @@ class UpdateApplicationDateView extends BaseView
      * Initializes the UpdateApplicationDateView with core builders and configurations.
      *
      * @param bool|null        $formatHtml  Enable formatted HTML output. Defaults to false if not provided.
-     * @param CustomDebug|null $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
+     * @param Debug|null       $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
      * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new HtmlBuilder.
      * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new CompBuilder.
      * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for site meta. Defaults to a new IrtfBuilder.
      */
     public function __construct(
         ?bool $formatHtml = null,
-        ?CustomDebug $debug = null,
+        ?Debug $debug = null,
         ?HtmlBuilder $htmlBuilder = null, // Dependency injection to simplify unit testing
         ?CompBuilder $compBuilder = null, // Dependency injection to simplify unit testing
         ?IrtfBuilder $irtfBuilder = null  // Dependency injection to simplify unit testing

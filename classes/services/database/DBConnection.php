@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\services\database;
 
-use App\core\common\Config;
-use App\core\common\CustomDebug;
 use App\exceptions\DatabaseException;
+use App\core\common\Config;
+use App\core\common\CustomDebug as Debug;
 use App\services\database\MySQLiWrapper;
 
 /**
  * DBConnection class provides a singleton connection pool for database interactions.
  *
  * This class supports CRUD operations, transactions, and singleton connection management.
- * It uses `CustomDebug` for error reporting and `Config` for database configuration.
+ * It uses `Debug` for error reporting and `Config` for database configuration.
  *
  * The DBConnection class is immutable and locked to ensure system stability.
  *
@@ -27,16 +27,16 @@ use App\services\database\MySQLiWrapper;
  * @since    2024-10-29
  *
  * @uses \App\core\common\Config
- * @uses \App\core\common\CustomDebug
+ * @uses \App\core\common\Debug
  * @uses \App\exceptions\DatabaseException
  * @uses \App\services\database\MySQLiWrapper
  */
 class DBConnection
 {
     /**
-     * CustomDebug instance for logging and output.
+     * Debug instance for logging and output.
      *
-     * @var CustomDebug
+     * @var Debug
      */
     private $debug;
 
@@ -60,7 +60,7 @@ class DBConnection
      * @param string             $dbName        Database name for configuration lookup.
      * @param bool               $debugMode     Whether to enable debug mode.
      * @param MySQLiWrapper|null $mysqliWrapper Optional MySQLiWrapper instance for testing.
-     * @param CustomDebug|null   $debug         Optional CustomDebug instance for testing.
+     * @param Debug|null         $debug         Optional Debug instance for testing.
      *
      * @throws DatabaseException If the database configuration is missing or the connection fails.
      */
@@ -68,10 +68,10 @@ class DBConnection
         string $dbName,
         ?bool $debugMode = null,
         ?MySQLiWrapper $mysqliWrapper = null,
-        ?CustomDebug $debug = null
+        ?Debug $debug = null
     ) {
         // Only set debug mode once during instance creation
-        $this->debug = $debug ?? new CustomDebug('db', $debugMode ?? false, $debugMode ? 1 : 0);
+        $this->debug = $debug ?? new Debug('db', $debugMode ?? false, $debugMode ? 1 : 0);
 
         // Fetch the config for DBConnection credentials
         $config = Config::get('db_config');
@@ -119,19 +119,19 @@ class DBConnection
      * @param string           $dbName    Database name.
      * @param bool             $debugMode Whether to enable debug mode.
      * @param mysqli|null      $mysqli    Optional mysqli instance for testing.
-     * @param CustomDebug|null $debug     Optional CustomDebug instance for testing.
+     * @param Debug|null       $debug     Optional Debug instance for testing.
      *
      * @return DBConnection Database connection instance.
      *
      * @uses \App\core\common\Config
-     * @uses \App\core\common\CustomDebug
+     * @uses \App\core\common\Debug
      * @uses \App\services\database\MySQLiWrapper
      */
     public static function getInstance(
         string $dbName,
         ?bool $debugMode = null,
         ?MySQLiWrapper $mysqliWrapper = null,
-        ?CustomDebug $debug = null
+        ?Debug $debug = null
     ): DBConnection {
         if (!isset(self::$instances[$dbName])) {
             self::$instances[$dbName] = new self($dbName, $debugMode ?? false, $mysqliWrapper, $debug);

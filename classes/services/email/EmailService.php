@@ -8,7 +8,7 @@ use Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use App\core\common\Config;
-use App\core\common\CustomDebug;
+use App\core\common\CustomDebug   as Debug;
 
 /**
  * EmailService class that provides core functionality for all email services.
@@ -46,7 +46,7 @@ class EmailService
         ?PHPMailer $mailer = null
     ) {
         // Debug output
-        $this->debug = new CustomDebug('email', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
+        $this->debug = new Debug('email', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
         $debugHeading = $this->debug->debugHeading("Service", "__construct");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($smtpName, "{$debugHeading} -- smtpName");

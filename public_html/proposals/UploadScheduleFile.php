@@ -2,8 +2,7 @@
 
 require_once '/aux1/htdocs/inc/bootstrap.php';
 
-use App\core\common\CustomDebug;
-
+use App\core\common\CustomDebug                            as Debug;
 use App\controllers\proposals\UploadScheduleFileController as Controller;
 
 /**
@@ -31,7 +30,7 @@ use App\controllers\proposals\UploadScheduleFileController as Controller;
 // Enable debug mode for the entire application
 $debugMode = false;
 $debugLevel = $debugMode ? 1 : 0;
-$debug = new CustomDebug('default', $debugMode, $debugLevel);
+$debug = new Debug('default', $debugMode, $debugLevel);
 
 // Enable html formatting for the entire page
 $formatHtml = $debugMode;

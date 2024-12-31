@@ -2,8 +2,7 @@
 
 require_once '/aux1/htdocs/inc/bootstrap.php';
 
-use App\core\common\CustomDebug;
-
+use App\core\common\CustomDebug                   as Debug;
 use App\controllers\ishell\TemperaturesController as Controller;
 
 /**
@@ -18,7 +17,7 @@ use App\controllers\ishell\TemperaturesController as Controller;
 // Enable debug mode for the entire page
 $debugMode = true;
 $debugLevel = $debugMode ? 1 : 0;
-$debug = new CustomDebug('default', $debugMode, $debugLevel);
+$debug = new Debug('default', $debugMode, $debugLevel);
 
 // Output the start of debug logging
 $debug->log("Spectrograph: Entry point debug|log mode is ON.");

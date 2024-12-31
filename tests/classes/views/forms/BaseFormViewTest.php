@@ -64,7 +64,7 @@ class BaseFormViewTest extends TestCase
     use AssertPrivateDependenciesTrait;
 
     /**
-     * Mock instance of CustomDebug.
+     * Mock instance of Debug.
      *
      * @var Mockery\MockInterface
      */
