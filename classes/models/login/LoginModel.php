@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\models\login;
 
-use App\core\common\CustomDebug;
+use App\core\common\CustomDebug                             as Debug;
 use App\services\database\troublelog\read\GuestAcctsService as DbRead;
 
 /**
@@ -37,11 +37,11 @@ class LoginModel
      *                     If not provided, a default instance is created.
      */
     public function __construct(
-        ?CustomDebug $debug = null,
+        ?Debug $debug = null,
         ?DbRead $dbRead = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new CustomDebug('login', false, 0);
+        $this->debug = $debug ?? new Debug('login', false, 0);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
 
