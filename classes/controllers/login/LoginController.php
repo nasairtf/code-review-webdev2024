@@ -244,34 +244,6 @@ class LoginController
     }
 
     /**
-     * Generates an embeddable login form.
-     *
-     * Prepares an embeddable login form with optional customizations for
-     * action URL, form data, and instructions.
-     *
-     * @param string $action       [optional] The URL where the form should be submitted.
-     *                              Defaults to the current script.
-     * @param array  $data         [optional] Initial data for form fields. Defaults to empty fields.
-     * @param string $instructions [optional] Custom instructions displayed above the form. Empty by default.
-     *
-     * @return string The HTML output for the embeddable login form.
-     *//*
-    public function buildEmbeddableLoginForm(string $action = '', array $data = [], string $instructions = ''): string
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Controller", "buildEmbeddableLoginForm");
-        $this->debug->debug($debugHeading);
-
-        if (empty($action)) {
-            $action = $_SERVER['PHP_SELF'];
-        }
-        if (empty($data)) {
-            $data = $this->model->initializeDefaultFormData();
-        }
-        return $this->view->buildEmbeddableLoginForm($action, $data, $instructions);
-    }*/
-
-    /**
      * Manages login requests, including form submission handling and rendering.
      *
      * Checks for a 'redirect' parameter via GET to set up post-login redirection, and
