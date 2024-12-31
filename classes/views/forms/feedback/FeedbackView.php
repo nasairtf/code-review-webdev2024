@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\views\forms\feedback;
 
-use App\core\common\CustomDebug;
 use App\exceptions\HtmlBuilderException;
+use App\core\common\CustomDebug           as Debug;
 use App\views\forms\BaseFormView          as BaseView;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
@@ -31,7 +31,7 @@ class FeedbackView extends BaseView
      * Initializes the FeedbackView with core builders and configurations.
      *
      * @param bool|null        $formatHtml  Enable formatted HTML output. Defaults to false if not provided.
-     * @param CustomDebug|null $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
+     * @param Debug|null       $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
      * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new HtmlBuilder.
      * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new CompBuilder.
      * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for site meta. Defaults to a new IrtfBuilder.
@@ -39,7 +39,7 @@ class FeedbackView extends BaseView
      */
     public function __construct(
         ?bool $formatHtml = null,
-        ?CustomDebug $debug = null,
+        ?Debug $debug = null,
         ?HtmlBuilder $htmlBuilder = null, // Dependency injection to simplify unit testing
         ?CompBuilder $compBuilder = null, // Dependency injection to simplify unit testing
         ?IrtfBuilder $irtfBuilder = null, // Dependency injection to simplify unit testing
@@ -229,6 +229,33 @@ class FeedbackView extends BaseView
             '',
         ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
+    }
+
+    /**
+     * Builds the preamble section for the login form.
+     *
+     * @param array $formData The default form data for login fields.
+     *
+     * @return string The HTML for the preamble.
+     */
+    private function buildPreamble(int $pad = 0): string
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("View", "buildPreamble");
+        $this->debug->debug($debugHeading);
+
+        // Prep the section contents
+        $preamble = '';
+        $rowAttr = [];
+        $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'];
+
+        // Build the section contents
+        return $this->compBuilder->buildPreambleFormSection(
+            $preamble,
+            $rowAttr,
+            $tableAttr,
+            0
+        );
     }
 
     /**
