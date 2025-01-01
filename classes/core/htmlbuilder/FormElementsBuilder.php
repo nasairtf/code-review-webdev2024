@@ -89,6 +89,12 @@ class FormElementsBuilder
     }
 
     /**
+     * Assorted methods for building form sections. Standardised sections have a
+     * heading comment labeling the section, the code of the section itself wrapped
+     * in <center> tags (typically a table), and then an optional section break <hr>.
+     */
+
+    /**
      * Builds a horizontal line break section for the form.
      *
      * This method returns a formatted HTML line element, which serves as a visual
@@ -108,19 +114,60 @@ class FormElementsBuilder
     }
 
     /**
+     * Builds a generic form section with standard centering and optional line break.
+     *
+     * This method provides a standardized wrapper for form sections, ensuring
+     * that the content is centered and optionally includes a line break.
+     *
+     * @param string $contentHtml   The HTML content of the section (typically a table element).
+     * @param string $sectionTag    Section tag to be used in the header, used for debugging or commenting.
+     * @param bool   $includeBreak  Whether to include a line break after the section. Defaults to false.
+     * @param int    $pad           Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The formatted HTML for the section.
+     */
+    public function buildFormSection(
+        string $contentHtml,
+        string $sectionTag,
+        bool $includeBreak = false,
+        int $pad = 0
+    ): string {
+        // Wrap the content in additional markup for centering and styling
+        $htmlParts = [
+            '',
+            sprintf('<!--  %s Section  -->', $sectionHeader),
+            '',
+            '<center>',
+            $contentHtml,
+            '</center>',
+            '',
+        ];
+
+        // Optionally include a line break after the section
+        if ($includeBreak) {
+            $htmlParts[] = $this->htmlBuilder->getLine([], $pad);
+            $htmlParts[] = '';
+        }
+
+        // Format and return the parts
+        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+    }
+
+    /**
      * Generates a section containing form buttons.
      *
      * This method creates a table to render form buttons (e.g., submit, reset) in a
      * single centered row. It supports customizable attributes for the table and row,
-     * as well as padding for formatting.
+     * as well as padding for formatting. It uses the generic section builder to simplify wrapping.
      *
-     * @param array $buttons   An array of HTML strings representing the buttons.
-     *                         Each button should be generated using a helper method,
-     *                         such as `getSubmitButton` or `getResetButton`.
-     * @param array $rowAttr   Optional attributes for the table row.
-     * @param array $tableAttr Optional attributes for the table element.
-     *                         Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
-     * @param int   $pad       Optional padding level for formatted output. Defaults to 0.
+     * @param array $buttons      An array of HTML strings representing the buttons.
+     *                            Each button should be generated using a helper method,
+     *                            such as `getSubmitButton` or `getResetButton`.
+     * @param array $rowAttr      Optional attributes for the table row.
+     * @param array $tableAttr    Optional attributes for the table element.
+     *                            Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param bool  $includeBreak Whether to include a line break after the section. Defaults to false.
+     * @param int   $pad          Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The HTML for the buttons section.
      */
@@ -128,6 +175,7 @@ class FormElementsBuilder
         array $buttons,
         array $rowAttr = [],
         array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+        bool $includeBreak = false,
         int $pad = 0
     ): string {
         // Validate the buttons array
@@ -157,17 +205,12 @@ class FormElementsBuilder
         );
 
         // Wrap the table in additional markup for centering and styling
-        $htmlParts = [
-            '',
-            '<!--  Buttons Section  -->',
-            '',
-            '<center>',
+        return $this->buildFormSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+            'Buttons',
+            $includeBreak,
+            $pad
+        );
     }
 
     /**
@@ -181,6 +224,7 @@ class FormElementsBuilder
      * @param array  $rowAttr      Optional attributes for the table row.
      * @param array  $tableAttr    Optional attributes for the table element.
      *                             Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param bool   $includeBreak Whether to include a line break after the section. Defaults to false.
      * @param int    $pad          Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The complete HTML for the preamble section.
@@ -189,6 +233,7 @@ class FormElementsBuilder
         string $preamble,
         array $rowAttr = [],
         array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+        bool $includeBreak = false,
         int $pad = 0
     ): string {
         // Render the preamble table
@@ -212,16 +257,12 @@ class FormElementsBuilder
         );
 
         // Wrap the table in additional markup for centering and styling
-        $htmlParts = [
-            '',
-            '<!--  Preamble  -->',
-            '',
-            '<center>',
+        return $this->buildFormSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+            'Preamble',
+            $includeBreak,
+            $pad
+        );
     }
 
     /**
@@ -241,6 +282,7 @@ class FormElementsBuilder
      * @param array $rowAttr      Optional attributes for the table row.
      * @param array $tableAttr    Optional attributes for the table element.
      *                            Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param bool  $includeBreak Whether to include a line break after the section. Defaults to false.
      * @param int   $pad          Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The HTML for the input fields section.
@@ -249,6 +291,7 @@ class FormElementsBuilder
         array $fieldConfigs,
         array $rowAttr = [],
         array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+        bool $includeBreak = false,
         int $pad = 0
     ): string {
         $tablePad = $pad;
@@ -281,18 +324,17 @@ class FormElementsBuilder
         $tableHtml = $this->htmlBuilder->getTableFromRows($rows, $tableAttr, $tablePad);
 
         // Wrap the table in additional markup for centering and styling
-        $htmlParts = [
-            '',
-            '<!--  Input Fields Section  -->',
-            '',
-            '<center>',
+        return $this->buildFormSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatOutput);
+            'Input Fields',
+            $includeBreak,
+            $pad
+        );
     }
+
+    /**
+     * Assorted methods for building semester/proposal forms.
+     */
 
     /**
      * Generates reset and submit buttons for a form, with a customizable submit button label.
