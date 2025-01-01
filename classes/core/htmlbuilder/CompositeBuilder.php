@@ -130,19 +130,48 @@ class CompositeBuilder
     }
 
     /**
+     * Builds a generic form section.
+     *
+     * This method provides a standardized wrapper for form sections, allowing optional
+     * inclusion of a line break and handling table-based content.
+     *
+     * @param string $contentHtml   The HTML content of the section (typically a table element).
+     * @param string $sectionHeader Optional header for the section, used for debugging or commenting.
+     * @param bool   $includeBreak  Whether to include a line break after the section. Defaults to false.
+     * @param int    $pad           Optional padding level for formatted output. Defaults to 0.
+     *
+     * @return string The formatted HTML for the section.
+     */
+    public function buildFormSection(
+        string $contentHtml,
+        string $sectionHeader = '',
+        bool $includeBreak = false,
+        int $pad = 0
+    ): string {
+        // Wrap the table in additional markup for centering and styling
+        return $this->elemBuilder->buildGenericFormSection(
+            $contentHtml,
+            $sectionHeader,
+            $includeBreak,
+            $pad
+        );
+    }
+
+    /**
      * Generates a section containing form buttons.
      *
      * This method creates a table to render form buttons (e.g., submit, reset) in a
      * single centered row. It supports customizable attributes for the table and row,
      * as well as padding for formatting.
      *
-     * @param array $buttons   An array of HTML strings representing the buttons.
-     *                         Each button should be generated using a helper method,
-     *                         such as `getSubmitButton` or `getResetButton`.
-     * @param array $rowAttr   Optional attributes for the table row.
-     * @param array $tableAttr Optional attributes for the table element.
-     *                         Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
-     * @param int   $pad       Optional padding level for formatted output. Defaults to 0.
+     * @param array $buttons      An array of HTML strings representing the buttons.
+     *                            Each button should be generated using a helper method,
+     *                            such as `getSubmitButton` or `getResetButton`.
+     * @param array $rowAttr      Optional attributes for the table row.
+     * @param array $tableAttr    Optional attributes for the table element.
+     *                            Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param bool  $includeBreak Whether to include a line break after the section. Defaults to false.
+     * @param int   $pad          Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The HTML for the buttons section.
      */
@@ -150,12 +179,14 @@ class CompositeBuilder
         array $buttons,
         array $rowAttr = [],
         array $tableAttr = ['border' => '0', 'cellspacing' => '4'],
+        bool $includeBreak = false,
         int $pad = 0
     ): string {
         return $this->elemBuilder->buildButtonsFormSection(
             $buttons,
             $rowAttr,
             $tableAttr,
+            $includeBreak,
             $pad
         );
     }
@@ -171,6 +202,7 @@ class CompositeBuilder
      * @param array  $rowAttr      Optional attributes for the table row.
      * @param array  $tableAttr    Optional attributes for the table element.
      *                             Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param bool  $includeBreak  Whether to include a line break after the section. Defaults to false.
      * @param int    $pad          Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The complete HTML for the preamble section.
@@ -179,12 +211,14 @@ class CompositeBuilder
         string $preambleHtml,
         array $rowAttr = [],
         array $tableAttr = ['border' => '0', 'cellspacing' => '4'],
+        bool $includeBreak = false,
         int $pad = 0
     ): string {
         return $this->elemBuilder->buildPreambleFormSection(
             $preambleHtml,
             $rowAttr,
             $tableAttr,
+            $includeBreak,
             $pad
         );
     }
@@ -206,6 +240,7 @@ class CompositeBuilder
      * @param array $rowAttr      Optional attributes for the table row.
      * @param array $tableAttr    Optional attributes for the table element.
      *                            Defaults to ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'].
+     * @param bool  $includeBreak Whether to include a line break after the section. Defaults to false.
      * @param int   $pad          Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The HTML for the input fields section.
@@ -214,12 +249,14 @@ class CompositeBuilder
         array $fieldConfigs,
         array $rowAttr = [],
         array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+        bool $includeBreak = false,
         int $pad = 0
     ): string {
         return $this->elemBuilder->buildInputFieldsFormSection(
             $fieldConfigs,
             $rowAttr,
             $tableAttr,
+            $includeBreak,
             $pad
         );
     }
