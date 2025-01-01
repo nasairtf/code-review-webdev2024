@@ -149,7 +149,7 @@ class CompositeBuilder
         int $pad = 0
     ): string {
         // Wrap the table in additional markup for centering and styling
-        return $this->elemBuilder->buildGenericFormSection(
+        return $this->elemBuilder->buildFormSection(
             $contentHtml,
             $sectionTag,
             $includeBreak,
