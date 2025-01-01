@@ -64,7 +64,7 @@ class FeedbackView extends BaseView
     /**
      * Provides field labels for the Feedback form.
      *
-     * Maps internal field names to user-friendly labels.
+     * Maps internal field names to user-friendly labels displayed on the form.
      *
      * @return array An associative array mapping field names to labels.
      */
@@ -121,33 +121,24 @@ class FeedbackView extends BaseView
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
         // Build the page contents
+        $break = true;
         $line = $this->htmlBuilder->getLine([], $pad);
         $htmlParts = [
-            $this->getPreamble($pad),
-            $line,
-            //$this->getButtons($pad),
-            $this->buildButtons($pad),
-            $line,
-            //$this->getSecurity($pad),
-            //$line,
-            $this->getProgramInfo($dbData, $formData, $pad),
-            $line,
-            $this->getTechnicalFeedback($formData, $pad),
-            $line,
-            $this->getPersonnelFeedback($formData, $pad),
-            $line,
-            $this->getScientificResults($formData, $pad),
-            $line,
-            $this->getSuggestions($formData, $pad),
-            $line,
-            $this->getButtons($pad),
-            $line,
+            $this->getPreamble($break, $pad),
+            $this->buildButtons($break, $pad),
+            $this->getProgramInfo($dbData, $formData, $break, $pad),
+            $this->getTechnicalFeedback($formData, $break, $pad),
+            $this->getPersonnelFeedback($formData, $break, $pad),
+            $this->getScientificResults($formData, $break, $pad),
+            $this->getSuggestions($formData, $break, $pad),
+            $this->buildButtons($break, $pad),
             "",
         ];
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
     }
 
     private function getPreamble(
+        bool $break = true,
         int $pad = 0
     ): string {
         // Debug output
@@ -219,52 +210,30 @@ class FeedbackView extends BaseView
             $tableAttr,
             $tablePad
         );
-        $htmlParts = [
-            '',
-            '<!--  Preamble  -->',
-            '',
-            '<center>',
+
+        // Wrap the table in additional markup for centering and styling
+        return $this->compBuilder->buildFormSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
-    }
-
-    /**
-     * Builds the preamble section for the login form.
-     *
-     * @param array $formData The default form data for login fields.
-     *
-     * @return string The HTML for the preamble.
-     */
-    private function buildPreamble(int $pad = 0): string
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "buildPreamble");
-        $this->debug->debug($debugHeading);
-
-        // Prep the section contents
-        $preamble = '';
-        $rowAttr = [];
-        $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'];
-
-        // Build the section contents
-        return $this->compBuilder->buildPreambleFormSection(
-            $preamble,
-            $rowAttr,
-            $tableAttr,
-            0
+            'Preamble',
+            $break,
+            $pad
         );
     }
 
     /**
      * Builds the button section for the feedback form.
      *
+     * Generates the buttons for form actions, including submission and reset buttons.
+     *
+     * @param bool  $break    Whether to include a line break after the section. Defaults to true.
+     * @param int   $pad      Optional padding level for formatted output. Defaults to 0.
+     *
      * @return string The HTML for the form buttons.
      */
-    private function buildButtons(int $pad = 0): string
-    {
+    private function buildButtons(
+        bool $break = true,
+        int $pad = 0
+    ): string {
         // Debug output
         $debugHeading = $this->debug->debugHeading("View", "buildButtons");
         $this->debug->debug($debugHeading);
@@ -284,35 +253,35 @@ class FeedbackView extends BaseView
             $buttons,
             $rowAttr,
             $tableAttr,
+            $break,
             $pad
         );
     }
 
-    //$htmlParts[] = $this->getSecurity($pad);
-    //$code .= getSecurity( $debug, $title, $isForm, $data );
-    private function getSecurity(
+    private function buildSecurity(
+        bool $break = true,
         int $pad = 0
     ): string {
         // Debug output
         $debugHeading = $this->debug->debugHeading("View", "getSecurity");
         $this->debug->debug($debugHeading);
 
-        // Render output
-        $htmlParts = [
-            '',
-            '<!--  Security section  -->',
-            '',
-            //'<center>',
-            //$tableHtml,
-            //'</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
+        // Generate the HTML for the security table
+        $tableHtml = '';
+
+        // Wrap the table in additional markup for centering and styling
+        return $this->compBuilder->buildFormSection(
+            $tableHtml,
+            'Security',
+            $break,
+            $pad
+        );
     }
 
     private function getProgramInfo(
         array $dbData = [],
         array $formData = [],
+        bool $break = true,
         int $pad = 0
     ): string {
         // Debug output
@@ -474,20 +443,19 @@ class FeedbackView extends BaseView
             $tableAttr,
             $tablePad
         );
-        $htmlParts = [
-            '',
-            '<!--  Program information section  -->',
-            '',
-            '<center>',
+
+        // Wrap the table in additional markup for centering and styling
+        return $this->compBuilder->buildFormSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
+            'Program Information',
+            $break,
+            $pad
+        );
     }
 
     private function getTechnicalFeedback(
         array $formData = [],
+        bool $break = true,
         int $pad = 0
     ): string {
         // Debug output
@@ -572,20 +540,19 @@ class FeedbackView extends BaseView
         ];
 
         $tableHtml = $this->htmlBuilder->getTableFromRows($rows, $tableAttr, $tablePad);
-        $htmlParts = [
-            '',
-            '<!--  Technical feedback section  -->',
-            '',
-            '<center>',
+
+        // Wrap the table in additional markup for centering and styling
+        return $this->compBuilder->buildFormSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
+            'Technical feedback',
+            $break,
+            $pad
+        );
     }
 
     private function getPersonnelFeedback(
         array $formData = [],
+        bool $break = true,
         int $pad = 0
     ): string {
         // Debug output
@@ -701,20 +668,19 @@ class FeedbackView extends BaseView
             ),
         ];
         $tableHtml = $this->htmlBuilder->getTableFromRows($rows, $tableAttr, $tablePad);
-        $htmlParts = [
-            '',
-            '<!--  Personnel feedback section  -->',
-            '',
-            '<center>',
+
+        // Wrap the table in additional markup for centering and styling
+        return $this->compBuilder->buildFormSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
+            'Personnel feedback',
+            $break,
+            $pad
+        );
     }
 
     private function getScientificResults(
         array $formData = [],
+        bool $break = true,
         int $pad = 0
     ): string {
         // Debug output
@@ -730,20 +696,19 @@ class FeedbackView extends BaseView
             'Please describe general results and comment on whether your expectations for data were met.',
             $pad
         );
-        $htmlParts = [
-            '',
-            '<!--  Scientific results section  -->',
-            '',
-            '<center>',
+
+        // Wrap the table in additional markup for centering and styling
+        return $this->compBuilder->buildFormSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
+            'Scientific results',
+            $break,
+            $pad
+        );
     }
 
     private function getSuggestions(
         array $formData = [],
+        bool $break = true,
         int $pad = 0
     ): string {
         // Debug output
@@ -759,15 +724,13 @@ class FeedbackView extends BaseView
             'Please describe what you liked during your run and also where we can improve.',
             $pad
         );
-        $htmlParts = [
-            '',
-            '<!--  Comments and Suggestions section  -->',
-            '',
-            '<center>',
+
+        // Wrap the table in additional markup for centering and styling
+        return $this->compBuilder->buildFormSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
+            'Comments and Suggestions',
+            $break,
+            $pad
+        );
     }
 }

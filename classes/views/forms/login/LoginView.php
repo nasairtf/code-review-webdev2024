@@ -112,10 +112,11 @@ class LoginView extends BaseView
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
         // Build the page contents
+        $break = true;
         $htmlParts = [
-            $this->buildPreamble($formData),
-            $this->buildInputFields($formData),
-            $this->buildButtons(),
+            $this->buildPreamble($formData, $break, $pad),
+            $this->buildInputFields($formData, $break, $pad),
+            $this->buildButtons($break, $pad),
         ];
 
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
@@ -147,10 +148,12 @@ class LoginView extends BaseView
      * Generates introductory instructions or content displayed at the top of the form.
      *
      * @param array $formData Data array containing form field values, including instructions.
+     * @param bool  $break    Whether to include a line break after the section. Defaults to true.
+     * @param int   $pad      Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The HTML for the preamble.
      */
-    private function buildPreamble(array $formData): string
+    private function buildPreamble(array $formData, bool $break = true, int $pad = 0): string
     {
         // Debug output
         $debugHeading = $this->debug->debugHeading("View", "buildPreamble");
@@ -166,8 +169,8 @@ class LoginView extends BaseView
             $instructions,
             $rowAttr,
             $tableAttr,
-            true,
-            0
+            $break,
+            $pad
         );
     }
 
@@ -178,10 +181,12 @@ class LoginView extends BaseView
      * with provided data if available.
      *
      * @param array $formData Data array containing form field values.
+     * @param bool  $break    Whether to include a line break after the section. Defaults to true.
+     * @param int   $pad      Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The HTML for the input fields.
      */
-    private function buildInputFields(array $formData): string
+    private function buildInputFields(array $formData, bool $break = true, int $pad = 0): string
     {
         // Debug output
         $debugHeading = $this->debug->debugHeading("View", "buildInputFields");
@@ -210,8 +215,8 @@ class LoginView extends BaseView
             $inputFields,
             $rowAttr,
             $tableAttr,
-            true,
-            0
+            $break,
+            $pad
         );
     }
 
@@ -220,9 +225,12 @@ class LoginView extends BaseView
      *
      * Generates the buttons for form actions, including submission and reset buttons.
      *
+     * @param bool  $break    Whether to include a line break after the section. Defaults to true.
+     * @param int   $pad      Optional padding level for formatted output. Defaults to 0.
+     *
      * @return string The HTML for the form buttons.
      */
-    private function buildButtons(): string
+    private function buildButtons(bool $break = true, int $pad = 0): string
     {
         // Debug output
         $debugHeading = $this->debug->debugHeading("View", "buildButtons");
@@ -243,8 +251,8 @@ class LoginView extends BaseView
             $buttons,
             $rowAttr,
             $tableAttr,
-            true,
-            0
+            $break,
+            $pad
         );
     }
 }
