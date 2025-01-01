@@ -2,13 +2,13 @@
 
 require_once '/aux1/htdocs/inc/bootstrap.php';
 
-use App\core\common\CustomDebug;
+use App\core\common\CustomDebug           as Debug;
 use App\controllers\login\LogoutController as Controller;
 
 /**
- * /home/webdev2024/public_html/Logout.php
+ * /home/webdev2024/public_html/login/Logout.php
  *
- * A quick and dirty logout page to reset sessions.
+ * The Logout Form.
  *
  * @category Logout
  * @package  IRTF
@@ -19,7 +19,7 @@ use App\controllers\login\LogoutController as Controller;
 // Enable debug mode for the entire page
 $debugMode = true;
 $debugLevel = $debugMode ? 1 : 0;
-$debug = new CustomDebug('login', $debugMode, $debugLevel); // entry point
+$debug = new Debug('login', $debugMode, $debugLevel); // entry point
 
 // Enable html formatting for the entire page
 $formatHtml = $debugMode;
