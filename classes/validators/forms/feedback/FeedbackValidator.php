@@ -115,25 +115,25 @@ class FeedbackValidator extends BaseValidator
         //$valid[$email]['semesterID'] = $db['program']['s'];
         // Observing Dates
         $this->validateDates(
-            $form['startmonth'],
-            $form['startday'],
-            $form['startyear'],
-            $form['endmonth'],
-            $form['endday'],
-            $form['endyear'],
+            (int) $form['startmonth'],
+            (int) $form['startday'],
+            (int) $form['startyear'],
+            (int) $form['endmonth'],
+            (int) $form['endday'],
+            (int) $form['endyear'],
             $form['s'],
             'dates',
             true
         );
         $valid[$fb]['start_date'] = IrtfUtilities::returnUnixDate(
-            $form['startmonth'],
-            $form['startday'],
-            $form['startyear']
+            (int) $form['startmonth'],
+            (int) $form['startday'],
+            (int) $form['startyear']
         );
         $valid[$fb]['end_date'] = IrtfUtilities::returnUnixDate(
-            $form['endmonth'],
-            $form['endday'],
-            $form['endyear']
+            (int) $form['endmonth'],
+            (int) $form['endday'],
+            (int) $form['endyear']
         );
         // Support Staff
         $valid[$sp] = $this->validateSelection(
@@ -167,12 +167,12 @@ class FeedbackValidator extends BaseValidator
         );
         // Technical Feedback
         $valid[$fb]['location'] = $this->validateLocation(
-            $form['location'],
+            (int) $form['location'],
             'location',
             true
         );
         $valid[$fb]['technical_rating'] = $this->validateRating(
-            $form['experience'],
+            (int) $form['experience'],
             false,
             'experience',
             true
@@ -185,19 +185,19 @@ class FeedbackValidator extends BaseValidator
         );
         // Personnel Feedback
         $valid[$fb]['scientific_staff_rating'] = $this->validateRating(
-            $form['scientificstaff'],
+            (int) $form['scientificstaff'],
             true,
             'scientificstaff',
             true
         );
         $valid[$fb]['TO_rating'] = $this->validateRating(
-            $form['operators'],
+            (int) $form['operators'],
             true,
             'operators',
             true
         );
         $valid[$fb]['daycrew_rating'] = $this->validateRating(
-            $form['daycrew'],
+            (int) $form['daycrew'],
             true,
             'daycrew',
             true
