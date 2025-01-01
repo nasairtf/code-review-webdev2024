@@ -96,7 +96,7 @@ class BaseFormValidator
             if (!in_array($option, $allowedSet, true)) {
                 $this->errors[$fieldKey][$option] = "{$errorMessage} Value: {$option}";
             } else {
-                $validatedOptions[] = IrtfUtilities::escape($option);
+                $validatedOptions[] = IrtfUtilities::escape((string) $option);
             }
         }
         return !empty($validatedOptions) ? $validatedOptions : null;
@@ -416,7 +416,8 @@ class BaseFormValidator
         $allowed = $addNA ? [0 => 0, 1, 2, 3, 4, 5] : [1 => 1, 2, 3, 4, 5];
         $starter = $addNA ? 0 : 1;
         $errorMsg = "Invalid rating. Must be between {$starter} and 5.";
-        return $this->validateSelection([$rating], $allowed, $fieldKey, $required, $errorMsg)[0];
+        $validatedResult = $this->validateSelection([$rating], $allowed, $fieldKey, $required, $errorMsg)[0];
+        return (int) $validatedResult ?? null;
     }
 
     /**
@@ -445,7 +446,8 @@ class BaseFormValidator
         // Validate fields
         $allowed = [0, 1];
         $errorMsg = "Invalid location. Must be 0 or 1.";
-        return $this->validateSelection([$location], $allowed, $fieldKey, $required, $errorMsg)[0];
+        $validatedResult = $this->validateSelection([$location], $allowed, $fieldKey, $required, $errorMsg)[0];
+        return (int) $validatedResult ?? null;
     }
 
     /**
