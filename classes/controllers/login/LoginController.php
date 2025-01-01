@@ -20,6 +20,9 @@ use App\validators\forms\login\LoginValidator as Validator;
  * and manages redirection after successful authentication. It supports both standalone
  * and embeddable login forms, ensuring flexibility across various forms.
  *
+ * Note: Embeddable login form removed from class as of 2024/12/31 due to some logic issues.
+ *       Will be re-added at a future date.
+ *
  * Key responsibilities include:
  * - Validating program and session data via `LoginValidator`.
  * - Checking credentials against the database with `LoginModel`.
@@ -57,16 +60,37 @@ class LoginController
     use LoginHelperTrait;
 
     // internal login-form specific properties
+
+    /** @var bool Whether to format HTML output. */
     private $formatHtml;
+
+    /** @var Debug Debugging utility for logging. */
     private $debug;
+
+    /** @var Model Model handling database interactions for login. */
     private $model;
+
+    /** @var View View managing form rendering. */
     private $view;
+
+    /** @var Validator Validator managing data validation. */
     private $valid;
+
+    /** @var array Configured allowed redirect URLs. */
     private $allowedRedirects = [];
+
     // possible to pass in properties from calling form
+
+    /** @var string Page title for the login form. */
     private $title;
+
+    /** @var string URL for form submission. */
     private $formAction;
+
+    /** @var string Instructions displayed on the login form. */
     private $instructions;
+
+    /** @var string Redirect path after successful login. */
     private $redirect;
 
     /**
@@ -107,7 +131,7 @@ class LoginController
         $this->valid = $valid ?? new Validator($this->debug);
         $this->debug->debug("{$debugHeading} -- Model, View, Validator classes successfully initialised.");
 
-        // calling form settable properties
+        // Initialise form settable properties
         $this->title = 'IRTF Form Login';
         $this->formAction = $_SERVER['PHP_SELF'];
         $this->instructions = $this->view->buildDefaultInstructions();
@@ -116,9 +140,8 @@ class LoginController
         // Fetch allowed redirects from Config
         $this->allowedRedirects = $this->fetchLoginConfig('allowedRedirects');
 
-        // Output the SESSION values
+        // Output the SESSION and default class values
         $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
-        // Output default class values
         $this->debug->debugVariable($this->title, "{$debugHeading} -- this->title");
         $this->debug->debugVariable($this->formAction, "{$debugHeading} -- this->formAction");
         $this->debug->debugVariable($this->instructions, "{$debugHeading} -- this->instructions");
@@ -244,10 +267,11 @@ class LoginController
     }
 
     /**
-     * Manages login requests, including form submission handling and rendering.
+     * Handles the main login request flow.
      *
-     * Checks for a 'redirect' parameter via GET to set up post-login redirection, and
-     * determines if the request is a login attempt or form render request.
+     * Determines the appropriate method to handle based on the HTTP method and request data.
+     *
+     * @return void
      */
     public function handleRequest(): void
     {
@@ -259,9 +283,8 @@ class LoginController
         if (isset($_GET['redirect'])) {
             $this->setRedirect($_GET['redirect']);
         }
-        // Output the SESSION values
+        // Output the SESSION, redirection values
         $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
-        // Output the redirection values
         $this->debug->debugVariable($this->allowedRedirects, "{$debugHeading} -- allowedRedirects");
         $this->debug->debugVariable($this->redirect, "{$debugHeading} -- redirect");
 
@@ -286,6 +309,12 @@ class LoginController
         }
     }
 
+    /**
+     * Handles login via GET parameters.
+     *
+     * @param array $formData The GET data containing login credentials.
+     * @return void
+     */
     private function handleLoginLink(array $formData): void
     {
         // Debug output
@@ -308,25 +337,23 @@ class LoginController
             // Debug output
             $this->debug->debugVariable($e->getMessages(), "Validation Errors");
 
-            // Render the form with errors and user input if validation fails
+            // Handle generating the form with errors and user input if validation fails
             $this->renderFormWithErrors(
                 $formData,
                 $e->getMessages()
             );
         } catch (Exception $e) {
-            // If validation fails, render error page
+            // If validation fails, prepare the error page
             $this->debug->log("Error in link login: " . $e->getMessage());
             $this->renderErrorPage('Error in link login: ', $e->getMessage());
         }
     }
 
     /**
-     * Validates credentials and manages login submission.
+     * Handles login submission via POST data.
      *
-     * Validates form data, verifies credentials, and stores login data in the session if valid.
-     * Redirects to a predefined URL on success or rerenders the form with an error on failure.
-     *
-     * @param array $formData The form data to validate and authenticate.
+     * @param array $formData The POST data containing login credentials.
+     * @return void
      */
     private function handleLoginSubmit(array $formData): void
     {
@@ -346,17 +373,24 @@ class LoginController
             // Debug output
             $this->debug->debugVariable($e->getMessages(), "Validation Errors");
 
-            // Render the form with errors and user input if validation fails
+            // Handle generating the form with errors and user input if validation fails
             $this->renderFormWithErrors(
                 $formData,
                 $e->getMessages()
             );
         } catch (Exception $e) {
-            // If validation fails, render error page
+            // If validation fails, prepare the error page
             $this->renderErrorPage('Unexpected error: ', $e->getMessage());
         }
     }
 
+    /**
+     * Validates login form data and stores session data if valid.
+     *
+     * @param array $formData The form data to validate.
+     * @return void
+     * @throws ValidationException If validation fails.
+     */
     private function handleDataValidation(array $formData): void
     {
         // Debug output
@@ -373,9 +407,10 @@ class LoginController
         }
 
         // If login is successful, save login data in session
-        $program = $validData['program'];
-        $session = $validData['session'];
-        $_SESSION['login_data'] = compact('program', 'session');
+        $_SESSION['login_data'] = [
+            'program' => $validData['program'],
+            'session' => $validData['session'],
+        ];
         $this->debug->debugVariable($_SESSION, "{$debugHeading} -- _SESSION");
         $this->debug->debug("getRedirectURL: " . $this->getRedirectURL());
 
@@ -383,6 +418,49 @@ class LoginController
         $this->redirectLoggedInUser($this->getRedirectURL());
     }
 
+    /**
+     * Validates the redirect key against the allowed redirects list.
+     *
+     * @param string $redirect The redirect key to validate.
+     * @return bool True if the redirect key is valid, false otherwise.
+     */
+    private function validateRedirect(string $redirect): bool
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Controller", "validateRedirect");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($redirect, "{$debugHeading} -- redirect");
+
+        return array_key_exists($redirect, $this->allowedRedirects);
+    }
+
+    /**
+     * Prepares the form action URL.
+     *
+     * @return string The validated form action URL.
+     */
+    private function validateFormAction(): string
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Controller", "validateFormAction");
+        $this->debug->debug($debugHeading);
+        // Validate formAction
+        $formAction = $this->formAction;
+        $this->debug->debugVariable($formAction, "{$debugHeading} -- formAction");
+        if ($this->redirect) {
+            $formAction .= "?redirect=" . urlencode($this->getRedirect());
+        }
+        $this->debug->debugVariable($formAction, "{$debugHeading} -- formAction");
+        return $formAction;
+    }
+
+    /**
+     * Renders the login form with validation errors.
+     *
+     * @param array $formData   The form data provided by the user.
+     * @param array $dataErrors Validation error messages.
+     * @return void
+     */
     private function renderFormWithErrors(
         array $formData,
         array $dataErrors
@@ -393,11 +471,11 @@ class LoginController
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
         $this->debug->debugVariable($dataErrors, "{$debugHeading} -- dataErrors");
 
-        // Logic to generate the first page form
+        // Logic to generate the form with errors
         $formAction = $this->validateFormAction();
         $fieldLabels = $this->view->getFieldLabels();
 
-        // Render the errors section and the form
+        // Call the view to render the errors section and the form
         echo $this->view->renderFormWithErrors(
             $this->title, // title
             $formAction,  // action
@@ -424,11 +502,12 @@ class LoginController
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
 
+        // Logic to generate the first page form
         $formAction = $this->validateFormAction();
-        if (empty($formData)) {
-            $formData = $this->model->initializeDefaultFormData();
-        }
+        $formData = $formData ?: $this->model->initializeDefaultFormData();
         $formData['instructions'] = $this->instructions;
+
+        // Call the view to render the form
         echo $this->view->renderFormPage(
             $this->title, // title
             $formAction,  // action
@@ -436,39 +515,5 @@ class LoginController
             $formData,    // formData
             0             // pad
         );
-    }
-
-    /**
-     * Validates the redirect key against the allowed redirects list.
-     *
-     * Checks if the given redirect key exists in the `$allowedRedirects` configuration array.
-     *
-     * @param string $redirect The redirect key to validate.
-     *
-     * @return bool True if the redirect key is valid, false otherwise.
-     */
-    private function validateRedirect(string $redirect): bool
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Controller", "validateRedirect");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($redirect, "{$debugHeading} -- redirect");
-
-        return array_key_exists($redirect, $this->allowedRedirects);
-    }
-
-    private function validateFormAction(): string
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Controller", "validateFormAction");
-        $this->debug->debug($debugHeading);
-        // Validate formAction
-        $formAction = $this->formAction;
-        $this->debug->debugVariable($formAction, "{$debugHeading} -- formAction");
-        if ($this->redirect) {
-            $formAction .= "?redirect=" . urlencode($this->getRedirect());
-        }
-        $this->debug->debugVariable($formAction, "{$debugHeading} -- formAction");
-        return $formAction;
     }
 }
