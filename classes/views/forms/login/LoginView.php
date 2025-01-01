@@ -112,14 +112,10 @@ class LoginView extends BaseView
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
         // Build the page contents
-        $break = $this->compBuilder->buildFormSectionBreak(0);
         $htmlParts = [
             $this->buildPreamble($formData),
-            $break,
             $this->buildInputFields($formData),
-            $break,
             $this->buildButtons(),
-            $break,
         ];
 
         return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
@@ -170,6 +166,7 @@ class LoginView extends BaseView
             $instructions,
             $rowAttr,
             $tableAttr,
+            true,
             0
         );
     }
@@ -213,6 +210,7 @@ class LoginView extends BaseView
             $inputFields,
             $rowAttr,
             $tableAttr,
+            true,
             0
         );
     }
@@ -245,6 +243,7 @@ class LoginView extends BaseView
             $buttons,
             $rowAttr,
             $tableAttr,
+            true,
             0
         );
     }
