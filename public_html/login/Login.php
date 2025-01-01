@@ -17,7 +17,7 @@ use App\controllers\login\LoginController as Controller;
  */
 
 // Enable debug mode for the entire application
-$debugMode = true;
+$debugMode = false;
 $debugLevel = $debugMode ? 1 : 0;
 $debug = new Debug('login', $debugMode, $debugLevel); // entry point
 
