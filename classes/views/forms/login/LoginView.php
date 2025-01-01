@@ -15,28 +15,38 @@ use App\legacy\IRTFLayout                 as IrtfBuilder;
  * View for rendering the Login form.
  *
  * This class is responsible for generating the HTML structure of the login form,
- * including any default instructions and formatting options. It utilizes the shared
- * functionality in the BaseFormView.
+ * including default instructions, input fields, buttons, and any additional formatting options.
+ * It uses `BaseFormView` to leverage common form rendering functionality and relies on
+ * the `HtmlBuilder` and `CompositeBuilder` classes to dynamically generate HTML content.
  *
  * @category Views
  * @package  IRTF
  * @author   Miranda Hawarden-Ogata
  * @version  1.0.0
+ *
+ * @property Debug       $debug        Debugging utility for logging.
+ * @property HtmlBuilder $htmlBuilder  Utility for building HTML elements.
+ * @property CompBuilder $compBuilder  Utility for building composite HTML elements.
+ * @property IrtfBuilder $irtfBuilder  Legacy layout builder for IRTF-specific metadata.
+ *
+ * @see Debug
+ * @see HtmlBuilder
+ * @see CompBuilder
+ * @see IrtfBuilder
  */
-
 class LoginView extends BaseView
 {
     /**
      * Constructor for initializing the LoginView.
      *
-     * Sets up the necessary builders and layout utilities, and determines
-     * whether HTML output should be formatted.
+     * Sets up dependencies for rendering the login form, including HTML and composite builders.
+     * Determines whether HTML output should be formatted.
      *
      * @param bool|null        $formatHtml  Enable formatted HTML output. Defaults to false if not provided.
-     * @param Debug|null       $debug       Debug instance for logging and debugging. Defaults to a new Debug instance.
-     * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new HtmlBuilder.
-     * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new CompBuilder.
-     * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for site meta. Defaults to a new IrtfBuilder.
+     * @param Debug|null       $debug       Debug instance for logging and debugging. Defaults to a new `Debug` instance.
+     * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new `HtmlBuilder`.
+     * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new `CompositeBuilder`.
+     * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for IRTF-specific metadata. Defaults to a new `IrtfBuilder`.
      */
     public function __construct(
         ?bool $formatHtml = null,
@@ -60,7 +70,7 @@ class LoginView extends BaseView
     /**
      * Provides field labels for the Login form.
      *
-     * Maps internal field names to user-friendly labels.
+     * Maps internal field names to user-friendly labels displayed on the form.
      *
      * @return array An associative array mapping field names to labels.
      */
@@ -80,9 +90,8 @@ class LoginView extends BaseView
     /**
      * Generates the main page content for the login form.
      *
-     * This method defines the specific HTML structure for the login form,
-     * using the provided database and form data. The BaseFormView parent method
-     * getContentsForm() passes the contents to renderFormPage(), etc., for rendering.
+     * Defines the HTML structure of the login form, including preamble, input fields, and buttons.
+     * It uses provided database and form data to populate the fields and applies padding for formatted output.
      *
      * @param array $dbData   Data arrays required to populate form options. Defaults to an empty array.
      * @param array $formData Default data for form fields. Defaults to an empty array.
@@ -139,7 +148,9 @@ class LoginView extends BaseView
     /**
      * Builds the preamble section for the login form.
      *
-     * @param array $formData The default form data for login fields.
+     * Generates introductory instructions or content displayed at the top of the form.
+     *
+     * @param array $formData Data array containing form field values, including instructions.
      *
      * @return string The HTML for the preamble.
      */
@@ -166,7 +177,10 @@ class LoginView extends BaseView
     /**
      * Builds the input fields section for the login form.
      *
-     * @param array $formData The default form data for login fields.
+     * Generates the form's input fields for program number and session code, pre-filled
+     * with provided data if available.
+     *
+     * @param array $formData Data array containing form field values.
      *
      * @return string The HTML for the input fields.
      */
@@ -205,6 +219,8 @@ class LoginView extends BaseView
 
     /**
      * Builds the button section for the login form.
+     *
+     * Generates the buttons for form actions, including submission and reset buttons.
      *
      * @return string The HTML for the form buttons.
      */

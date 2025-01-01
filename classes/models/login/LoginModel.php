@@ -10,14 +10,21 @@ use App\services\database\troublelog\read\GuestAcctsService as DbRead;
 /**
  * Model for handling login-related data operations.
  *
- * The `LoginModel` class interacts with the data layer to validate user credentials.
- * It communicates with the `GuestAcctsService` to access login information, primarily
- * focusing on program and session code validation.
+ * The `LoginModel` class serves as the interface between the login business logic and the database.
+ * It utilizes the `GuestAcctsService` to validate user credentials, ensuring a secure and seamless
+ * login process. This class also provides default data structures for the login form fields.
  *
  * @category Models
  * @package  IRTF
+ * @author   Miranda Hawarden-Ogata
+ * @version  1.0.0
+ *
+ * @property Debug   $debug  Debugging utility for logging and error handling.
+ * @property DbRead  $dbRead Database read service for accessing guest account data.
+ *
+ * @see Debug
+ * @see DbRead
  */
-
 class LoginModel
 {
     /**
@@ -30,11 +37,16 @@ class LoginModel
      */
     private $dbRead;
 
-    /**
+   /**
      * Initializes the `LoginModel` with debugging and data service components.
      *
-     * @param Debug $debug Optional. Debugging utility instance for logging.
-     *                     If not provided, a default instance is created.
+     * The constructor ensures that debugging and database service dependencies are properly initialized.
+     * If not explicitly provided, it defaults to creating new instances with minimal configuration.
+     *
+     * @param Debug|null $debug Optional debugging utility instance for logging.
+     *                          If not provided, a default instance is created.
+     * @param DbRead|null $dbRead Optional database read service for guest accounts.
+     *                            If not provided, a default instance is created.
      */
     public function __construct(
         ?Debug $debug = null,
@@ -54,44 +66,51 @@ class LoginModel
     }
 
     /**
-     * Checks if the given program number and session code match a record in the database.
+     * Checks if the provided program number and session code are valid.
      *
-     * This method queries the `GuestAcctsService` to validate if a given
-     * program-session pair exists, ensuring that users can only log in with valid credentials.
+     * This method validates the provided credentials by querying the `GuestAcctsService`.
+     * It ensures that the credentials exist in the database and are allowed for login.
      *
-     * @param string $program Program number provided by the user.
-     * @param string $session Session code provided by the user.
+     * @param string $program Program number submitted by the user.
+     * @param string $session Session code submitted by the user.
      *
-     * @return bool True if credentials are valid, otherwise false.
+     * @return bool True if the credentials are valid; false otherwise.
      */
     public function checkCredentials(string $program, string $session): bool
     {
         // Debug output
-        $this->debug->debug("Login Model: checkCredentials()");
-        $this->debug->debugVariable($program, "program");
-        $this->debug->debugVariable($session, "session");
+        $debugHeading = $this->debug->debugHeading("Model", "checkCredentials");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($program, "{$debugHeading} -- program");
+        $this->debug->debugVariable($session, "{$debugHeading} -- session");
+
         // Return the validation result
         $result = $this->dbRead->fetchProgramValidation($program, $session);
         $this->debug->debugVariable($result, "result");
+
+        // Return true if at least one valid match is found
         return ($result[0]['count'] > 0);
     }
 
     /**
-     * Provides default data for the login form fields.
+     * Initializes default values for login form fields.
+     *
+     * This method provides default values for the login form fields, ensuring a consistent structure
+     * for the form input. These defaults are used when rendering a blank or reset form.
      *
      * @return array Default values for the login form fields.
      */
     public function initializeDefaultFormData(): array
     {
         // Debug output
-        $this->debug->debug("Login Model: initializeDefaultFormData()");
-        // Return the data
+        $debugHeading = $this->debug->debugHeading("Model", "initializeDefaultFormData");
+        $this->debug->debug($debugHeading);
+
+        // Return default field values
         return [
-            // Program Information
-            'program' => '',    // Program Number
-            'session' => '',    // Session Code
-            // Error Information
-            'error' => '',      // Failed validation errors
+            'program' => '', // Default empty program number
+            'session' => '', // Default empty session code
+            'error'   => '', // Placeholder for validation error messages
         ];
     }
 }

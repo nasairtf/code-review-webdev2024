@@ -26,6 +26,7 @@ use App\core\common\CustomDebug as Debug;
  *
  * @category Controllers
  * @package  IRTF
+ * @author   Miranda Hawarden-Ogata
  * @version  1.0.0
  */
 

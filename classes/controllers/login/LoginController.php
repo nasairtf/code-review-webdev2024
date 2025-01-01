@@ -37,6 +37,7 @@ use App\validators\forms\login\LoginValidator as Validator;
  *
  * @category Controllers
  * @package  IRTF
+ * @author   Miranda Hawarden-Ogata
  * @version  1.0.0
  *
  * @property Debug     $debug            Debugging utility for logging.
