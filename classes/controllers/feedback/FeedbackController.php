@@ -53,6 +53,9 @@ class FeedbackController
         ?Validator $valid = null,
         ?Email $email = null
     ) {
+        // Start the session for the login form
+        $this->sessionSetup();
+
         // Debug output
         $this->debug = $debug ?? new Debug('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
