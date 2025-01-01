@@ -10,45 +10,38 @@ use App\core\common\Config;
 use App\core\common\CustomDebug as Debug;
 
 /**
- * Manages logout functionality for IRTF forms, handling validation, submission, and redirection.
+ * Manages logout functionality for IRTF forms, handling session cleanup and redirection.
  *
- * This controller handles requests to the login form, validates user credentials,
- * and manages redirection after successful authentication. It supports both standalone
- * and embeddable login forms, ensuring flexibility across various forms.
+ * This controller is responsible for terminating user sessions securely and optionally
+ * redirecting users to a designated page after logout. It supports debugging for session
+ * management activities and leverages reusable logic from `LoginHelperTrait`.
  *
  * Key responsibilities include:
- * - Validating program and session data via `LoginValidator`.
- * - Checking credentials against the database with `LoginModel`.
- * - Handling allowed redirects for different IRTF application endpoints.
- * - Displaying or re-displaying the login form with error messages on failure.
+ * - Clearing and destroying active sessions.
+ * - Logging session cleanup events for debugging.
+ * - Providing flexibility for logout workflows across multiple IRTF applications.
  *
  * Dependencies:
- * - `LoginModel`: Provides methods to check login credentials against the database.
- * - `LoginView`: Manages HTML generation for the login form.
- * - `LoginValidator`: Handles validation of form input data.
  * - `CustomDebug`: Logs information for debugging purposes, especially useful during development.
  *
  * @category Controllers
  * @package  IRTF
  * @version  1.0.0
- *
- * @property Debug  $debug            Debugging utility for logging.
- * @property array  $allowedRedirects Configured allowed redirect URLs.
- * @property string $title            Title for the login form page.
- * @property string $formAction       URL for form submission.
- * @property string $instructions     Instructions displayed on the login form.
- * @property string $redirect         Redirect path after successful login.
- *
- * @see Debug
  */
 
 class LogoutController
 {
     use LoginHelperTrait;
 
-    // internal login-form specific properties
+    /** @var Debug Debugging utility for logging. */
     private $debug;
 
+    /**
+     * Initializes the `LogoutController` with core dependencies and prepares for session cleanup.
+     *
+     * @param bool      $formatHtml Whether to enable HTML formatting in debug output (default: false).
+     * @param Debug|null $debug     An optional debug instance for logging. If not provided, a new instance is created.
+     */
     public function __construct(
         bool $formatHtml = false,
         ?Debug $debug = null
@@ -62,10 +55,12 @@ class LogoutController
     }
 
     /**
-     * Manages login requests, including form submission handling and rendering.
+     * Handles the logout request by performing session cleanup.
      *
-     * Checks for a 'redirect' parameter via GET to set up post-login redirection, and
-     * determines if the request is a login attempt or form render request.
+     * This method clears all session data and destroys the session to ensure the user is fully logged out.
+     * It leverages the session cleanup logic from `LoginHelperTrait` and logs the process for debugging.
+     *
+     * @return void
      */
     public function handleRequest(): void
     {
