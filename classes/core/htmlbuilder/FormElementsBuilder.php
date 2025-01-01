@@ -135,7 +135,7 @@ class FormElementsBuilder
         // Wrap the content in additional markup for centering and styling
         $htmlParts = [
             '',
-            sprintf('<!--  %s Section  -->', $sectionHeader),
+            sprintf('<!--  %s Section  -->', $sectionTag),
             '',
             '<center>',
             $contentHtml,
@@ -230,7 +230,7 @@ class FormElementsBuilder
      * @return string The complete HTML for the preamble section.
      */
     public function buildPreambleFormSection(
-        string $preamble,
+        string $preambleHtml,
         array $rowAttr = [],
         array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
         bool $includeBreak = false,
@@ -244,7 +244,7 @@ class FormElementsBuilder
         $tableHtml = $this->htmlBuilder->getTableFromRows(
             [
                 $this->htmlBuilder->getTableRowFromArray(
-                    [$preamble],
+                    [$preambleHtml],
                     false,
                     [false],
                     $rowAttr,

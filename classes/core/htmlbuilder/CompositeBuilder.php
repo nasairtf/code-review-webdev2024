@@ -208,7 +208,7 @@ class CompositeBuilder
      * @return string The complete HTML for the preamble section.
      */
     public function buildPreambleFormSection(
-        string $preamble,
+        string $preambleHtml,
         array $rowAttr = [],
         array $tableAttr = ['border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
         bool $includeBreak = false,
