@@ -71,5 +71,7 @@ class LogoutController
 
         // Clear and destroy the session if it is active
         $this->sessionCleanup();
+
+        echo "Session has been cleared and user is now logged out.";
     }
 }
