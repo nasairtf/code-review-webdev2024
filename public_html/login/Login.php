@@ -16,7 +16,7 @@ use App\controllers\login\LoginController as Controller;
  * @version  1.0.0
  */
 
-// Enable debug mode for the entire page
+// Enable debug mode for the entire application
 $debugMode = true;
 $debugLevel = $debugMode ? 1 : 0;
 $debug = new Debug('login', $debugMode, $debugLevel); // entry point
@@ -24,7 +24,7 @@ $debug = new Debug('login', $debugMode, $debugLevel); // entry point
 // Enable html formatting for the entire page
 $formatHtml = $debugMode;
 
-// Log the start of login module operation
+// Log the start of module operation
 $debug->log("Login: Entry point debug|log mode is ON.");
 
 // Initialize and process the login controller

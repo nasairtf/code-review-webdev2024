@@ -8,16 +8,21 @@ use App\controllers\ishell\TemperaturesController as Controller;
 /**
  * /home/webdev2024/public_html/ishell/spectrograph_controller.php
  *
+ * The iSHELL spectrograph temperature controller page.
+ *
  * @category iSHELL
  * @package  IRTF
  * @author   Miranda Hawarden-Ogata
  * @version  1.0.0
  */
 
-// Enable debug mode for the entire page
+// Enable debug mode for the entire application
 $debugMode = true;
 $debugLevel = $debugMode ? 1 : 0;
 $debug = new Debug('default', $debugMode, $debugLevel);
+
+// Enable html formatting for the entire page
+//$formatHtml = $debugMode;
 
 // Output the start of debug logging
 $debug->log("Spectrograph: Entry point debug|log mode is ON.");

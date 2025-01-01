@@ -8,18 +8,7 @@ use App\controllers\proposals\UploadScheduleFileController as Controller;
 /**
  * /home/webdev2024/public_html/proposals/UploadScheduleFile.php
  *
- * Uploads the schedule CSV file, parses it, and loads it to the database.
- *
- * Created:
- *  2014/04/25 - Miranda Hawarden-Ogata
- *
- * Modified:
- *   2014/07/25 - Miranda Hawarden-Ogata
- *      - Fixed comment bug;
- *   2015/02/08 - Miranda Hawarden-Ogata
- *      - Moved to /home/proposal
- *  2024/11/19 - Miranda Hawarden-Ogata
- *      - Refactoring to MVC OOP.
+ * The UploadScheduleFile Form.
  *
  * @category Schedule
  * @package  IRTF
@@ -35,7 +24,7 @@ $debug = new Debug('default', $debugMode, $debugLevel);
 // Enable html formatting for the entire page
 $formatHtml = $debugMode;
 
-// Output the start of debug logging
+// Log the start of module operation
 $debug->log("UploadScheduleFile: Entry point debug|log mode is ON.");
 
 // Initialize the form controller

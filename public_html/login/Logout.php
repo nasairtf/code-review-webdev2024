@@ -16,7 +16,7 @@ use App\controllers\login\LogoutController as Controller;
  * @version  1.0.0
  */
 
-// Enable debug mode for the entire page
+// Enable debug mode for the entire application
 $debugMode = true;
 $debugLevel = $debugMode ? 1 : 0;
 $debug = new Debug('login', $debugMode, $debugLevel); // entry point
@@ -24,11 +24,11 @@ $debug = new Debug('login', $debugMode, $debugLevel); // entry point
 // Enable html formatting for the entire page
 $formatHtml = $debugMode;
 
-// Log the start of logout module operation
+// Log the start of module operation
 $debug->log("Logout: Entry point debug|log mode is ON.");
 
 // Initialize and process the logout controller
 $controller = new Controller($formatHtml, $debug); // entry point
 
-// Process and render the logout form based on request type.
+// Process and render the logout.
 $controller->handleRequest();
