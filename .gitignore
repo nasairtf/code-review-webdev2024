@@ -61,11 +61,17 @@ public_html/test_*.php
 
 # Exclude public_html files not in source control
 public_html/*.php
+public_html/ishell/*.php
+public_html/login/*.php
+public_html/observing/*.php
+public_html/observing/feedback/*.php
+public_html/observing/orf/*.php
+public_html/proposals/*.php
 
 # Include specific entry points in public_html
-!public_html/Login.php
-!public_html/Logout.php
-!public_html/feedback/Feedback.php
+!public_html/login/Login.php
+!public_html/login/Logout.php
+!public_html/observing/feedback/Feedback.php
 !public_html/ishell/index.html
 !public_html/ishell/spectrograph_controller.php
 !public_html/ishell/guider_controller.php
