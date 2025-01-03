@@ -168,7 +168,7 @@ class MySQLiWrapper
      *
      * @return \mysqli_result|bool The result object for SELECT queries or true/false for non-SELECT queries.
      */
-    public function query(string $sql): ?\mysqli_result
+    public function query(string $sql)
     {
         return $this->mysqli->query($sql);
     }
