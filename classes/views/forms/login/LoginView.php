@@ -42,11 +42,16 @@ class LoginView extends BaseView
      * Sets up dependencies for rendering the login form, including HTML and composite builders.
      * Determines whether HTML output should be formatted.
      *
-     * @param bool|null        $formatHtml  Enable formatted HTML output. Defaults to false if not provided.
-     * @param Debug|null       $debug       Debug instance for logging and debugging. Defaults to a new `Debug` instance.
-     * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements. Defaults to a new `HtmlBuilder`.
-     * @param CompBuilder|null $compBuilder Instance for composite HTML elements. Defaults to a new `CompositeBuilder`.
-     * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for IRTF-specific metadata. Defaults to a new `IrtfBuilder`.
+     * @param bool|null        $formatHtml  Enable formatted HTML output.
+     *                                      Defaults to false.
+     * @param Debug|null       $debug       Debug instance for logging and debugging.
+     *                                      Defaults to a new `Debug` instance.
+     * @param HtmlBuilder|null $htmlBuilder Instance for constructing HTML elements.
+     *                                      Defaults to a new `HtmlBuilder`.
+     * @param CompBuilder|null $compBuilder Instance for composite HTML elements.
+     *                                      Defaults to a new `CompositeBuilder`.
+     * @param IrtfBuilder|null $irtfBuilder Legacy layout builder for IRTF-specific metadata.
+     *                                      Defaults to a new `IrtfBuilder`.
      */
     public function __construct(
         ?bool $formatHtml = null,
