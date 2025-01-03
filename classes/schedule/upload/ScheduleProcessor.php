@@ -769,7 +769,7 @@ IGNORE 1 LINES
         if ($facilityOpen === 1 || $facilityClose === 1 || $insChange === 1 || $facilityShutD === 1) {
             $projectPI = $commentList[6];
         }
-        $programData = $this->parseProgram($programID, $programList);
+        $programData = $this->parseProgram((string) $programID, $programList);
         $projectMembers = $programData['projectMembers'];
         $otherInfo = $programData['otherInfo'];
         $PIName = $programData['PIName'];
@@ -846,7 +846,14 @@ IGNORE 1 LINES
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($startTime, "{$debugHeading} -- startTime");
         // Calculate the value for logID
-        $cutoffTime = mktime(6, 0, 0, date('n', $startTime), date('j', $startTime), date('Y', $startTime));
+        $cutoffTime = mktime(
+            6,
+            0,
+            0,
+            (int) date('n', $startTime),
+            (int) date('j', $startTime),
+            (int) date('Y', $startTime)
+        );
         // if the start is < the cutoff time, the logID is the previous day's date
         // if the start is > the cutoff time, the logID is the current day's date
         return $startTime <= $cutoffTime
