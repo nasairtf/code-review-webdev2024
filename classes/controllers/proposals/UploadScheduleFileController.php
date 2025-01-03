@@ -14,25 +14,51 @@ use App\validators\forms\proposals\UploadScheduleFileValidator as Validator;
 /**
  * Controller for handling the schedule upload logic.
  *
+ * This controller manages the logic for uploading schedule files, including:
+ * - Validating uploaded data.
+ * - Processing schedule files via the `ScheduleManager`.
+ * - Rendering appropriate views based on user input or errors.
+ *
+ * It interacts with:
+ * - `UploadScheduleFileValidator` for validating input and uploaded files.
+ * - `UploadScheduleFileView` for rendering form and result pages.
+ * - `ScheduleManager` for processing the uploaded schedule files.
+ *
  * @category Controllers
  * @package  IRTF
  * @author   Miranda Hawarden-Ogata
  * @version  1.0.0
+ *
+ * @property bool        $formatHtml Determines whether HTML output is formatted.
+ * @property Debug       $debug      Debugging utility for logging and error tracing.
+ * @property View        $view       View instance for rendering HTML pages.
+ * @property Validator   $valid      Validator instance for validating form data and files.
+ * @property Manager     $schedule   Manager instance for handling schedule operations.
  */
 
 class UploadScheduleFileController
 {
     private $formatHtml;
     private $debug;
-    //private $model;
     private $view;
     private $valid;
     private $schedule;
 
-    // Constructor: Initializes the controller, view, and model, and sets up debugging
+    /**
+     * Constructs the controller, initializing dependencies and utilities.
+     *
+     * @param bool|null      $formatHtml Enable or disable HTML formatting (default: false).
+     * @param Debug|null     $debug      Debugging utility for logging (default: new Debug instance).
+     * @param View|null      $view       View instance for rendering forms and pages (default: new View).
+     * @param Validator|null $valid      Validator instance for form validation (default: new Validator).
+     * @param Manager|null   $schedule   Manager instance for processing schedules (default: new Manager).
+     */
     public function __construct(
-        bool $formatHtml = false,
-        ?Debug $debug = null
+        ?bool $formatHtml = null,
+        ?Debug $debug = null,
+        ?View $view = null,
+        ?Validator $valid = null,
+        ?Manager $schedule = null
     ) {
         // Debug output
         $this->debug = $debug ?? new Debug('default', false, 0);
@@ -40,18 +66,26 @@ class UploadScheduleFileController
         $this->debug->debug($debugHeading);
 
         // Set the global html formatting
-        $this->formatHtml = $formatHtml;
+        $this->formatHtml = $formatHtml ?? false;
 
         // Initialise the view and validator. Model is not needed.
-        $this->view = new View($this->formatHtml, $this->debug);
-        $this->valid = new Validator($this->debug);
+        $this->view = $view ?? new View($formatHtml, $this->debug);
+        $this->valid = $valid ?? new Validator($this->debug);
         $this->debug->log("{$debugHeading} -- View, Validator classes are successfully initialised.");
 
         // Initialise the additional class(es) needed by this controller
-        $this->schedule = new Manager($this->debug->isDebugMode());
+        $this->schedule = $schedule ?? new Manager($this->debug->isDebugMode());
         $this->debug->log("{$debugHeading} -- Additional class successfully initialised.");
     }
 
+    /**
+     * Handles incoming requests.
+     *
+     * Determines whether to process a form submission or render the form page.
+     * Delegates specific actions to helper methods.
+     *
+     * @return void
+     */
     public function handleRequest(): void
     {
         // Debug output
@@ -70,10 +104,14 @@ class UploadScheduleFileController
     }
 
     /**
-     * Data validation methods that call the validation helpers and then determine
-     * whether to throw exceptions or pass the data on to the processing methods.
+     * Handles form submissions, including validation and processing.
+     *
+     * @param array $formData The submitted form data.
+     * @param array $fileData The uploaded file data.
+     *
+     * @return void
+     * @throws ValidationException If validation errors occur.
      */
-
     private function handleFormSubmit(
         array $formData,
         array $fileData
@@ -83,10 +121,12 @@ class UploadScheduleFileController
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($formData, "{$debugHeading} -- _POST");
         $this->debug->debugVariable($fileData, "{$debugHeading} -- _FILES");
+
         // Merge the file data into the form data array
         $formData['file'] = $fileData['file'];
         $formData['path'] = "/home/proposal/schedule/";
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+
         try {
             // Validate the form data
             $validData = $this->valid->validateFormData($formData);
@@ -109,18 +149,23 @@ class UploadScheduleFileController
     }
 
     /**
-     * Data processing methods that set up interface with the DB Class
+     * Processes validated form data by delegating to the ScheduleManager.
      *
+     * @param array $validData Validated form and file data.
+     *
+     * @return void
+     * @throws Exception If processing fails.
      */
-
     private function processFormSubmit(array $validData): void
     {
         // Debug output
         $debugHeading = $this->debug->debugHeading("Controller", "processFormSubmit");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($validData, "{$debugHeading} -- validData");
+
         // The SQL loading mode: fileload ? infile : explicit SQL
         $validData['fileload'] = true;
+
         // Process and then render the results page
         try {
             // Pass the file and form data off to the schedule manager for processing
@@ -134,29 +179,39 @@ class UploadScheduleFileController
     }
 
     /**
-     * Page rendering methods that interface with View Class
+     * Collects the form information and calls the view to render the initial form page.
+     *
+     * @return void
      */
-
     private function renderFormPage(): void
     {
         // Debug output
         $debugHeading = $this->debug->debugHeading("Controller", "renderFormPage");
         $this->debug->debug($debugHeading);
-        // Render the initial form
+
+        // Prepare to render the initial form
         $pageTitle = "Upload Schedule File";
         $formAction = $_SERVER['PHP_SELF'];
         $dbData = [];
         $formData = [];
-        // Render the initial form
-        $code = $this->view->renderFormPage(
+
+        // Call the view to render the initial form
+        echo $this->view->renderFormPage(
             $pageTitle,
             $formAction,
             $dbData,
             $formData
         );
-        echo $code;
     }
 
+    /**
+     * Renders the form page with validation errors.
+     *
+     * @param array $formData   The submitted form data.
+     * @param array $dataErrors Validation error messages.
+     *
+     * @return void
+     */
     private function renderFormWithErrors(
         array $formData,
         array $dataErrors
@@ -166,12 +221,14 @@ class UploadScheduleFileController
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
         $this->debug->debugVariable($dataErrors, "{$debugHeading} -- dataErrors");
-        // Render the initial form
+
+        // Prepare to render the form with errors
         $pageTitle = "Upload Schedule File";
         $formAction = $_SERVER['PHP_SELF'];
         $fieldLabels = $this->view->getFieldLabels();
-        // Render the errors section and the form
-        $code = $this->view->renderFormWithErrors(
+
+        // Call the view to render the errors section and the form
+        echo $this->view->renderFormWithErrors(
             $pageTitle,
             $formAction,
             [],
@@ -179,9 +236,15 @@ class UploadScheduleFileController
             $dataErrors,
             $fieldLabels
         );
-        echo $code;
     }
 
+    /**
+     * Renders the results page after processing the form.
+     *
+     * @param array $resultMessages Messages or data to display on the results page.
+     *
+     * @return void
+     */
     private function renderResultsPage(
         array $resultMessages
     ): void {
@@ -189,11 +252,22 @@ class UploadScheduleFileController
         $debugHeading = $this->debug->debugHeading("Controller", "renderResultsPage");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($resultMessages, "{$debugHeading} -- resultMessages");
-        // Render the results page
-        $pageTitle = "Schedule File Upload Results";
-        echo $this->view->renderPageWithResults($pageTitle, $resultMessages);
+
+        // Call the view to render the results page
+        echo $this->view->renderPageWithResults(
+            'Schedule File Upload Results',
+            $resultMessages
+        );
     }
 
+    /**
+     * Renders an error page with a provided error message.
+     *
+     * @param string $errorTitle   The title of the error page.
+     * @param string $errorMessage The error message to display.
+     *
+     * @return void
+     */
     private function renderErrorPage(
         string $errorTitle,
         string $errorMessage
@@ -203,7 +277,11 @@ class UploadScheduleFileController
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($errorTitle, "{$debugHeading} -- errorTitle");
         $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
-        // Render the display page
-        echo $this->view->renderErrorPage($errorTitle, $errorMessage);
+
+        // Call the view to render the error page
+        echo $this->view->renderErrorPage(
+            $errorTitle,
+            $errorMessage
+        );
     }
 }
