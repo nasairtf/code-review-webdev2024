@@ -6,6 +6,7 @@ namespace App\views\forms;
 
 use App\exceptions\HtmlBuilderException;
 use App\core\common\CustomDebug           as Debug;
+use App\views\BaseView                    as BaseView;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
 use App\legacy\IRTFLayout                 as IrtfBuilder;
@@ -28,62 +29,8 @@ use App\legacy\IRTFLayout                 as IrtfBuilder;
  * @version  1.0.0
  */
 
-abstract class BaseFormView
+abstract class BaseFormView extends BaseView
 {
-    /**
-     * Whether to produce formatted (readable) HTML output.
-     *
-     * Determines if the HTML builders should include line breaks and indentation
-     * in the generated HTML for better readability during development.
-     * Defaults to `false` if not explicitly set.
-     *
-     * @var bool
-     */
-    protected $formatHtml;
-
-    /**
-     * Debug instance for logging and debugging output.
-     *
-     * Provides methods for structured debug messages and error tracking. If no
-     * instance is provided, a default instance is initialized with debug mode
-     * disabled.
-     *
-     * @var Debug
-     */
-    protected $debug;
-
-    /**
-     * Instance for constructing individual HTML elements.
-     *
-     * This builder is used to create basic HTML components such as tables,
-     * paragraphs, and forms. It supports formatting based on the `$formatHtml` setting.
-     *
-     * @var HtmlBuilder
-     */
-    protected $htmlBuilder;
-
-    /**
-     * Instance for building composite HTML components.
-     *
-     * Used to generate higher-level HTML constructs like forms with validation errors
-     * or results tables, combining multiple basic elements. Inherits formatting preferences
-     * from the `$htmlBuilder`.
-     *
-     * @var CompBuilder
-     */
-    protected $compBuilder;
-
-    /**
-     * Legacy layout builder for header/footer content.
-     *
-     * Handles specific layout components, such as the page header and footer, based on
-     * legacy IRTF requirements. This is primarily used for wrapping form content in
-     * site-wide templates.
-     *
-     * @var IrtfBuilder
-     */
-    protected $irtfBuilder;
-
     /**
      * Constructor for the BaseFormView class.
      *
@@ -103,20 +50,11 @@ abstract class BaseFormView
         ?CompBuilder $compBuilder = null, // Dependency injection to simplify unit testing
         ?IrtfBuilder $irtfBuilder = null  // Dependency injection to simplify unit testing
     ) {
-        // Initialize debugging
-        $this->debug = $debug ?? new Debug('default', false, 0);
-        $debugHeading = $this->debug->debugHeading("View", "__construct");
+        // Use parent class' constructor
+        parent::__construct($formatHtml, $debug, $htmlBuilder, $compBuilder, $irtfBuilder);
+        $debugHeading = $this->debug->debugHeading("BaseFormView", "__construct");
         $this->debug->debug($debugHeading);
-
-        // Set global HTML formatting preference
-        $this->formatHtml = $formatHtml ?? false;
-        $this->debug->debugVariable($this->formatHtml, "{$debugHeading} -- this->formatHtml");
-
-        // Initialize builder instances
-        $this->htmlBuilder = $htmlBuilder ?? new HtmlBuilder($this->formatHtml);
-        $this->compBuilder = $compBuilder ?? new CompBuilder($this->formatHtml, $this->htmlBuilder);
-        $this->irtfBuilder = $irtfBuilder ?? new IrtfBuilder();
-        $this->debug->debug("{$debugHeading} -- HtmlBuilder, CompBuilder, IrtfBuilder successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
 
         // Constructor completed
         $this->debug->debug("{$debugHeading} -- Parent View initialisation complete.");
@@ -157,72 +95,6 @@ abstract class BaseFormView
     ): string;
 
     /**
-     * Retrieves the HTML formatting preference.
-     *
-     * This method returns the value of the `$formatHtml` property,
-     * which indicates whether the HTML output should be formatted
-     * with indentation and line breaks for readability.
-     *
-     * @return bool True if HTML formatting is enabled; false otherwise.
-     */
-    public function getFormatHtml(): bool
-    {
-        return $this->formatHtml;
-    }
-
-    /**
-     * Renders the results page after form submission.
-     *
-     * This method generates a standardized results page using a message
-     * and wraps it with the site's standard layout.
-     *
-     * @param string $title   The title of the results page.
-     * @param string $message The message to display on the results page.
-     *
-     * @return string The complete HTML of the results page.
-     */
-    public function renderResultsPage(
-        string $title = '',
-        string $message = ''
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "renderResultsPage");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($title, "{$debugHeading} -- title");
-        $this->debug->debugVariable($message, "{$debugHeading} -- message");
-
-        // Generate the results page contents
-        $content = $this->compBuilder->buildResultsPage($message, [], 0);
-        return $this->renderPage($title, $content);
-    }
-
-    /**
-     * Renders an error page with a provided title and message.
-     *
-     * This method generates a standardized error page using the provided
-     * message and wraps it with the site's standard layout.
-     *
-     * @param string $title   The title of the error page.
-     * @param string $message The error message to display on the page.
-     *
-     * @return string The complete HTML of the error page.
-     */
-    public function renderErrorPage(
-        string $title = '',
-        string $message = ''
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "renderErrorPage");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($title, "{$debugHeading} -- title");
-        $this->debug->debugVariable($message, "{$debugHeading} -- message");
-
-        // Generate the error page contents
-        $content = $this->compBuilder->buildErrorPage($message, [], 0);
-        return $this->renderPage($title, $content);
-    }
-
-    /**
      * Renders the main form page.
      *
      * This method generates a form page with the provided title and form data.
@@ -244,7 +116,7 @@ abstract class BaseFormView
         int $pad = 0
     ): string {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "renderFormPage");
+        $debugHeading = $this->debug->debugHeading("BaseFormView", "renderFormPage");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($title, "{$debugHeading} -- title");
         $this->debug->debugVariable($action, "{$debugHeading} -- action");
@@ -253,8 +125,15 @@ abstract class BaseFormView
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
         // Wrap form tags around the body content
-        $content = $this->getContentsForm($action, $dbData, $formData, $pad);
-        return $this->renderPage($title, $content);
+        return $this->renderPage(
+            $title,
+            $this->getContentsForm(
+                $action,
+                $dbData,
+                $formData,
+                $pad
+            )
+        );
     }
 
     /**
@@ -284,7 +163,7 @@ abstract class BaseFormView
         int $pad = 0
     ): string {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "renderFormWithErrors");
+        $debugHeading = $this->debug->debugHeading("BaseFormView", "renderFormWithErrors");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($title, "{$debugHeading} -- title");
         $this->debug->debugVariable($action, "{$debugHeading} -- action");
@@ -299,74 +178,21 @@ abstract class BaseFormView
             $title,
             $this->htmlBuilder->formatParts(
                 [
-                    $this->getErrorsBlock($dataErrors, $fieldLabels, $pad),
-                    $this->getContentsForm($action, $dbData, $formData, $pad),
+                    $this->getErrorsBlock(
+                        $dataErrors,
+                        $fieldLabels,
+                        $pad
+                    ),
+                    $this->getContentsForm(
+                        $action,
+                        $dbData,
+                        $formData,
+                        $pad
+                    ),
                 ],
                 $this->formatHtml
             )
         );
-    }
-
-    /**
-     * Renders the results page after form submission.
-     *
-     * This method generates a standardized results page using a message
-     * and wraps it with the site's standard layout.
-     *
-     * @param string $title   The title of the results page.
-     * @param string $message The message to display on the results page.
-     *
-     * @return string The complete HTML of the results page.
-     */
-    public function renderPageWithResults(
-        string $title = '',
-        array $messages = []
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "renderPageWithResults");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($title, "{$debugHeading} -- title");
-        $this->debug->debugVariable($messages, "{$debugHeading} -- messages");
-
-        // Generate the results block
-        $resultBlock = $this->getResultsBlock($messages, 0);
-
-        // Generate the results page contents
-        $content = $this->compBuilder->buildResultsBlockPage($resultBlock, [], 0);
-        return $this->renderPage($title, $content);
-    }
-
-    /**
-     * Renders a complete HTML page with a title and content.
-     *
-     * This method wraps the provided content in the site's standard header
-     * and footer layout.
-     *
-     * @param string $title   The title of the page.
-     * @param string $content The HTML content of the page.
-     *
-     * @return string The complete HTML of the page.
-     */
-    protected function renderPage(
-        string $title = '',
-        string $content = ''
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "renderPage");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($title, "{$debugHeading} -- title");
-        //$this->debug->debugVariable($content, "{$debugHeading} -- content");
-
-        // REMOVE ONCE IRTFLayout HAS BEEN REFACTORED!
-        define('CONTACT', '');
-
-        // wrap the page contents in the site meta
-        $htmlParts = [
-            $this->irtfBuilder->myHeader(false, $title, false),
-            $content,
-            $this->irtfBuilder->myFooter(__FILE__, false),
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
     }
 
     /**
@@ -387,7 +213,7 @@ abstract class BaseFormView
         int $pad = 0
     ): string {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "getErrorsBlock");
+        $debugHeading = $this->debug->debugHeading("BaseFormView", "getErrorsBlock");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($dataErrors, "{$debugHeading} -- dataErrors");
         $this->debug->debugVariable($fieldLabels, "{$debugHeading} -- fieldLabels");
@@ -431,84 +257,14 @@ abstract class BaseFormView
             $tableAttr,
             $tablePad
         );
-        $htmlParts = [
-            '',
-            '<!--  Errors  -->',
-            '',
-            '<center>',
+
+        // Wrap the table in additional markup for centering and styling
+        return $this->compBuilder->buildPageSection(
             $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
-    }
-
-    /**
-     * Generates the HTML block for displaying results messages.
-     *
-     * This method creates a table of results messages formatted as paragraphs.
-     *
-     * @param array $dataResults An array of result messages.
-     * @param int   $pad         Optional padding level for formatted output (default: 0).
-     *
-     * @return string The HTML block containing formatted results messages.
-     */
-    protected function getResultsBlock(
-        array $dataResults = [],
-        int $pad = 0
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "getResultsBlock");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($dataResults, "{$debugHeading} -- dataResults");
-        $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
-
-        $tablePad = $pad;
-        $tableRowPad = $tablePad + 2;
-        $paragraphPad = $tableRowPad + 2;
-
-        $pAttr = ['align' => 'justify', 'class' => 'result-messages', 'color' => 'green'];
-        $rowAttr = [];
-        $tableAttr = ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'];
-
-        // Generate the results block
-        $rows = [];
-        foreach ($dataResults as $message) {
-            $escapedMessage = $this->htmlBuilder->escape(
-                is_array($message)
-                    ? implode(', ', $message)
-                    : $message
-            );
-            $paragraph = $this->htmlBuilder->getParagraph(
-                $escapedMessage,
-                $pAttr,
-                $paragraphPad,
-                true
-            );
-            $rows[] = $this->htmlBuilder->getTableRowFromArray(
-                [$paragraph],
-                false,
-                [false],
-                $rowAttr,
-                $tableRowPad,
-                true
-            );
-        }
-        $tableHtml = $this->htmlBuilder->getTableFromRows(
-            $rows,
-            $tableAttr,
-            $tablePad
+            'Errors',
+            false,
+            $pad
         );
-        $htmlParts = [
-            '',
-            '<!--  Results  -->',
-            '',
-            '<center>',
-            $tableHtml,
-            '</center>',
-            '',
-        ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
     }
 
     /**
@@ -531,7 +287,7 @@ abstract class BaseFormView
         int $pad = 0
     ): string {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "getContentsForm");
+        $debugHeading = $this->debug->debugHeading("BaseFormView", "getContentsForm");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($action, "{$debugHeading} -- action");
         $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
@@ -549,6 +305,9 @@ abstract class BaseFormView
                 true
             ),
         ];
-        return $this->htmlBuilder->formatParts($htmlParts, $this->formatHtml);
+        return $this->htmlBuilder->formatParts(
+            $htmlParts,
+            $this->formatHtml
+        );
     }
 }
