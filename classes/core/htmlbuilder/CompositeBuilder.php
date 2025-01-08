@@ -123,16 +123,16 @@ class CompositeBuilder
      *
      * @return string The HTML for the section break, formatted as a horizontal line.
      */
-    public function buildFormSectionBreak(
+    public function buildPageSectionBreak(
         int $pad = 0
     ): string {
-        return $this->elemBuilder->buildFormSectionBreak($pad);
+        return $this->elemBuilder->buildPageSectionBreak($pad);
     }
 
     /**
-     * Builds a generic form section with standard centering and optional line break.
+     * Builds a generic page section with standard centering and optional line break.
      *
-     * This method provides a standardized wrapper for form sections, ensuring
+     * This method provides a standardized wrapper for page sections, ensuring
      * that the content is centered and optionally includes a line break.
      *
      * @param string $contentHtml   The HTML content of the section (typically a table element).
@@ -142,14 +142,14 @@ class CompositeBuilder
      *
      * @return string The formatted HTML for the section.
      */
-    public function buildFormSection(
+    public function buildPageSection(
         string $contentHtml,
         string $sectionTag,
         bool $includeBreak = false,
         int $pad = 0
     ): string {
         // Wrap the table in additional markup for centering and styling
-        return $this->elemBuilder->buildFormSection(
+        return $this->elemBuilder->buildPageSection(
             $contentHtml,
             $sectionTag,
             $includeBreak,
