@@ -102,7 +102,7 @@ class FormElementsBuilder
      *
      * @return string The HTML for the section break, formatted as a horizontal line.
      */
-    public function buildFormSectionBreak(
+    public function buildPageSectionBreak(
         int $pad = 0
     ): string {
         $htmlParts = [
@@ -114,9 +114,9 @@ class FormElementsBuilder
     }
 
     /**
-     * Builds a generic form section with standard centering and optional line break.
+     * Builds a generic page section with standard centering and optional line break.
      *
-     * This method provides a standardized wrapper for form sections, ensuring
+     * This method provides a standardized wrapper for page sections, ensuring
      * that the content is centered and optionally includes a line break.
      *
      * @param string $contentHtml   The HTML content of the section (typically a table element).
@@ -126,7 +126,7 @@ class FormElementsBuilder
      *
      * @return string The formatted HTML for the section.
      */
-    public function buildFormSection(
+    public function buildPageSection(
         string $contentHtml,
         string $sectionTag,
         bool $includeBreak = false,
@@ -205,7 +205,7 @@ class FormElementsBuilder
         );
 
         // Wrap the table in additional markup for centering and styling
-        return $this->buildFormSection(
+        return $this->buildPageSection(
             $tableHtml,
             'Buttons',
             $includeBreak,
@@ -257,7 +257,7 @@ class FormElementsBuilder
         );
 
         // Wrap the table in additional markup for centering and styling
-        return $this->buildFormSection(
+        return $this->buildPageSection(
             $tableHtml,
             'Preamble',
             $includeBreak,
@@ -324,7 +324,7 @@ class FormElementsBuilder
         $tableHtml = $this->htmlBuilder->getTableFromRows($rows, $tableAttr, $tablePad);
 
         // Wrap the table in additional markup for centering and styling
-        return $this->buildFormSection(
+        return $this->buildPageSection(
             $tableHtml,
             'Input Fields',
             $includeBreak,
