@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\views\forms\proposals;
+namespace App\views\pages\proposals;
 
 use App\exceptions\HtmlBuilderException;
 use App\core\common\CustomDebug           as Debug;
-use App\views\forms\BaseFormView          as BaseView;
+use App\views\pages\BasePageView          as BaseView;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
 use App\legacy\IRTFLayout                 as IrtfBuilder;
@@ -48,24 +48,7 @@ class UpdateApplicationDateView extends BaseView
         $this->debug->debug("{$debugHeading} -- View initialisation complete.");
     }
 
-    // Abstract methods: getFieldLabels(), getPageContents()
-
-    /**
-     * Provides field labels for the Login form.
-     *
-     * Maps internal field names to user-friendly labels.
-     *
-     * @return array An associative array mapping field names to labels.
-     */
-    public function getFieldLabels(): array
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "getFieldLabels");
-        $this->debug->debug($debugHeading);
-
-        // Map internal field names to user-friendly labels
-        return [];
-    }
+    // Abstract methods: getPageContents()
 
     /**
      * Generates the main page content for the update form.
@@ -75,73 +58,32 @@ class UpdateApplicationDateView extends BaseView
      * getContentsForm() passes the contents to renderFormPage(), etc., for rendering.
      *
      * @param array $dbData   Data arrays required to populate form options. Defaults to an empty array.
-     * @param array $formData Default data for form fields. Defaults to an empty array.
+     * @param array $pageData Default data for form fields. Defaults to an empty array.
      * @param int   $pad      Optional padding level for formatted output. Defaults to 0.
      *
      * @return string The HTML content for the form page.
      */
     protected function getPageContents(
         array $dbData = [],
-        array $formData = [],
+        array $pageData = [],
         int $pad = 0
     ): string {
         // Debug output
         $debugHeading = $this->debug->debugHeading("View", "getPageContents");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
-        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+        $this->debug->debugVariable($pageData, "{$debugHeading} -- pageData");
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
-        // Determine which form is requrested
-        if (!empty($formData)) {
-            // Proposal update page
-            return $this->getProposalUpdateHtml($formData);
-        } else {
-            // Initial page
-            return $this->getSemesterChooserHtml();
-        }
-    }
-
-    private function getSemesterChooserHtml(): string
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "getSemesterChooserHtml");
-        $this->debug->debug($debugHeading);
-
-        // Generate the main page content for the form
-        $instructions = 'Select the semester to edit proposals for.';
-        return $this->compBuilder->buildSemesterChooserTable(
+        // Build the page contents
+        $instructions = 'Select the proposal for which to update the submission date. '
+            . 'The unix timestamp value will be needed on the next screen.';
+        return $this->compBuilder->buildSemesterProposalListForm(
+            $dbData['action'],
             $instructions,
+            $pageData,
             [],
-            0
-        );
-    }
-
-    private function getProposalUpdateHtml(
-        array $proposal = []
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("View", "getProposalUpdateHtml");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($proposal, "{$debugHeading} -- proposal");
-
-        // Generate the main page content for the form
-        $instructions = 'Enter the new submission time for this proposal. Remember to use the unix timestamp. '
-            . 'If you need to convert the timestamp, check out <a href="https://www.epochconverter.com">'
-            . 'https://www.epochconverter.com</a>.';
-        $timestampInput = $this->htmlBuilder->getUnixTimestampInput(
-            't',
-            (string) $proposal['creationDate'],
-            [],
-            0,
-            false
-        );
-        return $this->compBuilder->buildProposalUpdateConfirmationTable(
-            $instructions,
-            $proposal,
-            $timestampInput,
-            [],
-            0
+            $pad
         );
     }
 }

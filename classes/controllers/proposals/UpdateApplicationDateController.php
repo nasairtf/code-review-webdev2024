@@ -7,7 +7,8 @@ namespace App\controllers\proposals;
 use Exception;
 use App\core\common\CustomDebug                                   as Debug;
 use App\models\proposals\UpdateApplicationDateModel               as Model;
-use App\views\forms\proposals\UpdateApplicationDateView           as View;
+use App\views\forms\proposals\UpdateApplicationDateView           as FormView;
+use App\views\pages\proposals\UpdateApplicationDateView           as ListView;
 use App\validators\forms\proposals\UpdateApplicationDateValidator as Validator;
 
 /**
@@ -24,26 +25,52 @@ class UpdateApplicationDateController
     private $formatHtml;
     private $debug;
     private $model;
-    private $view;
+    private $formView;
+    private $listView;
     private $valid;
 
-    // Constructor: Initializes the controller, view, and model, and sets up debugging
     public function __construct(
-        bool $formatHtml = false,
-        ?Debug $debug = null
+        ?bool $formatHtml = null,
+        ?Debug $debug = null,
+        ?Model $model = null,
+        ?FormView $formView = null,
+        ?ListView $listView = null,
+        ?Validator $valid = null
     ) {
-        $this->formatHtml = $formatHtml; // set the global html formatting
+        // Debug output
         $this->debug = $debug ?? new Debug('default', false, 0);
-        $this->model = new Model($this->debug);
-        $this->view = new View($this->formatHtml, $this->debug);
-        $this->valid = new Validator($this->debug);
-        $this->debug->log("Controller: Debug mode is ON.");
+        $debugHeading = $this->debug->debugHeading("Controller", "__construct");
+        $this->debug->debug($debugHeading);
+
+        // Set the global html formatting
+        $this->formatHtml = $formatHtml ?? false;
+
+        // Initialise dependencies with fallbacks
+        $this->model = $model ?? new Model($this->debug);
+        $this->formView = $formView ?? new FormView($this->formatHtml, $this->debug);
+        $this->listView = $listView ?? new ListView($this->formatHtml, $this->debug);
+        $this->valid = $valid ?? new Validator($this->debug);
+        $this->debug->debug("{$debugHeading} -- Model, View, Validator classes successfully initialised.");
+
+        // Class initialisation complete
+        $this->debug->debug("{$debugHeading} -- Controller initialisation complete.");
     }
 
+    /**
+     * Handles incoming requests.
+     *
+     * Determines whether to process a form submission or render the form page.
+     * Delegates specific actions to helper methods.
+     *
+     * @return void
+     */
     public function handleRequest(): void
     {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: handleRequest()");
+        $debugHeading = $this->debug->debugHeading("Controller", "handleRequest");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($_GET, "{$debugHeading} -- _GET");
+        $this->debug->debugVariable($_POST, "{$debugHeading} -- _POST");
 
         if (isset($_GET['submit'])) {
             // Handle first form submit
@@ -56,7 +83,7 @@ class UpdateApplicationDateController
             $this->handleForm3Submit($_POST);
         } else {
             // Display the first page if no form is submitted
-            $this->renderForm1Page();
+            $this->renderSemesterSelectFormPage();
         }
     }
 
@@ -73,8 +100,10 @@ class UpdateApplicationDateController
         array $formData
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: handleForm1Submit()");
-        $this->debug->debugVariable($formData, "_GET");
+        $debugHeading = $this->debug->debugHeading("Controller", "handleForm1Submit");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+
         try {
             // Validate the form data
             $year = $this->valid->validateYear($formData['y'] ?? null);
@@ -91,8 +120,10 @@ class UpdateApplicationDateController
         array $formData
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: handleForm2Submit()");
-        $this->debug->debugVariable($formData, "_POST");
+        $debugHeading = $this->debug->debugHeading("Controller", "handleForm2Submit");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+
         try {
             // Validate the form data
             $obsAppId = $this->valid->validateObsAppID($formData['i'] ?? null);
@@ -108,8 +139,10 @@ class UpdateApplicationDateController
         array $formData
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: handleForm3Submit()");
-        $this->debug->debugVariable($formData, "_POST");
+        $debugHeading = $this->debug->debugHeading("Controller", "handleForm3Submit");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+
         try {
             // Validate the form data
             $obsAppId = $this->valid->validateObsAppID($formData['i'] ?? null);
@@ -135,13 +168,16 @@ class UpdateApplicationDateController
         string $semester
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: processForm1Submit()");
+        $debugHeading = $this->debug->debugHeading("Controller", "processForm1Submit");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($year, "{$debugHeading} -- year");
+        $this->debug->debugVariable($semester, "{$debugHeading} -- semester");
 
         try {
             // Fetch the semester data
             $proposals = $this->model->fetchSemesterData($year, $semester);
             // Render the next form with the retrieved data
-            $this->renderForm2Page($proposals);
+            $this->renderSemesterListFormsPage($proposals);
         } catch (Exception $e) {
             // Handle any errors during the data fetching process
             $this->renderErrorPage("Error fetching semester data", $e->getMessage());
@@ -152,13 +188,15 @@ class UpdateApplicationDateController
         int $obsAppId
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: processForm2Submit()");
+        $debugHeading = $this->debug->debugHeading("Controller", "processForm2Submit");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($obsAppId, "{$debugHeading} -- obsAppId");
 
         try {
             // Fetch the proposal data
             $proposal = $this->model->fetchProposalData($obsAppId);
             // Render the next form with the retrieved proposal data
-            $this->renderForm3Page($proposal[0]);
+            $this->renderProposalEditFormPage($proposal[0]);
         } catch (Exception $e) {
             // Handle any errors during the data fetching process
             $this->renderErrorPage("Error fetching proposal data", $e->getMessage());
@@ -170,13 +208,16 @@ class UpdateApplicationDateController
         int $timestamp
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: processForm3Submit()");
+        $debugHeading = $this->debug->debugHeading("Controller", "processForm3Submit");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($obsAppId, "{$debugHeading} -- obsAppId");
+        $this->debug->debugVariable($timestamp, "{$debugHeading} -- timestamp");
 
         try {
             // Update the proposal with the new timestamp
             $resultMessage = $this->model->updateProposal($obsAppId, $timestamp);
             // Render the results page with the result message
-            $this->renderForm4Page($resultMessage);
+            $this->renderResultsPage($resultMessage);
         } catch (Exception $e) {
             // Handle any errors during the update process
             $this->renderErrorPage("Error updating proposal timestamp", $e->getMessage());
@@ -186,67 +227,99 @@ class UpdateApplicationDateController
     /**
      * Page rendering methods that interface with View Class
      *
-     * renderForm1Page - renders the semester choosing form
-     * renderForm2Page - renders the semester listing form
-     * renderForm3Page - renders the creation date update form
-     * renderForm4Page - renders the successful update result page
-     * renderErrorPage - renders the error page displayed for caught exceptions
+     * renderSemesterSelectFormPage - renders the semester choosing form
+     * renderSemesterListFormsPage  - renders the semester listing form
+     * renderProposalEditFormPage   - renders the creation date update form
+     * renderResultsPage            - renders the successful update result page
+     * renderErrorPage              - renders the error page displayed for caught exceptions
      */
 
-    private function renderForm1Page(): void
+    private function renderSemesterSelectFormPage(): void
     {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: renderForm1Page()");
+        $debugHeading = $this->debug->debugHeading("Controller", "renderSemesterSelectFormPage");
+        $this->debug->debug($debugHeading);
 
-        // Logic to generate the first page form
+        // Prepare to render the initial form
         $pageTitle = "IRTF Proposal Date Update Semester Chooser";
         $formAction = $_SERVER['PHP_SELF'];
-        $code = $this->view->renderForm1Page($pageTitle, $formAction);
-        // Render the initial form
-        echo $code;
+        $dbData = [];
+        $formData = [];
+
+        // Call the view to render the initial form
+        echo $this->formView->renderFormPage(
+            $pageTitle,  // title
+            $formAction, // action
+            $dbData,     // dbData
+            $formData,   // formData
+            false,       // methodPost
+            true,        // targetBlank
+            0            // pad
+        );
     }
 
-    private function renderForm2Page(
+    private function renderSemesterListFormsPage(
         array $proposals
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: renderForm2Page()");
-        $this->debug->debugVariable($proposals, "proposals");
+        $debugHeading = $this->debug->debugHeading("Controller", "renderSemesterListFormsPage");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($proposals, "{$debugHeading} -- proposals");
 
-        // Logic to generate the second page form
+        // Prepare to render the semester list forms page
         $pageTitle = "IRTF Proposal Date Update Semester Listing";
-        $formAction = $_SERVER['PHP_SELF'];
-        $code = $this->view->renderForm2Page($pageTitle, $formAction, $proposals);
-        // Render the semester listing form
-        echo $code;
+        $dbData = ['action' => $_SERVER['PHP_SELF']];
+        $pageData = $proposals;
+        $pad = 0;
+
+        // Call the view to render the list of forms
+        echo $this->listView->renderDisplayPage(
+            $pageTitle,
+            $dbData,
+            $pageData,
+            $pad
+        );
     }
 
-    private function renderForm3Page(
+    private function renderProposalEditFormPage(
         array $proposal
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: renderForm3Page()");
-        $this->debug->debugVariable($proposal, "proposal");
+        $debugHeading = $this->debug->debugHeading("Controller", "renderProposalEditFormPage");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($proposal, "{$debugHeading} -- proposal");
 
-        // Logic to generate the third page form
+        // Prepare to render the initial form
         $pageTitle = "IRTF Proposal Creation Date Entry";
         $formAction = $_SERVER['PHP_SELF'];
-        $code = $this->view->renderForm3Page($pageTitle, $formAction, $proposal);
-        // Render the creation date entry form
-        echo $code;
+        $dbData = [];
+        $formData = $proposal;
+
+        // Call the view to render the initial form
+        echo $this->formView->renderFormPage(
+            $pageTitle,
+            $formAction,
+            $dbData,
+            $formData
+        );
     }
 
-    private function renderForm4Page(
+    private function renderResultsPage(
         string $resultMessage
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: renderForm4Page()");
+        $debugHeading = $this->debug->debugHeading("Controller", "renderResultsPage");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($resultMessage, "{$debugHeading} -- resultMessage");
 
-        // Logic to generate the fourth page form
+        // Prepare to render the edit results page
         $pageTitle = "IRTF Proposal Submission Date Update";
-        $code = $this->view->renderResultsPage($pageTitle, $resultMessage);
-        // Render the submission date update form
-        echo $code;
+
+        // Call the view to render the results page
+        echo $this->listView->renderResultsPage(
+            $pageTitle,
+            $resultMessage
+        );
     }
 
     private function renderErrorPage(
@@ -254,8 +327,15 @@ class UpdateApplicationDateController
         string $errorMessage
     ): void {
         // Debug output
-        $this->debug->debug("UpdateApplicationDate Controller: renderErrorPage()");
+        $debugHeading = $this->debug->debugHeading("Controller", "renderErrorPage");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($errorTitle, "{$debugHeading} -- errorTitle");
+        $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
 
-        echo $this->view->renderErrorPage($errorTitle, $errorMessage);
+        // Call the view to render the error page
+        echo $this->listView->renderErrorPage(
+            $errorTitle,
+            $errorMessage
+        );
     }
 }
