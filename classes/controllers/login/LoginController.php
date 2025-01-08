@@ -514,6 +514,8 @@ class LoginController
             $formAction,  // action
             [],           // dbData
             $formData,    // formData
+            true,         // methodPost
+            false,        // targetBlank
             0             // pad
         );
     }
