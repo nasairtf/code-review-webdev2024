@@ -212,7 +212,7 @@ class FeedbackView extends BaseView
         );
 
         // Wrap the table in additional markup for centering and styling
-        return $this->compBuilder->buildFormSection(
+        return $this->compBuilder->buildPageSection(
             $tableHtml,
             'Preamble',
             $break,
@@ -270,7 +270,7 @@ class FeedbackView extends BaseView
         $tableHtml = '';
 
         // Wrap the table in additional markup for centering and styling
-        return $this->compBuilder->buildFormSection(
+        return $this->compBuilder->buildPageSection(
             $tableHtml,
             'Security',
             $break,
@@ -445,7 +445,7 @@ class FeedbackView extends BaseView
         );
 
         // Wrap the table in additional markup for centering and styling
-        return $this->compBuilder->buildFormSection(
+        return $this->compBuilder->buildPageSection(
             $tableHtml,
             'Program Information',
             $break,
@@ -542,7 +542,7 @@ class FeedbackView extends BaseView
         $tableHtml = $this->htmlBuilder->getTableFromRows($rows, $tableAttr, $tablePad);
 
         // Wrap the table in additional markup for centering and styling
-        return $this->compBuilder->buildFormSection(
+        return $this->compBuilder->buildPageSection(
             $tableHtml,
             'Technical feedback',
             $break,
@@ -670,7 +670,7 @@ class FeedbackView extends BaseView
         $tableHtml = $this->htmlBuilder->getTableFromRows($rows, $tableAttr, $tablePad);
 
         // Wrap the table in additional markup for centering and styling
-        return $this->compBuilder->buildFormSection(
+        return $this->compBuilder->buildPageSection(
             $tableHtml,
             'Personnel feedback',
             $break,
@@ -698,7 +698,7 @@ class FeedbackView extends BaseView
         );
 
         // Wrap the table in additional markup for centering and styling
-        return $this->compBuilder->buildFormSection(
+        return $this->compBuilder->buildPageSection(
             $tableHtml,
             'Scientific results',
             $break,
@@ -726,7 +726,7 @@ class FeedbackView extends BaseView
         );
 
         // Wrap the table in additional markup for centering and styling
-        return $this->compBuilder->buildFormSection(
+        return $this->compBuilder->buildPageSection(
             $tableHtml,
             'Comments and Suggestions',
             $break,
