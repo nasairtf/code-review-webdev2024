@@ -100,11 +100,13 @@ abstract class BaseFormView extends BaseView
      * This method generates a form page with the provided title and form data.
      * It wraps the form in the site's standard layout.
      *
-     * @param string $title    The title of the form page.
-     * @param string $action   The form submission URL.
-     * @param array  $dbData   Data arrays required to populate form options.
-     * @param array  $formData Default data for form fields.
-     * @param int    $pad      Optional padding level for formatted output (default: 0).
+     * @param string $title       The title of the form page.
+     * @param string $action      The form submission URL.
+     * @param array  $dbData      Data arrays required to populate form options.
+     * @param array  $formData    Default data for form fields.
+     * @param bool   $methodPost  Whether the form uses 'method="post"' (default: true).
+     * @param bool   $targetBlank Whether the form includes 'target="_blank"' (default: false).
+     * @param int    $pad         Optional padding level for formatted output (default: 0).
      *
      * @return string The complete HTML of the form page.
      */
@@ -113,6 +115,8 @@ abstract class BaseFormView extends BaseView
         string $action = '',
         array $dbData = [],
         array $formData = [],
+        bool $methodPost = true,
+        bool $targetBlank = false,
         int $pad = 0
     ): string {
         // Debug output
@@ -122,6 +126,8 @@ abstract class BaseFormView extends BaseView
         $this->debug->debugVariable($action, "{$debugHeading} -- action");
         $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+        $this->debug->debugVariable($methodPost, "{$debugHeading} -- methodPost");
+        $this->debug->debugVariable($targetBlank, "{$debugHeading} -- targetBlank");
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
         // Wrap form tags around the body content
@@ -131,6 +137,8 @@ abstract class BaseFormView extends BaseView
                 $action,
                 $dbData,
                 $formData,
+                $methodPost,
+                $targetBlank,
                 $pad
             )
         );
@@ -149,6 +157,8 @@ abstract class BaseFormView extends BaseView
      * @param array  $formData    Default data for form fields.
      * @param array  $dataErrors  Validation error messages for fields.
      * @param array  $fieldLabels Labels for form fields to display with errors.
+     * @param bool   $methodPost  Whether the form uses 'method="post"' (default: true).
+     * @param bool   $targetBlank Whether the form includes 'target="_blank"' (default: false).
      * @param int    $pad         Optional padding level for formatted output (default: 0).
      *
      * @return string The complete HTML of the form page with validation errors.
@@ -160,6 +170,8 @@ abstract class BaseFormView extends BaseView
         array $formData = [],
         array $dataErrors = [],
         array $fieldLabels = [],
+        bool $methodPost = true,
+        bool $targetBlank = false,
         int $pad = 0
     ): string {
         // Debug output
@@ -171,6 +183,8 @@ abstract class BaseFormView extends BaseView
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
         $this->debug->debugVariable($dataErrors, "{$debugHeading} -- dataErrors");
         $this->debug->debugVariable($fieldLabels, "{$debugHeading} -- fieldLabels");
+        $this->debug->debugVariable($methodPost, "{$debugHeading} -- methodPost");
+        $this->debug->debugVariable($targetBlank, "{$debugHeading} -- targetBlank");
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
         // Render the errors section and the form
@@ -187,6 +201,8 @@ abstract class BaseFormView extends BaseView
                         $action,
                         $dbData,
                         $formData,
+                        $methodPost,
+                        $targetBlank,
                         $pad
                     ),
                 ],
@@ -273,10 +289,12 @@ abstract class BaseFormView extends BaseView
      * This method wraps the page content in form tags and applies necessary attributes,
      * formatting it according to the specified padding and layout rules.
      *
-     * @param string $action   The form submission URL.
-     * @param array  $dbData   Data arrays required to populate form options.
-     * @param array  $formData Default data for form fields.
-     * @param int    $pad      Optional padding level for formatted output (default: 0).
+     * @param string $action      The form submission URL.
+     * @param array  $dbData      Data arrays required to populate form options.
+     * @param array  $formData    Default data for form fields.
+     * @param bool   $methodPost  Whether the form uses 'method="post"' (default: true).
+     * @param bool   $targetBlank Whether the form includes 'target="_blank"' (default: false).
+     * @param int    $pad         Optional padding level for formatted output (default: 0).
      *
      * @return string The formatted HTML for the form contents.
      */
@@ -284,6 +302,8 @@ abstract class BaseFormView extends BaseView
         string $action = '',
         array $dbData = [],
         array $formData = [],
+        bool $methodPost = true,
+        bool $targetBlank = false,
         int $pad = 0
     ): string {
         // Debug output
@@ -292,15 +312,22 @@ abstract class BaseFormView extends BaseView
         $this->debug->debugVariable($action, "{$debugHeading} -- action");
         $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
+        $this->debug->debugVariable($methodPost, "{$debugHeading} -- methodPost");
+        $this->debug->debugVariable($targetBlank, "{$debugHeading} -- targetBlank");
         $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
 
         // Wrap form tags around the body content
+        $formAttr = array_merge(
+            ['enctype' => 'multipart/form-data'],
+            $targetBlank ? ['target' => '_blank'] : []
+        );
+        $method = $methodPost ? 'post' : 'get';
         $htmlParts = [
             $this->htmlBuilder->getForm(
                 $action,
-                'post',
+                $method,
                 $this->getPageContents($dbData, $formData, $pad),
-                ['enctype' => 'multipart/form-data'],
+                $formAttr,
                 $pad,
                 true
             ),
