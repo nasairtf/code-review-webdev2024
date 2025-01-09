@@ -82,8 +82,13 @@ class BaseFormValidator
         $this->debug->debugVariable($validateByKey, "{$debugHeading} -- validateByKey");
 
         // Check if selection is required and no options were selected
-        if ($required && empty($options)) {
-            $this->errors[$fieldKey] = "Please make a selection for this field.";
+        $options = $this->validateRequiredField(
+            $options,
+            $required,
+            $fieldKey,
+            "Please make a selection for this field."
+        );
+        if ($options === null) {
             return null;
         }
 
@@ -125,11 +130,19 @@ class BaseFormValidator
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
 
-        // Validate fields
-        if ($required && empty($name)) {
-            $this->errors[$fieldKey] = "Name is required.";
+        // Validate required field
+        $name = $this->validateRequiredField(
+            $name,
+            $required,
+            $fieldKey,
+            "Name is required."
+        );
+        if ($name === null) {
             return null;
-        } elseif (strlen($name) > 70) {
+        }
+
+        // Validate fields
+        if (strlen($name) > 70) {
             $this->errors[$fieldKey] = "Invalid name. Must be 1-70 characters.";
             return null;
         }
@@ -159,15 +172,296 @@ class BaseFormValidator
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
 
-        // Validate field
-        if ($required && empty($email)) {
-            $this->errors[$fieldKey] = "Email is required.";
+        // Validate required field
+        $email = $this->validateRequiredField(
+            $email,
+            $required,
+            $fieldKey,
+            "Email is required."
+        );
+        if ($email === null) {
             return null;
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        }
+
+        // Validate fields
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $this->errors[$fieldKey] = "Invalid email format.";
             return null;
         }
         return $email;
+    }
+
+    /**
+     * Validates a semester value.
+     *
+     * This method ensures the semester is a valid value ('A' or 'B') and handles
+     * case insensitivity by converting the value to uppercase. It also checks if the
+     * field is required and handles empty input appropriately.
+     *
+     * @param string      $semester      The semester value to validate.
+     * @param string      $fieldKey      Key to associate errors with this field (default: 'semester').
+     * @param bool        $required      Whether the field is required (default: false).
+     * @param string|null $errorMessage  Optional custom error message to override the default.
+     *
+     * @return string|null The validated semester as an uppercase string, or null if validation fails.
+     *
+     * @throws ValidationException If the semester is invalid and the field is required.
+     */
+    protected function validateSemester(
+        string $semester,
+        string $fieldKey = 'semester',
+        bool $required = false,
+        ?string $errorMessage = null
+    ): ?string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateSemester");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($semester, "{$debugHeading} -- semester");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+        $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
+
+        // Validate required field
+        $semester = $this->validateRequiredField(
+            $semester,
+            $required,
+            $fieldKey,
+            "Semester is required."
+        );
+        if ($semester === null) {
+            return null;
+        }
+
+        // Validate fields
+        if (!in_array(strtoupper($semester), ['A', 'B'], true)) {
+            $this->errors[$fieldKey] = "Invalid semester: Must be 'A' or 'B'.";
+            return null;
+        }
+        return strtoupper($semester);
+    }
+
+    /**
+     * Validates a year value against a specified range.
+     *
+     * This method ensures the year is an integer within an acceptable range,
+     * with optional minimum and maximum year overrides. It also checks if the field
+     * is required and handles null or empty input appropriately.
+     *
+     * By default, the valid year range is 2000 to the next calendar year.
+     *
+     * @param mixed       $year         The year value to validate. Can be a string, int, or null.
+     * @param string      $fieldKey     Key to associate errors with this field (default: 'year').
+     * @param bool        $required     Whether the field is required (default: false).
+     * @param int|null    $minYear      The minimum valid year for validation (default: 2000).
+     * @param int|null    $maxYear      The maximum valid year for validation (default: next calendar year).
+     * @param string|null $errorMessage Optional custom error message to override the default.
+     *
+     * @return int|null The validated year as an integer, or null if validation fails.
+     *
+     * @throws ValidationException If the year is invalid and the field is required.
+     */
+    protected function validateYear(
+        $year,
+        string $fieldKey = 'year',
+        bool $required = false,
+        ?int $minYear = null,
+        ?int $maxYear = null,
+        ?string $errorMessage = null
+    ): ?int {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateYear");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($year, "{$debugHeading} -- year");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+        $this->debug->debugVariable($minYear, "{$debugHeading} -- minYear");
+        $this->debug->debugVariable($maxYear, "{$debugHeading} -- maxYear");
+        $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
+
+        // Validate required field
+        $year = $this->validateRequiredField(
+            $year,
+            $required,
+            $fieldKey,
+            "Year is required."
+        );
+        if ($year === null) {
+            return null;
+        }
+
+        // Use provided range or default to 2000 to next calendar year
+        $minYear = $minYear ?? 2000;
+        $maxYear = $maxYear ?? intval(date('Y')) + 1;
+        $options = [
+            'options' => [
+                'min_range' => $minYear,
+                'max_range' => $maxYear,
+            ],
+        ];
+
+        // Validate field
+        if (!filter_var($year, FILTER_VALIDATE_INT, $options)) {
+            $this->errors[$fieldKey] = $errorMessage
+                ?? "Invalid year: Must be between {$minYear} and {$maxYear}.";
+            return null;
+        }
+        return (int) $year;
+    }
+
+    /**
+     * Validates a timestamp value against a specified range.
+     *
+     * This method ensures the timestamp is an integer within an acceptable range.
+     * It also checks if the field is required and handles null or empty input appropriately.
+     *
+     * @param mixed       $timestamp     The timestamp value to validate. Can be a string, int, or null.
+     * @param string      $fieldKey      Key to associate errors with this field (default: 'timestamp').
+     * @param bool        $required      Whether the field is required (default: false).
+     * @param int|null    $minTimestamp  The minimum valid timestamp for validation (default: UNIX epoch).
+     * @param int|null    $maxTimestamp  The maximum valid timestamp for validation (default: December 31, 9999).
+     * @param string|null $errorMessage  Optional custom error message to override the default.
+     *
+     * @return int|null The validated timestamp as an integer, or null if validation fails.
+     */
+    protected function validateTimestamp(
+        $timestamp,
+        string $fieldKey = 'timestamp',
+        bool $required = false,
+        ?int $minTimestamp = null,
+        ?int $maxTimestamp = null,
+        ?string $errorMessage = null
+    ): ?int {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateTimestamp");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($timestamp, "{$debugHeading} -- timestamp");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+        $this->debug->debugVariable($minTimestamp, "{$debugHeading} -- minTimestamp");
+        $this->debug->debugVariable($maxTimestamp, "{$debugHeading} -- maxTimestamp");
+        $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
+
+        // Validate required field
+        $timestamp = $this->validateRequiredField(
+            $timestamp,
+            $required,
+            $fieldKey,
+            "Timestamp is required."
+        );
+        if ($timestamp === null) {
+            return null;
+        }
+
+        // Use provided range or default to UNIX epoch to December 31, 9999
+        $minTimestamp = $minTimestamp ?? 0; // 1970-01-01 00:00:00 UTC
+        $maxTimestamp = $maxTimestamp ?? 253402300799; // December 31, 9999
+        $options = [
+            'options' => [
+                'min_range' => $minTimestamp,
+                'max_range' => $maxTimestamp,
+            ],
+        ];
+
+        // Validate field
+        if (!filter_var($timestamp, FILTER_VALIDATE_INT, $options)) {
+            $this->errors[$fieldKey] = $errorMessage
+                ?? "Invalid timestamp: Must be between {$minTimestamp} and {$maxTimestamp}.";
+            return null;
+        }
+        return (int) $timestamp;
+    }
+
+    protected function validateObsAppID(
+        $obsapp_id,
+        string $fieldKey = 'obsapp_id',
+        bool $required = false
+    ): ?int {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateObsAppID");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($obsapp_id, "{$debugHeading} -- obsapp_id");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate required field
+        $obsapp_id = $this->validateRequiredField(
+            $obsapp_id,
+            $required,
+            $fieldKey,
+            "ObsAppID is required."
+        );
+        if ($obsapp_id === null) {
+            return null;
+        }
+
+        // Validate fields
+        if (is_null($obsapp_id) || !filter_var($obsapp_id, FILTER_VALIDATE_INT)) {
+            $this->debug->fail("The obsapp_id provided is invalid.");
+        }
+        return (int) $obsapp_id;
+    }
+
+    /**
+     * Validates a short program number.
+     *
+     * This method ensures the program number is an integer within the range of 1 to 999.
+     * It also checks if the field is required and handles null or empty input appropriately.
+     *
+     * @param mixed       $program      The program number to validate. Can be a string, int, or null.
+     * @param string      $fieldKey     Key to associate errors with this field (default: 'program_number').
+     * @param bool        $required     Whether the field is required (default: false).
+     * @param int|null    $minNumber    The minimum valid program number (default: 1).
+     * @param int|null    $maxNumber    The maximum valid program number (default: 999).
+     * @param string|null $errorMessage Optional custom error message to override the default.
+     *
+     * @return int|null The validated program number as an integer, or null if validation fails.
+     */
+    protected function validateShortProgramNumber(
+        $program,
+        string $fieldKey = 'program',
+        bool $required = false,
+        ?int $minNumber = null,
+        ?int $maxNumber = null,
+        ?string $errorMessage = null
+    ): ?int {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateShortProgramNumber");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($programNumber, "{$debugHeading} -- program");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+        $this->debug->debugVariable($minNumber, "{$debugHeading} -- minNumber");
+        $this->debug->debugVariable($maxNumber, "{$debugHeading} -- maxNumber");
+        $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
+
+        // Validate required field
+        $program = $this->validateRequiredField(
+            $program,
+            $required,
+            $fieldKey,
+            "Program number is required."
+        );
+        if ($program === null) {
+            return null;
+        }
+
+        // Use provided range or default to 1 to 999
+        $minNumber = $minNumber ?? 1;
+        $maxNumber = $maxNumber ?? 999;
+        $options = [
+            'options' => [
+                'min_range' => $minNumber,
+                'max_range' => $maxNumber,
+            ],
+        ];
+
+        // Validate program number
+        if (!filter_var($program, FILTER_VALIDATE_INT, $options)) {
+            $this->errors[$fieldKey] = $errorMessage
+                ?? "Invalid program number: Must be between {$minNumber} and {$maxNumber}.";
+            return null;
+        }
+        return (int) $program;
     }
 
     /**
@@ -198,6 +492,17 @@ class BaseFormValidator
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
 
+        // Validate required field
+        $program = $this->validateRequiredField(
+            $program,
+            $required,
+            $fieldKey,
+            "Program number is required."
+        );
+        if ($program === null) {
+            return null;
+        }
+
         // Validate fields
 
         $pattern = '/^\d{4}[AB]\d{3}$/'; // Matches YYYY[A|B]NNN format
@@ -211,21 +516,37 @@ class BaseFormValidator
         $semester = $program[4];
         $number = intval(substr($program, 5, 3));
 
-        if ($year < 2000 || $year > intval(date('Y')) + 1) {
-            $this->errors[$fieldKey] = "Invalid year in program number '{$program}'. "
-                . "Year must be between 2000 and next calendar year.";
+        $year = $this->validateYear(
+            $year,
+            'program',
+            $required,
+            2000,
+            intval(date('Y')) + 1,
+            "Invalid year in '{$program}'. Year must be between 2000 and next calendar year."
+        );
+        if ($year === null) {
             return null;
         }
 
-        if (!in_array($semester, ['A', 'B'])) {
-            $this->errors[$fieldKey] = "Invalid semester in program number '{$program}'. "
-                . "Semester must be 'A' or 'B'.";
+        $semester = $this->validateSemester(
+            $semester,
+            'program',
+            $required,
+            "Invalid semester in '{$program}'. Semester must be 'A' or 'B'."
+        );
+        if ($semester === null) {
             return null;
         }
 
-        if ($number < 1 || $number > 999) {
-            $this->errors[$fieldKey] = "Invalid program number in '{$program}'. "
-                . "Number must be between 001 and 999.";
+        $number = $this->validateShortProgramNumber(
+            $number,
+            'program',
+            $required,
+            1,
+            999,
+            "Invalid program number in '{$program}'. Number must be between 001 and 999."
+        );
+        if ($number === null) {
             return null;
         }
 
@@ -257,6 +578,17 @@ class BaseFormValidator
         $this->debug->debugVariable($session, "{$debugHeading} -- session");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate required field
+        $session = $this->validateRequiredField(
+            $session,
+            $required,
+            $fieldKey,
+            "Session is required."
+        );
+        if ($session === null) {
+            return null;
+        }
 
         // Validate fields
 
@@ -375,11 +707,19 @@ class BaseFormValidator
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
 
-        // Validate fields
-        if ($required && empty($text)) {
-            $this->errors[$fieldKey] = "Content is required.";
+        // Validate required field
+        $text = $this->validateRequiredField(
+            $text,
+            $required,
+            $fieldKey,
+            "Content is required."
+        );
+        if ($text === null) {
             return null;
-        } elseif (strlen($text) > $textLength) {
+        }
+
+        // Validate fields
+        if (strlen($text) > $textLength) {
             $this->errors[$fieldKey] = "Text content too long. Must be under {$textLength} characters.";
             return null;
         }
@@ -658,5 +998,49 @@ class BaseFormValidator
             )
         );
         return ['form' => $formIns, 'db' => $dbIns];
+    }
+
+    /**
+     * Validates that a required field is not empty or null.
+     *
+     * This method handles various types of inputs, including strings, numbers, arrays, and objects.
+     * It treats `0` (numeric or string) and empty arrays differently to ensure appropriate validation.
+     *
+     * @param mixed  $value        The value to validate.
+     * @param bool   $required     Whether the field is required.
+     * @param string $fieldKey     Key to associate errors with this field.
+     * @param string $errorMessage Custom error message for empty or missing values.
+     *
+     * @return mixed|null The original value if validation passes, or null if validation fails.
+     */
+    protected function validateRequiredField(
+        $value,
+        bool $required,
+        string $fieldKey,
+        string $errorMessage
+    ) {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateRequiredField");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($value, "{$debugHeading} -- value");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
+
+        // Perform required check
+        if ($required) {
+            // Handle special cases for numeric and array values
+            if (
+                $value === null ||
+                (is_string($value) && trim($value) === '') ||
+                (is_array($value) && empty($value)) ||
+                (!is_numeric($value) && empty($value))
+            ) {
+                $this->errors[$fieldKey] = $errorMessage;
+                return null;
+            }
+        }
+
+        return $value;
     }
 }
