@@ -216,11 +216,6 @@ class Proposals
         return processTACResultsFMP($debug, $title, $tfile);
     }
 
-    public function processTACResultsTxt($debug, $title, $year, $semester, $tac, $tfile)
-    {
-        return processTACResultsTxt($debug, $title, $year, $semester, $tac, $tfile);
-    }
-
     public function processTACResultsComments($debug, $title, $year, $semester, $tac, $tfile)
     {
         return processTACResultsComments($debug, $title, $year, $semester, $tac, $tfile);
