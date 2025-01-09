@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\schedule;
+namespace App\domains\schedule;
 
 use Exception;
 use App\core\common\Debug;
