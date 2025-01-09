@@ -7,7 +7,7 @@ namespace App\controllers\proposals;
 use Exception;
 use App\exceptions\ValidationException;
 use App\core\common\CustomDebug                                as Debug;
-use App\schedule\ScheduleManager                               as Manager;
+use App\domains\schedule\ScheduleManager                       as Manager;
 use App\views\forms\proposals\UploadScheduleFileView           as View;
 use App\validators\forms\proposals\UploadScheduleFileValidator as Validator;
 
