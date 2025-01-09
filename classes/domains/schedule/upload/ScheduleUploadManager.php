@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\schedule\upload;
+namespace App\domains\schedule\upload;
 
 use Exception;
 use App\core\common\Debug;
 use App\services\files\FileParser as Parser;
-use App\schedule\common\ScheduleUtility;
-use App\schedule\upload\ScheduleProcessor as Processor;
-use App\schedule\upload\ScheduleIngester as Ingester;
+use App\domains\schedule\common\ScheduleUtility;
+use App\domains\schedule\upload\ScheduleProcessor as Processor;
+use App\domains\schedule\upload\ScheduleIngester as Ingester;
 
 /**
- * /home/webdev2024/classes/schedule/upload/ScheduleUploadManager.php
+ * /home/webdev2024/classes/domains/schedule/upload/ScheduleUploadManager.php
  *
  * @category Manager
  * @package  IRTF

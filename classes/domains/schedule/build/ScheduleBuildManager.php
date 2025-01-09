@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\schedule\build;
+namespace App\domains\schedule\build;
 
 use App\core\common\Debug;
 
 /**
- * /home/webdev2024/classes/schedule/generate/ScheduleBuildManager.php
+ * /home/webdev2024/classes/domains/schedule/build/ScheduleBuildManager.php
  *
  * @category Manager
  * @package  IRTF

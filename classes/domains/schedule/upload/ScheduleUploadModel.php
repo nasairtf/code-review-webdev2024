@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\schedule\upload;
+namespace App\domains\schedule\upload;
 
 use Exception;
 use App\core\common\Debug;
-use App\schedule\common\ScheduleUtility;
+use App\domains\schedule\common\ScheduleUtility;
 use App\services\database\troublelog\read\HardwareService as HardwareRead;
 use App\services\database\troublelog\read\ObsAppService as ObsAppRead;
 use App\services\database\troublelog\read\OperatorService as OperatorRead;
@@ -16,7 +16,7 @@ use App\services\database\troublelog\write\ProgramService as ProgramWrite;
 use App\services\database\troublelog\write\ScheduleObsService as ScheduleWrite;
 
 /**
- * /home/webdev2024/classes/schedule/upload/ScheduleUploadModel.php
+ * /home/webdev2024/classes/domains/schedule/upload/ScheduleUploadModel.php
  *
  * @category Model
  * @package  IRTF

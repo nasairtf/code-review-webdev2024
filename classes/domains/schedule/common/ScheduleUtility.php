@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\schedule\common;
+namespace App\domains\schedule\common;
 
 use Exception;
 
 /**
- * /home/webdev2024/classes/schedule/common/ScheduleUtility.php
+ * /home/webdev2024/classes/domains/schedule/common/ScheduleUtility.php
  *
  * This class provides static methods to handle IRTF-specific tasks.
  *

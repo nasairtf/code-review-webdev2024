@@ -6,11 +6,11 @@ namespace App\schedule;
 
 use Exception;
 use App\core\common\Debug;
-use App\schedule\build\ScheduleBuildManager as Builder;
-use App\schedule\upload\ScheduleUploadManager as Uploader;
+use App\domains\schedule\build\ScheduleBuildManager   as Builder;
+use App\domains\schedule\upload\ScheduleUploadManager as Uploader;
 
 /**
- * /home/webdev2024/classes/schedule/ScheduleManager.php
+ * /home/webdev2024/classes/domains/schedule/ScheduleManager.php
  *
  * A single entry point for all schedule-related tasks.
  *

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\schedule\upload;
+namespace App\domains\schedule\upload;
 
 use App\core\common\Debug;
-use App\schedule\common\ScheduleUtility;
-use App\schedule\upload\ScheduleUploadModel as Model;
+use App\domains\schedule\common\ScheduleUtility;
+use App\domains\schedule\upload\ScheduleUploadModel as Model;
 
 /**
- * /home/webdev2024/classes/schedule/upload/ScheduleIngester.php
+ * /home/webdev2024/classes/domains/schedule/upload/ScheduleIngester.php
  *
  * @category Processor
  * @package  IRTF
