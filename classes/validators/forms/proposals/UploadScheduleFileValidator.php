@@ -102,7 +102,7 @@ class UploadScheduleFileValidator extends BaseValidator
             "Invalid load type.",
             false
         )[0];
-
+/*
         // Validate `access` field
         $valid['access'] = $this->validateSelection(
             [$form['access'] ?? ''],
@@ -112,7 +112,7 @@ class UploadScheduleFileValidator extends BaseValidator
             "Invalid access type.",
             false
         )[0];
-
+*/
         // Validate uploaded `file`
         //$allowedMimeTypes = ['text/csv', 'text/plain', 'application/octet-stream'];
         $allowedMimeTypes = ['text/csv']; // Allowed MIME types for uploaded files
