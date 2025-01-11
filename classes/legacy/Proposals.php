@@ -18,11 +18,6 @@ class Proposals
     ############################################################################
 
 
-    public function generateFastTrackFormPage($debug, $title)
-    {
-        return generateFastTrackFormPage($debug, $title);
-    }
-
     public function generateScheduleFormPage($debug, $title)
     {
         return generateScheduleFormPage($debug, $title);
