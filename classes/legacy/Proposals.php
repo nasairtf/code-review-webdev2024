@@ -23,11 +23,6 @@ class Proposals
         return generateScheduleFormPage($debug, $title);
     }
 
-    public function generateTacResultsFormPage($debug, $title)
-    {
-        return generateTacResultsFormPage($debug, $title);
-    }
-
     public function generateEditDatabaseFormPage($debug, $title)
     {
         return generateEditDatabaseFormPage($debug, $title);
