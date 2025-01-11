@@ -2368,7 +2368,7 @@ class IrtfLinks
      */
     public static function getEditSupportAstromers(): string
     {
-        return '/~proposal/schedule/EditSupportAstromers.php';
+        return '/~proposal/schedule/EditSupportAstromersDB.php';
     }
 
     /**
@@ -2378,7 +2378,7 @@ class IrtfLinks
      */
     public static function getEditOperators(): string
     {
-        return '/~proposal/schedule/EditOperators.php';
+        return '/~proposal/schedule/EditOperatorsDB.php';
     }
 
     /**
@@ -2388,7 +2388,7 @@ class IrtfLinks
      */
     public static function getEditInstruments(): string
     {
-        return '/~proposal/schedule/EditInstruments.php';
+        return '/~proposal/schedule/EditInstrumentsDB.php';
     }
 
     /**
