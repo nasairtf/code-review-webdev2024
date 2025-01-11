@@ -211,11 +211,6 @@ class Proposals
         return processTACResultsFMP($debug, $title, $tfile);
     }
 
-    public function processTACResultsComments($debug, $title, $year, $semester, $tac, $tfile)
-    {
-        return processTACResultsComments($debug, $title, $year, $semester, $tac, $tfile);
-    }
-
     public function processFastTrack($debug, $title, $cvsfile, $loadtype, $access)
     {
         return processFastTrack($debug, $title, $cvsfile, $loadtype, $access);
