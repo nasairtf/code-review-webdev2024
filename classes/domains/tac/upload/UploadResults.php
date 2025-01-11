@@ -6,7 +6,9 @@ namespace App\domains\tac\upload;
 
 use Exception;
 use App\core\common\CustomDebug as Debug;
-use App\legacy\traits\ProcessTACScoreResultsTrait;
+use App\legacy\traits\ProcessTACResultsCommentsTrait;
+use App\legacy\traits\ProcessTACResultsFilemakerTrait;
+use App\legacy\traits\ProcessTACResultsScoresTrait;
 
 /**
  * /home/webdev2024/classes/domains/tac/upload/UploadResults.php
@@ -21,7 +23,9 @@ use App\legacy\traits\ProcessTACScoreResultsTrait;
 
 class UploadResults
 {
-    use ProcessTACScoreResultsTrait;
+    use ProcessTACResultsCommentsTrait;
+    use ProcessTACResultsFilemakerTrait;
+    use ProcessTACResultsScoresTrait;
 
     private $debug;
 
@@ -44,7 +48,7 @@ class UploadResults
         array $uploadData = []
     ): array {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Manager", "processUpload");
+        $debugHeading = $this->debug->debugHeading("Manager", "handleUploadingTACResults");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($uploadData, "{$debugHeading} -- uploadData");
 
@@ -72,6 +76,64 @@ class UploadResults
         } catch (Exception $e) {
             // Rethrow any errors generated during the tac upload
             $this->debug->fail("Error uploading the tac results: " . $e->getMessage());
+        }
+    }
+
+    public function handleUploadingTACFilemaker(
+        array $uploadData = []
+    ): array {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Manager", "handleUploadingTACFilemaker");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($uploadData, "{$debugHeading} -- uploadData");
+
+        $break = [' '];
+        try {
+            // Process the uploaded file
+            $results = $this->processTACResultsFMP(
+                $this->debug->isDebugMode(),
+                '',
+                $uploadData['file']
+            );
+            return $results;
+        } catch (Exception $e) {
+            // Rethrow any errors generated during the tac upload
+            $this->debug->fail("Error uploading the tac results filemaker: " . $e->getMessage());
+        }
+    }
+
+    public function handleUploadingTACComments(
+        array $uploadData = []
+    ): array {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Manager", "handleUploadingTACComments");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($uploadData, "{$debugHeading} -- uploadData");
+
+        $break = [' '];
+        try {
+            // Process the uploaded files
+            $resultSS = $this->processTACResultsComments(
+                $this->debug->isDebugMode(),
+                '',
+                $uploadData['year'],
+                $uploadData['semester'],
+                'ss',
+                $uploadData['filess']
+            );
+            $resultNSS = $this->processTACResultsComments(
+                $this->debug->isDebugMode(),
+                '',
+                $uploadData['year'],
+                $uploadData['semester'],
+                'nss',
+                $uploadData['filenss']
+            );
+            $results = array_merge($resultSS, $break, $resultNSS);
+            return $results;
+        } catch (Exception $e) {
+            // Rethrow any errors generated during the tac upload
+            $this->debug->fail("Error uploading the tac comments: " . $e->getMessage());
         }
     }
 }

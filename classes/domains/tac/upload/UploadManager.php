@@ -43,7 +43,7 @@ class UploadManager
         ?string $request = null
     ): array {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Manager", "processUpload");
+        $debugHeading = $this->debug->debugHeading("Manager", "handleUpload");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($uploadData, "{$debugHeading} -- uploadData");
         $this->debug->debugVariable($request, "{$debugHeading} -- request");
@@ -52,7 +52,22 @@ class UploadManager
             // instantiate upload manager
             $uploader = $uploader ?? new Results($this->debug);
             // Pass the uploaded file information to the tac upload manager
-            return $uploader->handleUploadingTACResults($uploadData);
+            switch ($request) {
+                case 'results':
+                    // handle tac scores/allocation upload request;
+                    return $uploader->handleUploadingTACResults($uploadData);
+                    break;
+
+                case 'comments':
+                    // handle tac comments upload request;
+                    return $uploader->handleUploadingTACComments($uploadData);
+                    break;
+
+                case 'filemaker':
+                    // handle tac filemaker upload request;
+                    return $uploader->handleUploadingTACFilemaker($uploadData);
+                    break;
+            }
         } catch (Exception $e) {
             // Rethrow any errors generated during the tac upload
             $this->debug->fail("Error uploading the tac results: " . $e->getMessage());
