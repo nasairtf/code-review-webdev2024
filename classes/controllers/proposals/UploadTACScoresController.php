@@ -212,7 +212,7 @@ class UploadTACScoresController
         $this->debug->debugVariable($resultMessages, "{$debugHeading} -- resultMessages");
 
         // Prepare to render the edit results page
-        $pageTitle = "IRTF Proposal Submission Date Update";
+        $pageTitle = "IRTF Upload TAC Scores Files";
 
         // Call the view to render the results page
         echo $this->view->renderPageWithResults(
