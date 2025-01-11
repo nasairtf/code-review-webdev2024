@@ -40,6 +40,24 @@ class EngProgramService extends BaseService
     }
 
     /**
+     * Fetches a list of programs for a specific semester.
+     *
+     * @param int    $year      The year of the semester.
+     * @param string $semester  The semester code ('A' or 'B').
+     *
+     * @return array An array of program data for the specified semester.
+     */
+    public function fetchScheduleSemesterEngProgramList(string $semester): array
+    {
+        return $this->fetchDataWithQuery(
+            $this->getScheduleSemesterEngProgramListQuery(),
+            [$semester],
+            's',
+            'No proposals found for the selected semester.'
+        );
+    }
+
+    /**
      * Helper methods to return the query strings
      */
 
@@ -54,5 +72,23 @@ class EngProgramService extends BaseService
         return "SELECT {$fields} "
             . "FROM EngProgram "
             . "WHERE semesterID = ? AND programID = ?;";
+    }
+
+    /**
+     * Returns a query string for fetching program data for a specific semester.
+     *
+     * @return string The SQL query string.
+     */
+    protected function getScheduleSemesterEngProgramListQuery(): string
+    {
+        return "SELECT "
+            .       "programID, semesterID, projectPI, projectMembers, PIEmail, PIName, "
+            .       "otherInfo, SciCategory, SciCategoryText, ApplicationTitle, Abstract "
+            .   "FROM "
+            .       "EngProgram "
+            .   "WHERE "
+            .       "semesterID = ? "
+            .   "ORDER BY "
+            .       "programID ASC;";
     }
 }
