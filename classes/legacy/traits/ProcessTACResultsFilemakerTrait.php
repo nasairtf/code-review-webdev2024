@@ -2,7 +2,7 @@
 
 namespace App\legacy\traits;
 
-trait ProcessTACResultsFMPTrait
+trait ProcessTACResultsFilemakerTrait
 {
     ############################################################################
     #
@@ -192,33 +192,39 @@ trait ProcessTACResultsFMPTrait
         #-- disconnect from the database
         disconnectMysql($debug, $dbc, $result);
 
-        $message = "\n";
+        //$message = "\n";
+        $message = [];
         if ($count == 0) {
             $count = $award + $notaward;
             if ($count == 1) {
-                $message .= "<p align='center'><strong>{$count} submitted proposal was processed for {$semester}:</strong></p>\n";
+                //$message .= "<p align='center'><strong>{$count} submitted proposal was processed for {$semester}:</strong></p>\n";
+                $message[] = "{$count} submitted proposal was processed for {$semester}:";
             } else {
-                $message .= "<p align='center'><strong>{$count} submitted proposals were processed for {$semester}:</strong></p>\n";
+                //$message .= "<p align='center'><strong>{$count} submitted proposals were processed for {$semester}:</strong></p>\n";
+                $message[] = "{$count} submitted proposals were processed for {$semester}:";
             }
             if ($award == 1) {
-                $message .= "<p align='center'>{$award} proposal was marked as awarded.</p>\n";
+                //$message .= "<p align='center'>{$award} proposal was marked as awarded.</p>\n";
+                $message[] = "{$award} proposal was marked as awarded.";
             } else {
-                $message .= "<p align='center'>{$award} proposals were marked as awarded.</p>\n";
+                //$message .= "<p align='center'>{$award} proposals were marked as awarded.</p>\n";
+                $message[] = "{$award} proposals were marked as awarded.";
             }
             if ($notaward == 1) {
-                $message .= "<p align='center'>{$notaward} proposal was marked as not awarded.</p>\n";
+                //$message .= "<p align='center'>{$notaward} proposal was marked as not awarded.</p>\n";
+                $message[] = "{$notaward} proposal was marked as not awarded.";
             } else {
-                $message .= "<p align='center'>{$notaward} proposals were marked as not awarded.</p>\n";
+                //$message .= "<p align='center'>{$notaward} proposals were marked as not awarded.</p>\n";
+                $message[] = "{$notaward} proposals were marked as not awarded.";
             }
         } else {
-            $message .= "<p align='center'>There was a problem processing the proposal awards. {$count} submitted proposals were not processed.</p>\n";
+            //$message .= "<p align='center'>There was a problem processing the proposal awards. {$count} submitted proposals were not processed.</p>\n";
+            $message[] = "There was a problem processing the proposal awards. {$count} submitted proposals were not processed.";
         }
-
 
         if ($debug) { echo "</div>\n"; }
 
-        $code .= generateResultsPage($debug, $title, $message);
-        return $code;
+        return $message;
     }
     #---------------------------------------------------------------------------
     #-- end of processTACResultsFMP
