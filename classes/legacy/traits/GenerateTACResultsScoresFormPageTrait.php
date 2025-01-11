@@ -2,7 +2,7 @@
 
 namespace App\legacy\traits;
 
-trait GenerateTACScoreResultsFormPageTrait
+trait GenerateTACResultsScoresFormPageTrait
 {
     ############################################################################
     #
