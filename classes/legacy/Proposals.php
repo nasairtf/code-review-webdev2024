@@ -206,11 +206,6 @@ class Proposals
     #
     ############################################################################
 
-    public function processTACResultsFMP($debug, $title, $tfile)
-    {
-        return processTACResultsFMP($debug, $title, $tfile);
-    }
-
     public function processFastTrack($debug, $title, $cvsfile, $loadtype, $access)
     {
         return processFastTrack($debug, $title, $cvsfile, $loadtype, $access);
