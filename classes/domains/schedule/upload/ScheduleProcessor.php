@@ -58,7 +58,7 @@ class ScheduleProcessor
             $scheduleData['csv']['lines'][0][0],
             $scheduleData['csv']['header'],
             $scheduleData['loadtype'],
-            $scheduleData['access'],
+            //$scheduleData['access'],
             $scheduleData['fileload']
         );
         $this->debug->debugVariable($prep, "{$debugHeading} -- prep");
@@ -120,6 +120,12 @@ class ScheduleProcessor
         $fileHeaders = $this->prepareHeaders();
         // Prepare file mapping
         $fileMapping = [
+            'engprogram'   => [
+                'filename' => "/home/webdev2024/data/schedule/infile.engprogram.sql.cvs",
+                'table'    => 'EngProgram',
+                'fields'   => $fileHeaders['engprogram'],
+                'sqldata'  => $sql['engprogram'],
+            ],
             'program'     => [
                 'filename' => "/home/webdev2024/data/schedule/infile.program.sql.cvs",
                 'table'    => 'Program',
@@ -212,6 +218,7 @@ IGNORE 1 LINES
         $instruments = $prep['instruments'];
         $operators   = $prep['operators'];
         $filemode    = $prep['fileload'];
+        $engPrograms = $prep['engprograms'];
         // Prepare the SQL arrays
         $tacProgramSQL = [];
         $engProgramSQL = [];
@@ -221,7 +228,7 @@ IGNORE 1 LINES
         // Prepare the INSERT statements
         foreach ($rows as $key => $row) {
             // Build program SQL (always processed, no way to know when the program runs)
-            $this->buildProgramSQL($row, $tacProgramSQL, $engProgramSQL, $filemode);
+            $this->buildProgramSQL($row, $engPrograms, $tacProgramSQL, $engProgramSQL, $filemode);
             // Skip processing irrelevant rows for partial loads
             if ($this->skipRow($row, $prep)) {
                 continue;
@@ -479,6 +486,7 @@ IGNORE 1 LINES
 
     private function buildProgramSQL(
         array $row,
+        array $engProgramList,
         array &$programInserts,
         array &$engProgramInserts,
         bool $fileLoad = true
@@ -487,23 +495,26 @@ IGNORE 1 LINES
         $debugHeading = $this->debug->debugHeading("Processor", "buildProgramSQL");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($row, "{$debugHeading} -- row");
+        $this->debug->debugVariable($engProgramList, "{$debugHeading} -- engProgramList");
         //$this->debug->debugVariable($programInserts, "{$debugHeading} -- &programInserts");
         //$this->debug->debugVariable($engProgramInserts, "{$debugHeading} -- &engProgramInserts");
         $this->debug->debugVariable($fileLoad, "{$debugHeading} -- fileLoad");
 
         // Prepare the fields
-        $programID      = $row['programID'];
-        $semesterID     = $row['semesterID'];
-        $projectPI      = $row['projectPI'];
-        $projectMembers = $row['projectMembers'];
-        $otherInfo      = $row['otherInfo'];
-        $PIName         = $row['PIName'];
-        $PIEmail        = $row['PIEmail'];
+        $programID        = $row['programID'];
+        $semesterID       = $row['semesterID'];
+        $projectPI        = $row['projectPI'];
+        $projectMembers   = $row['projectMembers'];
+        $otherInfo        = $row['otherInfo'];
+        $PIName           = $row['PIName'];
+        $PIEmail          = $row['PIEmail'];
 
         // Skip if programID is already in the inserts list
         if (array_key_exists($programID, $programInserts)) {
             $this->debug->debug("Program ID {$programID} already in programInserts -- skipping.");
             return;
+        } else {
+            $this->debug->debug("Program ID {$programID} NOT in programInserts -- processing.");
         }
 
         // Handle NULL or quoted strings for nullable fields
@@ -538,19 +549,54 @@ IGNORE 1 LINES
 
         // Handle Engineering Program if programID is in the specific range
         if ($programID >= 900 && $programID < 1000) {
+            $this->debug->debug("Handle engineering program if programID is in the specific range: {$programID}.");
+
+            // Find the engprogram in the provided list
+            $engRow = $engProgramList[$programID] ?? '';
+            $this->debug->debugVariable($engRow, "{$debugHeading} -- engRow");
+
+            // Handle NULL or quoted strings for nullable fields
+            $SciCategory = $engRow['SciCategory'] ?? 0;
+            $formattedProjectMembers = $this->formatNullableValue($engRow['projectMembers'] ?? '', $fileLoad);
+            $formattedOtherInfo = $this->formatNullableValue($engRow['otherInfo'] ?? '', $fileLoad);
+            $formattedPIName = $this->formatNullableValue($engRow['PIName'] ?? '', $fileLoad);
+            $formattedPIEmail = $this->formatNullableValue($engRow['PIEmail'] ?? '', $fileLoad);
+            $formattedAppTitle = $this->formatNullableValue($engRow['ApplicationTitle'] ?? '', $fileLoad);
+            $formattedAbstract = $this->formatNullableValue($engRow['Abstract'] ?? '', $fileLoad);
+            $formattedSciCatText = $this->formatNullableValue($engRow['SciCategoryText'] ?? '', $fileLoad);
+
+            // Build the SQL
             $engProgramSQL = $fileLoad
                 ? [
                     $programID,
                     $semesterID,
                     $projectPI,
+                    $formattedProjectMembers,
+                    $formattedOtherInfo,
+                    $formattedPIName,
+                    $formattedPIEmail,
+                    $SciCategory,
+                    $formattedSciCatText,
+                    $formattedAppTitle,
+                    $formattedAbstract,
                     $projectPI
                 ]
                 : sprintf(
-                    "INSERT INTO `EngProgram` SET programID=%d, semesterID='%s', projectPI='%s' "
+                    "INSERT INTO `EngProgram` SET programID=%d, semesterID='%s', projectPI='%s', "
+                        . "projectMembers='%s', otherInfo=%s, PIName=%s, PIEmail=%s, SciCategory=%s, "
+                        . "SciCategoryText='%s', ApplicationTitle='%s', Abstract='%s' "
                         . "ON DUPLICATE KEY UPDATE projectPI='%s';",
                     $programID,
                     $semesterID,
                     $projectPI,
+                    $formattedProjectMembers,
+                    $formattedOtherInfo,
+                    $formattedPIName,
+                    $formattedPIEmail,
+                    $SciCategory,
+                    $formattedSciCatText,
+                    $formattedAppTitle,
+                    $formattedAbstract,
                     $projectPI
                 );
             $engProgramInserts[$programID] = $engProgramSQL;
@@ -587,6 +633,7 @@ IGNORE 1 LINES
                 'instrument' => "DELETE FROM `DailyInstrument` WHERE semesterID = '{$semester}';",
                 'operator'   => "DELETE FROM `DailyOperator` WHERE semesterID = '{$semester}';",
                 'program'    => "DELETE FROM `Program` WHERE semesterID = '{$semester}';",
+                'engprogram' => "DELETE FROM `EngProgram` WHERE semesterID = '{$semester}';",
             ];
         } else {
             return [
@@ -594,6 +641,7 @@ IGNORE 1 LINES
                 'instrument' => "DELETE FROM `DailyInstrument` WHERE semesterID = '{$semester}' AND logID >= {$today};",
                 'operator'   => "DELETE FROM `DailyOperator` WHERE semesterID = '{$semester}' AND logID >= {$today};",
                 'program'    => "DELETE FROM `Program` WHERE semesterID = '{$semester}';",
+                'engprogram' => "DELETE FROM `EngProgram` WHERE semesterID = '{$semester}';",
             ];
         }
     }
@@ -650,7 +698,15 @@ IGNORE 1 LINES
             'engprogram' => [
                 'programID',
                 'semesterID',
-                'projectPI'
+                'projectPI',
+                'projectMembers',
+                'otherInfo',
+                'PIName',
+                'PIEmail',
+                'SciCategory',
+                'SciCategoryText',
+                'ApplicationTitle',
+                'Abstract',
             ],
         ];
     }
@@ -659,7 +715,7 @@ IGNORE 1 LINES
         string $program,
         array $headers,
         string $loadType,
-        string $access,
+        //string $access,
         bool $fileLoad
     ): array {
         // Debug output
@@ -668,14 +724,14 @@ IGNORE 1 LINES
         $this->debug->debugVariable($program, "{$debugHeading} -- program");
         $this->debug->debugVariable($headers, "{$debugHeading} -- headers");
         $this->debug->debugVariable($loadType, "{$debugHeading} -- loadType");
-        $this->debug->debugVariable($access, "{$debugHeading} -- access");
+        //$this->debug->debugVariable($access, "{$debugHeading} -- access");
         return [
             // The SQL loading mode: fileload ? infile : explicit SQL
             'fileload'    => $fileLoad,
             //-- The schedule load type
             'type'        => strtolower($loadType),
             //-- The schedule status (private or public)
-            'access'      => strtolower($access),
+            //'access'      => strtolower($access),
             //-- The logID timestamp (unix timestamp of midnight today)
             //-- Capture the time now, will be used for checking thru-out script.
             //-- $today is the logID value of tonight's observing, since the observing
@@ -696,6 +752,8 @@ IGNORE 1 LINES
             'operators'   => $this->fetchOperatorList(),
             //-- The list of programs from the database
             'programs'    => $this->fetchProgramList($program),
+            //-- The list of engprograms from the database
+            'engprograms' => $this->fetchEngProgramList($program),
         ];
     }
 
@@ -909,6 +967,18 @@ IGNORE 1 LINES
         $year = (int) substr($program, 0, 4);
         $semester = substr($program, 4, 1);
         return $this->model->fetchProgramList($year, $semester);
+    }
+
+    private function fetchEngProgramList(string $program): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Processor", "fetchEngProgramList");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($program, "{$debugHeading} -- program");
+        // Fetch program information from database
+        $year = (int) substr($program, 0, 4);
+        $semester = substr($program, 4, 1);
+        return $this->model->fetchEngProgramList($year, $semester);
     }
 
     private function filterRows(

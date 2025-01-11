@@ -94,6 +94,7 @@ class ScheduleIngester
             'instrument' => $this->model->deleteInstrumentRows($deleteSQL['instrument']),
             'operator' => $this->model->deleteOperatorRows($deleteSQL['operator']),
             'program' => $this->model->deleteProgramRows($deleteSQL['program']),
+            'engprogram' => $this->model->deleteEngProgramRows($deleteSQL['engprogram']),
         ];
         $this->debug->debugVariable($deleteResults, "{$debugHeading} -- deleteResults");
 
@@ -147,6 +148,7 @@ class ScheduleIngester
             'instrument' => $this->model->insertInstrumentRows($insertSQL['instrument']),
             'operator' => $this->model->insertOperatorRows($insertSQL['operator']),
             'program' => $this->model->insertProgramRows($insertSQL['program']),
+            'engprogram' => $this->model->insertEngProgramRows($insertSQL['engprogram']),
         ];
 
         // Return result message
