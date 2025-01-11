@@ -69,6 +69,11 @@ class TACManager
                 return $this->handleUploadComments($requestData);
                 break;
 
+            case 'filemaker':
+                // handle tac filemaker upload request;
+                return $this->handleUploadFilemaker($requestData);
+                break;
+
             case 'export':
             default:
                 // handle tac export request;
@@ -114,6 +119,26 @@ class TACManager
         } catch (Exception $e) {
             // Rethrow any errors generated during the tac upload
             $this->debug->fail("Error uploading the tac comments: " . $e->getMessage());
+        }
+    }
+
+    private function handleUploadFilemaker(
+        array $uploadData,
+        ?Uploader $uploader = null
+    ): array {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Manager", "handleUploadFilemaker");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($uploadData, "{$debugHeading} -- uploadData");
+
+        try {
+            // instantiate upload manager
+            $uploader = $uploader ?? new Uploader($this->debug);
+            // Pass the uploaded file information to the tac upload manager
+            return $uploader->handleUpload($uploadData, 'filemaker');
+        } catch (Exception $e) {
+            // Rethrow any errors generated during the tac upload
+            $this->debug->fail("Error uploading the tac filemaker: " . $e->getMessage());
         }
     }
 
