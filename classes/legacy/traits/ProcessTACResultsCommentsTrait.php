@@ -119,22 +119,25 @@ trait ProcessTACResultsCommentsTrait
         #-- disconnect from the database
         disconnectMysql($debug, $dbc, $result);
 
-        $message = "\n";
+        //$message = "\n";
+        $message = [];
         if ($count == 0) {
             $count = count($sql);
             if ($count == 1) {
-            $message .= "<p align='center'><strong>{$count} submitted {$tac} proposal was processed for {$year}{$semester}</strong></p>\n";
+                //$message .= "<p align='center'><strong>{$count} submitted {$tac} proposal was processed for {$year}{$semester}</strong></p>\n";
+                $message[] = "{$count} submitted {$tac} proposal was processed for {$year}{$semester}";
             } else {
-            $message .= "<p align='center'><strong>{$count} submitted {$tac} proposals were processed for {$year}{$semester}</strong></p>\n";
+                //$message .= "<p align='center'><strong>{$count} submitted {$tac} proposals were processed for {$year}{$semester}</strong></p>\n";
+                $message[] = "{$count} submitted {$tac} proposals were processed for {$year}{$semester}";
             }
         } else {
-            $message .= "<p align='center'>There was a problem processing the proposal awards. {$count} submitted proposals were not processed.</p>\n";
+            //$message .= "<p align='center'>There was a problem processing the proposal awards. {$count} submitted proposals were not processed.</p>\n";
+            $message[] = "There was a problem processing the proposal awards. {$count} submitted proposals were not processed.";
         }
 
         if ($debug) { echo "</div>\n"; }
 
-        $code .= generateResultsPage($debug, $title, $message);
-        return $code;
+        return $message;
     }
     #---------------------------------------------------------------------------
     #-- end of processTACResultsComments
