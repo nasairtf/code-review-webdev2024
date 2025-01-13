@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\domains\schedule\upload;
 
 use Exception;
+use App\exceptions\DatabaseException;
 use App\core\common\Debug;
 use App\domains\schedule\common\ScheduleUtility;
 use App\services\database\troublelog\read\EngProgramService as EngProgramRead;
@@ -352,7 +353,14 @@ class ScheduleUploadModel
         $this->debug->debugVariable($year, "{$debugHeading} -- year");
         $this->debug->debugVariable($semester, "{$debugHeading} -- semester");
         // Fetch list from database
-        $rawList = $this->dbEngPrgRead->fetchScheduleSemesterEngProgramList($year . $semester);
+        try {
+            // Fetch engineering programs
+            $rawList = $this->dbEngPrgRead->fetchScheduleSemesterEngProgramList($year . $semester);
+        } catch (DatabaseException $e) {
+            // No engineering programs, return empty list
+            $this->debug->debug("No engineering programs for {$year}{$semester}, return empty list.");
+            return [];
+        }
         // Format and structure the data
         $engprograms = [];
         foreach ($rawList as $row) {
