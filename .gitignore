@@ -78,3 +78,6 @@ public_html/proposals/*.php
 !public_html/ishell/monitor.php
 !public_html/proposals/UpdateApplicationDate.php
 !public_html/proposals/UploadScheduleFile.php
+!public_html/proposals/UploadTACScores.php
+!public_html/proposals/UploadTACFilemaker.php
+!public_html/proposals/ExportTACFilemaker.php
