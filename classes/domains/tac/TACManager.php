@@ -7,6 +7,7 @@ namespace App\domains\tac;
 use Exception;
 use App\core\common\CustomDebug          as Debug;
 use App\domains\tac\upload\UploadManager as Uploader;
+use App\domains\tac\export\ExportManager as Exporter;
 
 /**
  * /home/webdev2024/classes/domains/tac/TACManager.php
@@ -46,39 +47,49 @@ class TACManager
      */
     public function handleRequest(
         array $requestData,
+        ?bool $export = null,
         ?string $request = null
     ): array {
         // Debug output
         $debugHeading = $this->debug->debugHeading("Manager", "handleRequest");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($requestData, "{$debugHeading} -- requestData");
+        $this->debug->debugVariable($export, "{$debugHeading} -- export");
         $this->debug->debugVariable($request, "{$debugHeading} -- request");
 
         // Identify the request type
-        $request = $request ?? 'export';
+        $export = $export ?? true;
+        $request = $request ?? 'filemaker';
 
         // Handle the request
-        switch ($request) {
-            case 'results':
-                // handle tac scores/allocation upload request;
-                return $this->handleUploadResults($requestData);
-                break;
+        if (!$export) {
+            // Upload request
+            switch ($request) {
+                case 'results':
+                    // handle tac scores/allocation upload request;
+                    return $this->handleUploadResults($requestData);
+                    break;
 
-            case 'comments':
-                // handle tac comments upload request;
-                return $this->handleUploadComments($requestData);
-                break;
+                case 'comments':
+                    // handle tac comments upload request;
+                    return $this->handleUploadComments($requestData);
+                    break;
 
-            case 'filemaker':
-                // handle tac filemaker upload request;
-                return $this->handleUploadFilemaker($requestData);
-                break;
-
-            case 'export':
-            default:
-                // handle tac export request;
-                return $this->handleExportFilemaker($requestData);
-                break;
+                case 'filemaker':
+                default:
+                    // handle tac filemaker upload request;
+                    return $this->handleUploadFilemaker($requestData);
+                    break;
+            }
+        } else {
+            // Export request
+            switch ($request) {
+                case 'filemaker':
+                default:
+                    // handle tac export request;
+                    return $this->handleExportFilemaker($requestData);
+                    break;
+            }
         }
     }
 
@@ -142,32 +153,23 @@ class TACManager
         }
     }
 
-    /**
-     * Handle schedule upload tasks.
-     *
-     * @param array $scheduleData Data related to the schedule upload.
-     *
-     * @return string The result of the upload process.
-     *
-     * @throws Exception If an error occurs during the upload process.
-     */
-    private function processUpload(
-        array $uploadData,
-        ?Uploader $uploader = null
+    private function handleExportFilemaker(
+        array $exportData,
+        ?Exporter $exporter = null
     ): array {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Manager", "processUpload");
+        $debugHeading = $this->debug->debugHeading("Manager", "handleUploadFilemaker");
         $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($uploadData, "{$debugHeading} -- uploadData");
+        $this->debug->debugVariable($exportData, "{$debugHeading} -- exportData");
 
         try {
             // instantiate upload manager
-            $uploader = $uploader ?? new Uploader($this->debug);
+            $exporter = $exporter ?? new Exporter($this->debug);
             // Pass the uploaded file information to the tac upload manager
-            return $uploader->handleUpload($uploadData);
+            return $exporter->handleExport($exportData, 'filemaker');
         } catch (Exception $e) {
             // Rethrow any errors generated during the tac upload
-            $this->debug->fail("Error uploading the tac results: " . $e->getMessage());
+            $this->debug->fail("Error exporting the tac filemaker: " . $e->getMessage());
         }
     }
 }
