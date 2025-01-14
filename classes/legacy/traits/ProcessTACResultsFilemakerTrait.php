@@ -14,7 +14,7 @@ trait ProcessTACResultsFilemakerTrait
         $debug,     // boolean for debugging; to be replaced with $this->debug methods
         $title,     // page title
         $tfile      // the full path to the csv file
-   ) {
+    ) {
         $code = "";
 
         /********************************************************************

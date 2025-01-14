@@ -32,7 +32,7 @@ trait ProcessTACResultsCommentsTrait
                 # remove short lines
                 if (count($line) < 5) { continue; }
                 # remove blank lines
-                if ($line[0] == "" ) { continue; }
+                if ($line[0] == "") { continue; }
                 $line = str_replace($vt, "INTERNALLINEFEEDHERE", $line);
                 $line = str_replace($ht, " ", $line);
                 $line = str_replace("'", "&#39;", $line);
