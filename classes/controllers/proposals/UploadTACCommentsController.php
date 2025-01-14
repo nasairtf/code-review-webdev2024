@@ -145,7 +145,7 @@ class UploadTACCommentsController
         // Process and then render the results page
         try {
             // Pass the file and form data off to the manager for processing
-            $results = $this->manager->handleRequest($validData, 'comments');
+            $results = $this->manager->handleRequest($validData, false, 'comments');
             // Render the form with the results
             $this->renderResultsPage($results);
         } catch (Exception $e) {

@@ -144,7 +144,7 @@ class UploadTACFilemakerController
         // Process and then render the results page
         try {
             // Pass the file and form data off to the manager for processing
-            $results = $this->manager->handleRequest($validData, 'filemaker');
+            $results = $this->manager->handleRequest($validData, false, 'filemaker');
             // Render the form with the results
             $this->renderResultsPage($results);
         } catch (Exception $e) {
