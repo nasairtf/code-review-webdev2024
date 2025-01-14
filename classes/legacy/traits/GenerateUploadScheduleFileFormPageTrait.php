@@ -87,7 +87,7 @@ trait GenerateUploadScheduleFileFormPageTrait
         $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
         $code .= "    <td align='center'>\n";
-        $code .= "      <input type='submit' name='clear' value='Clear' style='width: {$bwid}px;'/>\n";
+        $code .= "      <input type='reset'  name='clear'  value='Clear'       style='width: {$bwid}px;'/>\n";
         $code .= "      <input type='submit' name='submit' value='Upload File' style='width: {$bwid}px;'/>\n";
         $code .= "    </td>\n";
         $code .= "  </tr>\n";
