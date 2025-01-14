@@ -236,6 +236,41 @@ abstract class BaseView
     }
 
     /**
+     * Renders the results page after form submission.
+     *
+     * This method generates a standardized results page using a message
+     * and wraps it with the site's standard layout.
+     *
+     * @param string $title   The title of the results page.
+     * @param string $message The message to display on the results page.
+     *
+     * @return string The complete HTML of the results page.
+     */
+    public function renderPageWithFormattedResults(
+        string $title = '',
+        array $messages = []
+    ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseView", "renderPageWithFormattedResults");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($title, "{$debugHeading} -- title");
+        $this->debug->debugVariable($messages, "{$debugHeading} -- messages");
+
+        // Generate the results block
+        $resultBlock = $this->getPreformattedResultsBlock($messages, 0);
+
+        // Generate the results page contents
+        return $this->renderPage(
+            $title,
+            $this->compBuilder->buildResultsBlockPage(
+                $resultBlock,
+                [],
+                0
+            )
+        );
+    }
+
+    /**
      * Renders a complete HTML page with a title and content.
      *
      * This method wraps the provided content in the site's standard header
@@ -335,4 +370,64 @@ abstract class BaseView
             $pad
         );
     }
-}
+
+    /**
+     * Generates the HTML block for displaying results messages.
+     *
+     * This method creates a table of results messages formatted as paragraphs.
+     *
+     * @param array $dataResults An array of result messages.
+     * @param int   $pad         Optional padding level for formatted output (default: 0).
+     *
+     * @return string The HTML block containing formatted results messages.
+     */
+    protected function getPreformattedResultsBlock(
+        array $dataResults = [],
+        int $pad = 0
+    ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseView", "getPreformattedResultsBlock");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($dataResults, "{$debugHeading} -- dataResults");
+        $this->debug->debugVariable($pad, "{$debugHeading} -- pad");
+
+        $tablePad = $pad;
+        $tableRowPad = $tablePad + 2;
+        $paragraphPad = $tableRowPad + 2;
+
+        $pAttr = ['align' => 'justify', 'class' => 'result-messages', 'color' => 'green'];
+        $rowAttr = [];
+        $tableAttr = ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'];
+
+        // Generate the results block
+        $rows = [];
+        foreach ($dataResults as $message) {
+            $paragraph = $this->htmlBuilder->getParagraph(
+                $message,
+                $pAttr,
+                $paragraphPad,
+                true
+            );
+            $rows[] = $this->htmlBuilder->getTableRowFromArray(
+                [$paragraph],
+                false,
+                [false],
+                $rowAttr,
+                $tableRowPad,
+                true
+            );
+        }
+        $tableHtml = $this->htmlBuilder->getTableFromRows(
+            $rows,
+            $tableAttr,
+            $tablePad
+        );
+
+        // Wrap the table in additional markup for centering and styling
+        return $this->compBuilder->buildPageSection(
+            $tableHtml,
+            'Results',
+            false,
+            $pad
+        );
+    }}
