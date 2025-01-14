@@ -70,11 +70,10 @@ class ExportTACFilemakerController
         $debugHeading = $this->debug->debugHeading("Controller", "handleRequest");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($_GET, "{$debugHeading} -- _GET");
-        $this->debug->debugVariable($_FILES, "{$debugHeading} -- _FILES");
 
         if (isset($_GET['submit'])) {
             // Handle form submit
-            $this->handleFormSubmit($_GET, $_FILES);
+            $this->handleFormSubmit($_GET);
         } else {
             // Display the form page if no form is submitted
             $this->renderFormPage();

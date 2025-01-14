@@ -11,7 +11,7 @@ use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
 use App\legacy\IRTFLayout                 as IrtfBuilder;
 use App\core\irtf\IrtfLinks;
-use App\legacy\traits\GenerateUploadScheduleFileFormPageTrait;
+use App\legacy\traits\LegacyUploadScheduleFileTrait;
 
 /**
  * View for rendering the schedule upload form.
@@ -24,7 +24,7 @@ use App\legacy\traits\GenerateUploadScheduleFileFormPageTrait;
 
 class UploadScheduleFileView extends BaseView
 {
-    use GenerateUploadScheduleFileFormPageTrait;
+    use LegacyUploadScheduleFileTrait;
 
     private $irtfLinks;
 

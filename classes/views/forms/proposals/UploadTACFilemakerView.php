@@ -11,7 +11,7 @@ use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
 use App\legacy\IRTFLayout                 as IrtfBuilder;
 use App\core\irtf\IrtfLinks;
-use App\legacy\traits\GenerateTACResultsFilemakerFormPageTrait;
+use App\legacy\traits\LegacyUploadTACFilemakerTrait;
 
 /**
  * View for rendering the TAC scores upload form.
@@ -24,7 +24,7 @@ use App\legacy\traits\GenerateTACResultsFilemakerFormPageTrait;
 
 class UploadTACFilemakerView extends BaseView
 {
-    use GenerateTACResultsFilemakerFormPageTrait;
+    use LegacyUploadTACFilemakerTrait;
 
     private $irtfLinks;
 

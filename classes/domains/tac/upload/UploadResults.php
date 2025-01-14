@@ -6,9 +6,7 @@ namespace App\domains\tac\upload;
 
 use Exception;
 use App\core\common\CustomDebug as Debug;
-use App\legacy\traits\ProcessTACResultsCommentsTrait;
-use App\legacy\traits\ProcessTACResultsFilemakerTrait;
-use App\legacy\traits\ProcessTACResultsScoresTrait;
+use App\legacy\traits\LegacyTacUploadUploadResultsTrait;
 
 /**
  * /home/webdev2024/classes/domains/tac/upload/UploadResults.php
@@ -23,9 +21,7 @@ use App\legacy\traits\ProcessTACResultsScoresTrait;
 
 class UploadResults
 {
-    use ProcessTACResultsCommentsTrait;
-    use ProcessTACResultsFilemakerTrait;
-    use ProcessTACResultsScoresTrait;
+    use LegacyTacUploadUploadResultsTrait;
 
     private $debug;
 

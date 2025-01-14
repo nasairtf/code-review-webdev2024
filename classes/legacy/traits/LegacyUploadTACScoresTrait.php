@@ -2,7 +2,7 @@
 
 namespace App\legacy\traits;
 
-trait GenerateTACResultsCommentsFormPageTrait
+trait LegacyUploadTACScoresTrait
 {
     ############################################################################
     #
@@ -42,7 +42,7 @@ trait GenerateTACResultsCommentsFormPageTrait
         $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
         $code .= "    <td align='right'>\n";
-        $code .= "      Solar System TAC comments file:\n";
+        $code .= "      Solar System TAC results/time allocation file:\n";
         $code .= "      <input type='hidden' name='MAX_FILE_SIZE' value='60000000' >\n";
         $code .= "    </td>\n";
         //$code .= "  </tr>\n";
@@ -53,7 +53,7 @@ trait GenerateTACResultsCommentsFormPageTrait
         $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
         $code .= "    <td align='right'>\n";
-        $code .= "      Non-Solar System TAC comments file:\n";
+        $code .= "      Non-Solar System TAC results/time allocation file:\n";
         $code .= "      <input type='hidden' name='MAX_FILE_SIZE' value='60000000' >\n";
         $code .= "    </td>\n";
         //$code .= "  </tr>\n";

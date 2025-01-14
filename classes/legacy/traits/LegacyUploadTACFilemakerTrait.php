@@ -2,7 +2,7 @@
 
 namespace App\legacy\traits;
 
-trait GenerateTACResultsScoresFormPageTrait
+trait LegacyUploadTACFilemakerTrait
 {
     ############################################################################
     #
@@ -42,30 +42,19 @@ trait GenerateTACResultsScoresFormPageTrait
         $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
         $code .= "    <td align='right'>\n";
-        $code .= "      Solar System TAC results/time allocation file:\n";
+        $code .= "      TAC results/time allocation Filemaker file:\n";
         $code .= "      <input type='hidden' name='MAX_FILE_SIZE' value='60000000' >\n";
         $code .= "    </td>\n";
         //$code .= "  </tr>\n";
         //$code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
-        $code .= "    <td align='left'><input type='file' name='tacss' /></td>\n";
-        $code .= "  </tr>\n";
-
-        $color = getGrayShading($color);
-        $code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
-        $code .= "    <td align='right'>\n";
-        $code .= "      Non-Solar System TAC results/time allocation file:\n";
-        $code .= "      <input type='hidden' name='MAX_FILE_SIZE' value='60000000' >\n";
-        $code .= "    </td>\n";
-        //$code .= "  </tr>\n";
-        //$code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
-        $code .= "    <td align='left'><input type='file' name='tacnss' /></td>\n";
+        $code .= "    <td align='left'><input type='file' name='tac' /></td>\n";
         $code .= "  </tr>\n";
 
         $color = getGrayShading($color);
         $code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
         $code .= "    <td colspan='2' align='center'>\n";
-        $code .= "      <input type='reset'  name='clear'  value='Clear'        style='width: {$bwid}px;'/>\n";
-        $code .= "      <input type='submit' name='submit' value='Upload Files' style='width: {$bwid}px;'/>\n";
+        $code .= "      <input type='reset'  name='clear'  value='Clear'       style='width: {$bwid}px;'/>\n";
+        $code .= "      <input type='submit' name='submit' value='Upload File' style='width: {$bwid}px;'/>\n";
         $code .= "    </td>\n";
         $code .= "  </tr>\n";
 

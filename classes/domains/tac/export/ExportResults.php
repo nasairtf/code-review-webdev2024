@@ -6,7 +6,7 @@ namespace App\domains\tac\export;
 
 use Exception;
 use App\core\common\CustomDebug as Debug;
-use App\legacy\traits\ProcessTACResultsFilemakerExportTrait;
+use App\legacy\traits\LegacyTacExportExportResultsTrait;
 
 /**
  * /home/webdev2024/classes/domains/tac/export/ExportResults.php
@@ -21,7 +21,7 @@ use App\legacy\traits\ProcessTACResultsFilemakerExportTrait;
 
 class ExportResults
 {
-    use ProcessTACResultsFilemakerExportTrait;
+    use LegacyTacExportExportResultsTrait;
 
     private $debug;
 

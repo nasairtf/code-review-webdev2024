@@ -11,7 +11,7 @@ use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
 use App\legacy\IRTFLayout                 as IrtfBuilder;
 use App\core\irtf\IrtfLinks;
-use App\legacy\traits\GenerateTACResultsCommentsFormPageTrait;
+use App\legacy\traits\LegacyUploadTACCommentsTrait;
 
 /**
  * View for rendering the TAC scores upload form.
@@ -24,7 +24,7 @@ use App\legacy\traits\GenerateTACResultsCommentsFormPageTrait;
 
 class UploadTACCommentsView extends BaseView
 {
-    use GenerateTACResultsCommentsFormPageTrait;
+    use LegacyUploadTACCommentsTrait;
 
     private $irtfLinks;
 
