@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\domains\schedule\build;
 
-use App\core\common\Debug;
+use App\core\common\CustomDebug as Debug;
 
 /**
  * /home/webdev2024/classes/domains/schedule/build/ScheduleBuildManager.php

@@ -169,7 +169,7 @@ class UploadScheduleFileController
         // Process and then render the results page
         try {
             // Pass the file and form data off to the schedule manager for processing
-            $results = $this->schedule->uploadSchedule($validData);
+            $results = $this->schedule->handleRequest($validData, 'upload');
             // Render the form with the results
             $this->renderResultsPage($results);
         } catch (Exception $e) {

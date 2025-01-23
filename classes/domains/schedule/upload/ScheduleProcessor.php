@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\domains\schedule\upload;
 
-use App\core\common\Debug;
-use App\services\files\FileWriter as Writer;
+use App\core\common\CustomDebug                     as Debug;
+use App\services\files\FileWriter                   as Writer;
 use App\domains\schedule\common\ScheduleUtility;
 use App\domains\schedule\upload\ScheduleUploadModel as Model;
 
