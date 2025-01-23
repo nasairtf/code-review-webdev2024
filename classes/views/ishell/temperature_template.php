@@ -7,7 +7,7 @@
 <body>
 
 <center>
-    <h1><a href="<?= $template['url'] ?>" target='_top'>iSHELL <?= $template['head'] ?> Temperatures</a></h1>
+    <h1><a href="<?= $template['url'] ?>" target="_top">iSHELL <?= $template['head'] ?> Temperatures</a></h1>
 
     <!-- Display the current temperatures for the assorted channels -->
     <h3>Current <?= $template['cur'] ?> Temperatures</h3>

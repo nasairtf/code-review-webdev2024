@@ -145,7 +145,7 @@ class TemperaturesModel
         return $this->dbRead->fetchTemperatureData($sensor_id, $system, null, true, false);
     }
 
-    private function fetchTemperatureRange(string $sensor_id, ?string $system = null, string $timestamp): array
+    private function fetchTemperatureRange(string $sensor_id, ?string $system = null, ?int $timestamp): array
     {
         // Debug output
         $debugHeading = $this->debug->debugHeading("Model", "fetchTemperatureRange");

@@ -153,6 +153,17 @@ class GraphService
             $adjustedTimestamps = [];
             for ($i = 0; $i < min($displayCount, $dataPointCount); $i++) {
                 $currentIndex = $ignoreEntries + $i;
+                $skipIteration = false;
+                foreach ($data as $index => $sensorData) {
+                    if (empty($sensorData[$currentIndex])) {
+                        $skipIteration = true;
+                        break; // Break out of the inner loop
+                    }
+                }
+                if ($skipIteration) {
+                    continue; // Skip to the next iteration of the outer loop
+                }
+
                 foreach ($data as $index => $sensorData) {
                     $adjustedData[$index][] = $sensorData[$currentIndex];
                 }
