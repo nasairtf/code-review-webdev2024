@@ -791,6 +791,56 @@ class BaseFormValidator
     }
 
     /**
+     * Validates the email type selection for sending real or dummy emails.
+     *
+     *
+     * @throws ValidationException If the location is invalid and the field is required.
+     */
+    protected function validateEmailsSendType(
+        int $emailType,
+        string $fieldKey = 'emails',
+        bool $required = false
+    ): ?int {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateEmailsSendType");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($emailType, "{$debugHeading} -- emailType");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate fields
+        $allowed = [0, 1];
+        $errorMsg = "Invalid email send type. Must be 0 or 1.";
+        $validatedResult = $this->validateSelection([$emailType], $allowed, $fieldKey, $required, $errorMsg)[0];
+        return (int) $validatedResult ?? null;
+    }
+
+    /**
+     * Validates the email type selection for sending real or dummy emails.
+     *
+     *
+     * @throws ValidationException If the location is invalid and the field is required.
+     */
+    protected function validateIntervalUnitType(
+        int $unitType,
+        string $fieldKey = 'units',
+        bool $required = false
+    ): ?int {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateIntervalUnitType");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($unitType, "{$debugHeading} -- unitType");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate fields
+        $allowed = [0, 1];
+        $errorMsg = "Invalid interval unit type. Must be 0 or 1.";
+        $validatedResult = $this->validateSelection([$unitType], $allowed, $fieldKey, $required, $errorMsg)[0];
+        return (int) $validatedResult ?? null;
+    }
+
+    /**
      * Validates the visitor instrument selection.
      *
      * @param string $instrument The visitor instrument selected.
@@ -922,6 +972,50 @@ class BaseFormValidator
             'Onsite',
         ];
         return $locationText[$location];
+    }
+
+    /**
+     * Converts a numeric location code to a descriptive text equivalent.
+     *
+     * @param int $location The location code (0 for "Remote", 1 for "Onsite").
+     *
+     * @return string The location description, either "Remote" or "Onsite".
+     */
+    protected function returnEmailsSendTypeText(
+        int $emailType
+    ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "returnEmailsSendTypeText");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($emailType, "{$debugHeading} -- emailType");
+        // Method text
+        $emailTypeText = [
+            'Yes (send real emails)',
+            'No (send dummy emails)',
+        ];
+        return $emailTypeText[$emailType];
+    }
+
+    /**
+     * Converts a numeric location code to a descriptive text equivalent.
+     *
+     * @param int $location The location code (0 for "Remote", 1 for "Onsite").
+     *
+     * @return string The location description, either "Remote" or "Onsite".
+     */
+    protected function returnIntervalUnitTypeText(
+        int $unitType
+    ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "returnIntervalUnitTypeText");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($unitType, "{$debugHeading} -- unitType");
+        // Method text
+        $unitTypeText = [
+            'Days',
+            'Weeks',
+        ];
+        return $unitTypeText[$unitType];
     }
 
     /**
