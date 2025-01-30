@@ -71,11 +71,11 @@ class UploadScheduleFileController
         // Initialise the view and validator. Model is not needed.
         $this->view = $view ?? new View($formatHtml, $this->debug);
         $this->valid = $valid ?? new Validator($this->debug);
-        $this->debug->log("{$debugHeading} -- View, Validator classes are successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- View, Validator classes are successfully initialised.");
 
         // Initialise the additional class(es) needed by this controller
         $this->schedule = $schedule ?? new Manager($this->debug->isDebugMode());
-        $this->debug->log("{$debugHeading} -- Additional class successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Additional class successfully initialised.");
     }
 
     /**

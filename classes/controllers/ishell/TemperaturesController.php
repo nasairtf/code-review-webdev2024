@@ -79,7 +79,7 @@ class TemperaturesController
         $this->valid = new Validator($this->config, $this->debug);
         $this->graph = new Graph($this->debug->isDebugMode());
 
-        $this->debug->log("{$debugHeading} -- Classes are successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Classes are successfully initialised.");
     }
 
     public function handleRequest(): void

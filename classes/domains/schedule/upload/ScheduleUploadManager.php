@@ -45,10 +45,10 @@ class ScheduleUploadManager
         $this->parser = $parser ?? new Parser('schedule', null, $this->debug->isDebugMode());
         $this->processor = $processor ?? new Processor($this->debug);
         $this->ingester = $ingester ?? new Ingester($this->debug);
-        $this->debug->log("{$debugHeading} -- Parser, Processor, Ingester classes successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Parser, Processor, Ingester classes successfully initialised.");
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- Manager initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Manager initialisation complete.");
     }
 
     public function handleSchedule(array $scheduleData): array

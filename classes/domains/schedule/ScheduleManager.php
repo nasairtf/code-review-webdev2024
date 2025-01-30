@@ -37,7 +37,7 @@ class ScheduleManager
         $this->debug->debug($debugHeading);
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- Schedule Manager initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Schedule Manager initialisation complete.");
     }
 
     /**

@@ -6,7 +6,7 @@ namespace App\validators\forms;
 
 use Exception;
 use App\exceptions\ValidationException;
-use App\core\common\Debug;
+use App\core\common\CustomDebug as Debug;
 use App\core\irtf\IrtfUtilities;
 
 /**
@@ -44,8 +44,11 @@ class BaseFormValidator
     ) {
         // Debug output
         $this->debug = $debug ?? new Debug('default', false, 0);
-        $debugHeading = $this->debug->debugHeading("Validator", "__construct");
+        $debugHeading = $this->debug->debugHeading("BaseFormValidator", "__construct");
         $this->debug->debug($debugHeading);
+
+        // Constructor completed
+        $this->debug->debug("{$debugHeading} -- Parent Validator initialisation complete.");
     }
 
     // Core Validation Methods

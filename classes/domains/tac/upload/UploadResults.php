@@ -37,7 +37,7 @@ class UploadResults
         $this->debug->debug($debugHeading);
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- Upload Manager initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Upload Manager initialisation complete.");
     }
 
     public function handleUploadingTACResults(

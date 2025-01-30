@@ -35,7 +35,7 @@ class ExportManager
         $this->debug->debug($debugHeading);
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- Export Manager initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Export Manager initialisation complete.");
     }
 
     public function handleExport(

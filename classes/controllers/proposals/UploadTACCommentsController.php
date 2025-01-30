@@ -46,11 +46,11 @@ class UploadTACCommentsController
         // Initialise dependencies with fallbacks. Model is not needed.
         $this->view = $view ?? new View($formatHtml, $this->debug);
         $this->valid = $valid ?? new Validator($this->debug);
-        $this->debug->log("{$debugHeading} -- View, Validator classes are successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- View, Validator classes are successfully initialised.");
 
         // Initialise the additional class(es) needed by this controller
         $this->manager = $manager ?? new Manager($this->debug->isDebugMode());
-        $this->debug->log("{$debugHeading} -- Additional class successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Additional class successfully initialised.");
 
         // Class initialisation complete
         $this->debug->debug("{$debugHeading} -- Controller initialisation complete.");

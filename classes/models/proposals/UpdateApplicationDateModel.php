@@ -36,10 +36,10 @@ class UpdateApplicationDateModel
         // Initialise the additional classes needed by this model
         $this->dbRead = $dbRead ?? new DbRead($this->debug->isDebugMode());
         $this->dbWrite = $dbWrite ?? new DbWrite($this->debug->isDebugMode());
-        $this->debug->log("{$debugHeading} -- Service classes successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Service classes successfully initialised.");
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- Model initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
     }
 
     /**

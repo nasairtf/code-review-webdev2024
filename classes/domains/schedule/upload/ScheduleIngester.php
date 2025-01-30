@@ -39,10 +39,10 @@ class ScheduleIngester
 
         // Initialise the additional classes needed by this processor
         $this->model = $model ?? new Model($this->debug);
-        $this->debug->log("{$debugHeading} -- Model class successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Model class successfully initialised.");
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- Ingester initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Ingester initialisation complete.");
     }
 
     public function ingestSchedule(array $scheduleData): array

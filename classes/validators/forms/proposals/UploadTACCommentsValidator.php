@@ -40,7 +40,7 @@ class UploadTACCommentsValidator extends BaseValidator
         parent::__construct($debug);
         $debugHeading = $this->debug->debugHeading("Validator", "__construct");
         $this->debug->debug($debugHeading);
-        $this->debug->log("{$debugHeading} -- Parent class is successfully constructed.");
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
     }
 
     /**

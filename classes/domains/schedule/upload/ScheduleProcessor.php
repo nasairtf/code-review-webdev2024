@@ -40,10 +40,10 @@ class ScheduleProcessor
         // Initialise the additional classes needed by this processor
         $this->model = $model ?? new Model($this->debug);
         $this->writer = $writer ?? new Writer('infilesql', null, $this->debug->isDebugMode());
-        $this->debug->log("{$debugHeading} -- Model, Writer classes successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- Model, Writer classes successfully initialised.");
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- Processor initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Processor initialisation complete.");
     }
 
     public function processSchedule(array $scheduleData): array

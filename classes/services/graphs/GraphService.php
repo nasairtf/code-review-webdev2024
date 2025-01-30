@@ -51,7 +51,7 @@ class GraphService
         $this->channelNames = $channelNames ?? ["Ch 1", "Ch 2", "Ch 3", "Ch 4", "Ch 5", "Ch 6", "Ch 7", "Ch 8"];
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- GraphService initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- GraphService initialisation complete.");
     }
 
     /**

@@ -37,7 +37,7 @@ class ObservingReminder
         $this->debug->debug($debugHeading);
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- Observing Reminder initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Observing Reminder initialisation complete.");
     }
 
     public function handleObservingReminders(

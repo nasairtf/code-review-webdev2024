@@ -37,7 +37,7 @@ class TACManager
         $this->debug->debug($debugHeading);
 
         // Class initialisation complete
-        $this->debug->log("{$debugHeading} -- TAC Manager initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- TAC Manager initialisation complete.");
     }
 
     /**

@@ -65,13 +65,13 @@ class ScheduleUploadModel
         $this->dbObsAppRead = $dbObsAppRead ?? new ObsAppRead($this->debug->isDebugMode());
         $this->dbInstruRead = $dbInstruRead ?? new HardwareRead($this->debug->isDebugMode());
         $this->dbOperatRead = $dbOperatRead ?? new OperatorRead($this->debug->isDebugMode());
-        $this->debug->log("{$debugHeading} -- DB read service classes successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- DB read service classes successfully initialised.");
         $this->dbEngPrgWrite = $dbEngPrgWrite ?? new EngProgramWrite($this->debug->isDebugMode());
         $this->dbProgrmWrite = $dbProgrmWrite ?? new ProgramWrite($this->debug->isDebugMode());
         $this->dbScheduWrite = $dbScheduWrite ?? new ScheduleWrite($this->debug->isDebugMode());
         $this->dbInstruWrite = $dbInstruWrite ?? new HardwareWrite($this->debug->isDebugMode());
         $this->dbOperatWrite = $dbOperatWrite ?? new OperatorWrite($this->debug->isDebugMode());
-        $this->debug->log("{$debugHeading} -- DB write service classes successfully initialised.");
+        $this->debug->debug("{$debugHeading} -- DB write service classes successfully initialised.");
     }
 
     public function deleteEngProgramRows(string $deleteSQL): string
