@@ -34,6 +34,11 @@ class EmailService
     protected $mailer;
 
     /**
+     * @var array $contacts Contact information for the core IRTF emails
+     */
+    protected $contacts;
+
+    /**
      * Constructs a new EmailService instance.
      *
      * @param string       $smtpName  Key to select which email configuration to use.
@@ -43,7 +48,8 @@ class EmailService
     public function __construct(
         string $smtpName,
         ?bool $debugMode = null,
-        ?PHPMailer $mailer = null
+        ?PHPMailer $mailer = null,
+        ?array $contacts = null
     ) {
         // Debug output
         $this->debug = new Debug('email', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
@@ -61,8 +67,23 @@ class EmailService
         $this->applySmtpSettings($config);              // Apply the chosen SMTP configuration
         $this->debug->debug("{$debugHeading} -- PHPMailer class successfully initialised.");
 
+        // Fetch the contacts config from Config
+        $this->contacts = Config::get('contact_config');
+        $this->debug->debugVariable($this->contacts, "{$debugHeading} -- contacts");
+        $this->debug->debug("{$debugHeading} -- Contacts successfully fetched.");
+
         // Class initialisation complete
         $this->debug->debug("{$debugHeading} -- EmailService initialisation complete.");
+    }
+
+    /**
+     * Gets the contact array.
+     *
+     * @return array The array of 'standard' contact information
+     */
+    public function getContacts(): array
+    {
+        return $this->contacts;
     }
 
     /**
