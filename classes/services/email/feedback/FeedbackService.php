@@ -119,13 +119,16 @@ Comments and Suggestions:
 
     private function irtfEmails(): array
     {
+        $sysad = $this->contacts['sysad'];
+        $dirct = $this->contacts['director'];
         return $this->debug->isDebugMode()
             ? [
-                'hawarden@hawaii.edu' => 'Miranda Hawarden-Ogata',
+                $sysad['email1'] => $sysad['name'],
               ]
             : [
-                'jrayner@hawaii.edu' => 'John Rayner',
-                'hawarden@hawaii.edu' => 'Miranda Hawarden-Ogata',
+                $dirct['email1'] => $dirct['name'],
+                // remove sysad address once successful deployment confirmed:
+                $sysad['email1'] => $sysad['name'],
               ];
     }
 }
