@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\core\common;
 
-use App\core\common\Debug as Base;
-use App\exceptions\DatabaseException as Database;
-use App\exceptions\EmailException as Email;
+use App\core\common\Debug              as Base;
+use App\exceptions\DatabaseException   as Database;
+use App\exceptions\EmailException      as Email;
 use App\exceptions\ValidationException as Validation;
+use App\exceptions\ExecutionException  as Execution;
 
 /**
  * CustomDebug class.
@@ -79,5 +80,24 @@ class CustomDebug extends Base
     {
         $throw = $this->handleFail($message, $throwMsg, $color);
         throw new Email($throw);
+    }
+
+    /**
+     * Logs a debug message and throws a execution exception.
+     *
+     * This method logs the provided message and throws a `ExecutionException`
+     * with the specified message. It uses the specified color for logging,
+     * or defaults to the class-defined color.
+     *
+     * @param string      $message   The debug message to log.
+     * @param string      $throwMsg  [optional] The exception message to throw. Defaults to $message.
+     * @param string|null $color     [optional] The color for the log message. Defaults to the class default.
+     *
+     * @throws \App\exceptions\ExecutionException Always throws a execution exception.
+     */
+    public function failExecution(string $message, string $throwMsg = '', ?string $color = null): void
+    {
+        $throw = $this->handleFail($message, $throwMsg, $color);
+        throw new Execution($throw);
     }
 }
