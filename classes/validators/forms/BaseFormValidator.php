@@ -124,7 +124,9 @@ class BaseFormValidator
     protected function validateName(
         string $name,
         string $fieldKey = 'name',
-        bool $required = false
+        bool $required = false,
+        ?int $length = null,
+        ?string $errorField = null
     ): ?string {
         // Debug output
         $debugHeading = $this->debug->debugHeading("Validator", "validateName");
@@ -132,24 +134,103 @@ class BaseFormValidator
         $this->debug->debugVariable($name, "{$debugHeading} -- name");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
+        $this->debug->debugVariable($length, "{$debugHeading} -- length");
+        $this->debug->debugVariable($errorField, "{$debugHeading} -- errorField");
+
+        $field = $errorField ?? 'Name';
 
         // Validate required field
         $name = $this->validateRequiredField(
             $name,
             $required,
             $fieldKey,
-            "Name is required."
+            "{$field} is required."
         );
         if ($name === null) {
             return null;
         }
 
         // Validate fields
-        if (strlen($name) > 70) {
-            $this->errors[$fieldKey] = "Invalid name. Must be 1-70 characters.";
+        $maxName = $length ?? 70;
+        if (strlen($name) > $maxName) {
+            $field = strtolower($field);
+            $this->errors[$fieldKey] = "Invalid {$field}. Must be 1-{$maxName} characters.";
             return null;
         }
         return IrtfUtilities::escape($name);
+    }
+
+    /**
+     * Validates a username field for length and content.
+     *
+     * @param string $username The username input to validate.
+     * @param string $fieldKey Key to associate errors with this field.
+     * @param bool   $required Whether the field is required.
+     *
+     * @return string|null Validated and escaped username, or null if validation fails.
+     *
+     * @throws ValidationException If the username is invalid and the field is required.
+     */
+    protected function validateUsername(
+        string $username,
+        string $fieldKey = 'username',
+        bool $required = false
+    ): ?string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateUsername");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($username, "{$debugHeading} -- username");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate field
+        return $this->validateName(
+            $username,
+            $fieldKey,
+            $required,
+            8,
+            "Username"
+        );
+    }
+
+    protected function validateShell(
+        string $shell,
+        string $fieldKey = 'shell',
+        bool $required = false,
+        ?string $errorMessage = null
+    ): ?string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateShell");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($shell, "{$debugHeading} -- shell");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+        $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
+
+        // Validate required field
+        $shell = $this->validateRequiredField(
+            $shell,
+            $required,
+            $fieldKey,
+            "Shell is required."
+        );
+        if ($shell === null) {
+            return null;
+        }
+
+        // Validate fields
+        $valid_shells = [
+            '/bin/bash',
+            '/bin/csh',
+            '/bin/sh',
+            '/bin/tcsh',
+            '/bin/zsh',
+        ];
+        if (!in_array(strtolower($shell), $valid_shells, true)) {
+            $this->errors[$fieldKey] = "Invalid shell.";
+            return null;
+        }
+        return strtolower($shell);
     }
 
     /**
@@ -402,6 +483,54 @@ class BaseFormValidator
             $this->debug->fail("The obsapp_id provided is invalid.");
         }
         return (int) $obsapp_id;
+    }
+
+    protected function validateNumberInRange(
+        $number,
+        string $fieldKey = 'number',
+        bool $required = false,
+        ?int $minNumber = null,
+        ?int $maxNumber = null,
+        ?string $errorMessage = null
+    ): ?int {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateNumberInRange");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($number, "{$debugHeading} -- number");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+        $this->debug->debugVariable($minNumber, "{$debugHeading} -- minNumber");
+        $this->debug->debugVariable($maxNumber, "{$debugHeading} -- maxNumber");
+        $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
+
+        // Validate required field
+        $number = $this->validateRequiredField(
+            $number,
+            $required,
+            $fieldKey,
+            "Number is required."
+        );
+        if ($number === null) {
+            return null;
+        }
+
+        // Use provided range or default to 1 to 9999
+        $minNumber = $minNumber ?? 1;
+        $maxNumber = $maxNumber ?? 9999;
+        $options = [
+            'options' => [
+                'min_range' => $minNumber,
+                'max_range' => $maxNumber,
+            ],
+        ];
+
+        // Validate program number
+        if (!filter_var($number, FILTER_VALIDATE_INT, $options)) {
+            $this->errors[$fieldKey] = $errorMessage
+                ?? "Invalid number: Must be between {$minNumber} and {$maxNumber}.";
+            return null;
+        }
+        return (int) $number;
     }
 
     /**
