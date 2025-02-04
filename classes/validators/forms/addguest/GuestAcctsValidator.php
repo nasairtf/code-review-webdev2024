@@ -126,7 +126,7 @@ class GuestAcctsValidator extends BaseValidator
             $form['uid'],
             'uid',
             true,
-            0,
+            1,
             20000,
             'Invalid uid.'
         );
@@ -136,7 +136,7 @@ class GuestAcctsValidator extends BaseValidator
             $form['gid'],
             'gid',
             true,
-            0,
+            1,
             20000,
             'Invalid gid.'
         );
@@ -167,13 +167,12 @@ class GuestAcctsValidator extends BaseValidator
         )[0];
 
         // Validate `expiredays` field
-        $valid['expiredays'] = $this->validateTimestamp(
-            $form['expiredays'],
+        $valid['expiredays'] = $this->validateNumberInRange(
+            0,
             'expiredays',
-            true,
-            null,
-            null,
-            'Invalid expiration.'
+            false,
+            -1,
+            null
         );
 
         // Check for validation errors and throw an exception if any are found

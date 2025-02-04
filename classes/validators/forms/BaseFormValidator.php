@@ -188,7 +188,7 @@ class BaseFormValidator
             $username,
             $fieldKey,
             $required,
-            8,
+            12,
             "Username"
         );
     }
@@ -502,21 +502,40 @@ class BaseFormValidator
         $this->debug->debugVariable($minNumber, "{$debugHeading} -- minNumber");
         $this->debug->debugVariable($maxNumber, "{$debugHeading} -- maxNumber");
         $this->debug->debugVariable($errorMessage, "{$debugHeading} -- errorMessage");
+    $this->debug->debugVariable($number, "{$debugHeading} -- number (before required check)");
 
         // Validate required field
+    // Validate required field (ensure it does not return null for 0)
         $number = $this->validateRequiredField(
             $number,
             $required,
             $fieldKey,
             "Number is required."
         );
+    $this->debug->debugVariable($number, "{$debugHeading} -- number (after required check)");
+    // If `validateRequiredField` returned null, exit early
         if ($number === null) {
             return null;
         }
 
+    // Ensure it's a valid integer by strict type conversion
+    if (!is_numeric($number) || floor($number) != $number) {
+        $this->errors[$fieldKey] = "Invalid number format. Must be an integer.";
+        return null;
+    }
+
+    // Convert the value explicitly to an integer
+    $number = (int) $number;
+    $this->debug->debugVariable($number, "{$debugHeading} -- number (after casting)");
+
+        // Cast number to int to ensure validation consistency
+        $number = (int) $number;
+
         // Use provided range or default to 1 to 9999
         $minNumber = $minNumber ?? 1;
         $maxNumber = $maxNumber ?? 9999;
+    $this->debug->debugVariable($minNumber, "{$debugHeading} -- minNumber");
+    $this->debug->debugVariable($maxNumber, "{$debugHeading} -- maxNumber");
         $options = [
             'options' => [
                 'min_range' => $minNumber,
@@ -524,7 +543,14 @@ class BaseFormValidator
             ],
         ];
 
-        // Validate program number
+    // Validate number
+    if ($number < $minNumber || $number > $maxNumber) {
+        $this->errors[$fieldKey] = $errorMessage
+            ?? "Invalid number: Must be between {$minNumber} and {$maxNumber}.";
+        return null;
+    }
+    return $number;
+        // Validate number
         if (!filter_var($number, FILTER_VALIDATE_INT, $options)) {
             $this->errors[$fieldKey] = $errorMessage
                 ?? "Invalid number: Must be between {$minNumber} and {$maxNumber}.";

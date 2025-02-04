@@ -37,8 +37,8 @@ class GuestAcctsModel extends BaseModel
         // Initialise the class properties
         $sys_command = '/home/addguest/bin/add_guest/run_addguest_on_webserver';
         //$send = "";
-        $send = " -x";
-        $verbose = ($this->debug->isDebugMode()) ? " -v" : '';
+        $send = ' -x';
+        $verbose = ($this->debug->isDebugMode()) ? ' -v' : '';
         $this->sys_command = $sys_command . $send . $verbose;
 
         // Class initialisation complete
@@ -105,11 +105,11 @@ class GuestAcctsModel extends BaseModel
         $command = $this->sys_command
             . " -c adduser"
             . " -u {$data['username']}"
-            . " -l {$data['acctname']}"
+            . " -l '{$data['acctname']}'"
             . " -i {$data['uid']}"
             . " -g {$data['gid']}"
             . " -r {$data['shell']}"
-            . " -p {$data['passwd']}"
+            . " -p '{$data['passwd']}'"
             . " -a {$data['accttype']}"
             . " -e {$data['expiredays']}";
 
