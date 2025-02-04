@@ -15,7 +15,7 @@ use App\core\common\Debug;
  * @version  1.0.0
  */
 
-class ProcessObsRemindersModel
+class ProcessFeedRemindersModel
 {
     private $debug;
     private $dbRead;
@@ -48,11 +48,11 @@ class ProcessObsRemindersModel
         // Calcualte necessary fields
         // Return the data
         return [
-            'emailLeadTime' => 3,              // Email lead time
-            'blockWindow'   => 10,             // Block window
+            'emailLeadTime' => -1,             // collect programs from emailleadtime and back one day
+            'blockWindow'   => 16,             // bobby wants a 15-day look-ahead window, so added to the -1 gives us 16 here;
             'serviceObsCm'  => 'Service Obs.', // Service comment
-            'units'         => 1,              // Experience Rating
-            'emails'        => 0,              // Comments and Suggestions
+            'units'         => 1,              // 1 = DAY, 0 = WEEK
+            'emails'        => 0,              // 1 = send emails, 0 = dummy emails
         ];
     }
 }

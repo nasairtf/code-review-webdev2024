@@ -25,7 +25,7 @@ use App\validators\forms\BaseFormValidator as BaseValidator;
  * @property Debug $debug Debugging utility for logging and error tracing.
  */
 
-class ProcessObsRemindersValidator extends BaseValidator
+class ProcessFeedRemindersValidator extends BaseValidator
 {
     /**
      * Initializes the validator and sets up debugging.
@@ -96,7 +96,7 @@ class ProcessObsRemindersValidator extends BaseValidator
         // Validate `emailLeadTime` field
         $valid['emailLeadTime'] = $this->validateSelection(
             [(int) $form['emailLeadTime']] ?? [],
-            range(1, 20),
+            range(-10, 20),
             'emailLeadTime',
             true,
             'Invalid lead time selection.',

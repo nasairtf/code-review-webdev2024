@@ -2,16 +2,15 @@
 
 namespace App\legacy\traits;
 
-trait LegacyProcessObsRemindersTrait
+trait LegacyProcessFeedRemindersTrait
 {
     ############################################################################
     #
-    # Generates the observing reminder form
+    # Generates the feedback reminder form
     #
     #---------------------------------------------------------------------------
     #
-    function generateObsReminder($debug, $data)
-    {
+    function generateFeedReminder($debug, $data) {
         $code  = "";
         $color = "";
         $cols  = 5;
@@ -47,12 +46,12 @@ trait LegacyProcessObsRemindersTrait
         $code .= "  <tr bgcolor='#{$color}' height='{$height}'>\n";
         $code .= "    <td colspan='{$cols}'>\n";
         $code .= "      <strong>Algorithm</strong>:<br/><br/>
-        This form generates the text of the reminder emails that would be sent to observers to notify them of imminent observing. The algorithm for generation of emails is fairly straightforward:<br/>
+        This form generates the text of the reminder emails that would be sent to observers to remind them to submit feedback. The algorithm for generation of emails is fairly straightforward:<br/>
         <ul>
             <li>a <strong>block window</strong> is a rolling {$data['blockWindow']} {$units} window of time that contains the observing times that will be examined.</li>
             <li>the <strong>email lead time</strong> is the {$data['emailLeadTime']} {$units} point when email reminders will be sent if the program's observing time meets the criteria for it.</li>
-            <li>if a program has upcoming observing time on the last day of the block window but an email has not been sent, a reminder email will be sent.</li>
-            <li>if a program has observing times within {$data['blockWindow']} {$units}{$blk} prior to the {$data['emailLeadTime']} {$units} email lead time and an email has already been sent, no additional email will be sent.</li>
+            <li>if a program has completed observing time on the first day of the block window but an email has not been sent, a reminder email will be sent.</li>
+            <li>if a program has observing times within {$data['blockWindow']} {$units}{$blk} after the {$data['emailLeadTime']} {$units} email lead time and an email has already been sent, no additional email will be sent.</li>
             <li>if a program has observing times within a block window but contains the comment '{$data['serviceObsCm']}', no email will be sent.</li>
             <li>no email will be sent for the 999 program. If 999 observing time has been reassigned, no reminders will be generated if the schedule has not been updated to reflect the new program numbers.</li>
         </ul>
@@ -145,17 +144,17 @@ trait LegacyProcessObsRemindersTrait
         return $code;
     }
     #---------------------------------------------------------------------------
-    #-- end of generateObsReminder
+    #-- end of generateFeedReminder
     ############################################################################
 
     ############################################################################
     #
-    # Generates the observer reminder chooser
+    # Generates the feedback reminder chooser
     #
     #---------------------------------------------------------------------------
     #
-    function generateObsReminderEmailPage($debug, $title, $data, $sendemails)
-    {
+    function generateFeedReminderEmailPage($debug, $title, $data, $sendemails) {
+
         $isForm = false;
         $code   = "";
         $msg    = "";
@@ -172,14 +171,14 @@ trait LegacyProcessObsRemindersTrait
             $isdebug = "";
         }
         $filedate = date("Ymd-Hi");
-        $filename = "/home/proposal/public_html/accounts/reminders/{$filedate}{$isdebug}_reminders.html";
-        $urlpath  = "/~proposal/accounts/reminders/{$filedate}{$isdebug}_reminders.html";
+        $filename = "/home/proposal/public_html/schedule/reminders/{$filedate}{$isdebug}_reminders.html";
+        $urlpath  = "/~proposal/schedule/reminders/{$filedate}{$isdebug}_reminders.html";
 
         #-- process the semester and generate the email text for previewing
-        $announce = $this->processObsReminderPreviewEmails($debug, $title, $data, $sendemails);
+        $announce = $this->processFeedReminderPreviewEmails($debug, $title, $data, $sendemails);
 
         if ($debug) {
-            echo "<br/>\n{reminders} (Array: merged) = generateObsReminderEmailPage({$debug}, {$title}, data, {$sendemails})<br/>\n";
+            echo "<br/>\n{reminders} (Array: merged) = generateFeedReminderEmailPage({$debug}, {$title}, data, {$sendemails})<br/>\n";
             print_r($announce);
         }
 
@@ -315,7 +314,7 @@ trait LegacyProcessObsRemindersTrait
             $fileid = fopen($filename, "w+");
             $bytes = fwrite($fileid, $tmp, strlen($tmp));
             if ($bytes == 0) {
-                $page_error = "There was a problem writing to the obs reminder email preview file.";
+                $page_error = "There was a problem writing to the feedback reminder email preview file.";
                 if ($debug) { echo "<h2>{$page_error}</h2>\n"; }
                 #generateErrorPage($debug, $page_title, $page_error, 8, $data);
                 exit;
@@ -346,7 +345,7 @@ trait LegacyProcessObsRemindersTrait
             $msg .= "  </tr>\n";
         }
 
-        //$code .= myHeader($debug, $title, $isForm);
+        $code .= myHeader($debug, $title, $isForm);
 
         #$code .= "<form enctype='multipart/form-data' target='_blank' action='{$_SERVER['PHP_SELF']}' method='get'>\n\n";
 
@@ -366,26 +365,26 @@ trait LegacyProcessObsRemindersTrait
         return $code;
     }
     #---------------------------------------------------------------------------
-    #-- end of generateObsReminderEmailPage
+    #-- end of generateFeedReminderEmailPage
     ############################################################################
 
     #---------------------------------------------------------------------------
-    # Generates and writes to file the preview observer reminder emails
+    # Generates and writes to file the preview feedback reminder emails
     #
-    function processObsReminderPreviewEmails($debug, $title, $data, $sendemails)
+    function processFeedReminderPreviewEmails($debug, $title, $data, $sendemails)
     {
-        if ($debug) { echo "<br/>\n<hr/>\n\n\n<h1>START: processObsReminderPreviewEmails({$debug}, {$title}, data, {$sendemails})</h1>\n"; }
+        if ($debug) { echo "<br/>\n<hr/>\n\n\n<h1>START: processFeedReminderPreviewEmails({$debug}, {$title}, data, {$sendemails})</h1>\n"; }
         $message = "";
         $isForm = false;
         $proposals = 0;
+        $numset = array();
 
         #-----------------------------------------------
-        #-- retrieve schedule entries from blockwindow1 (emails should have already been sent to these programs)
-        $intstart = $data['emailLeadTime'] - $data['blockWindow'];
-        #$intend   = $data['emailLeadTime'];
-        $intend   = $data['emailLeadTime'] + 1;
-        $blockwindow1 = $this->getIntervalScheduleDB($debug, $intstart, $intend, $this->returnReminderUnit($data['units']), false);
-        if ($debug) { echo "<br/>\ngetIntervalScheduleDB(blockwindow1):<br/>\n"; print_r($blockwindow1); }
+        #-- retrieve schedule entries from blockwindow1 (these are the program to which emails might need to be sent)
+        $intstart = $data['emailLeadTime'] - 1;
+        $intend   = $data['emailLeadTime'];
+        $blockwindow1 = $this->getFeedbackScheduleDB($debug, $intstart, $intend, $this->returnReminderUnit($data['units']), "", true);
+        if ($debug) { echo "<br/>\ngetFeedbackScheduleDB(blockwindow1):<br/>\n"; print_r($blockwindow1); }
         if ($debug) {
             $schedtext = array();
             $text1 = array();
@@ -399,12 +398,17 @@ trait LegacyProcessObsRemindersTrait
         }
 
         #-----------------------------------------------
-        #-- retrieve schedule entries from blockwindow2 (these are the program to which emails might need to be sent)
+        #-- retrieve the blockwindow1 program numbers
+        foreach ($blockwindow1 as $value) {
+            $numset[] = $value[0]['programID'];
+        }
+
+        #-----------------------------------------------
+        #-- retrieve schedule entries from blockwindow2 (if any of these programs match the ones from block1, no email is sent)
         $intstart = $data['emailLeadTime'];
-        $blockwindow2 = $this->getIntervalScheduleDB($debug, $intstart, $intend, $this->returnReminderUnit($data['units']), true);
-        if ($debug) { echo "<br/>\ngetIntervalScheduleDB(blockwindow2):<br/>\n"; print_r($blockwindow2); }
-        #$text2 = $this->returnMiniSchedule($debug, $blockwindow2, false);
-        #if ($debug) { echo "<br/>\nreturnMiniSchedule(blockwindow2):<br/>\n"; print_r($text2); }
+        $intend   = $data['emailLeadTime'] + $data['blockWindow'];
+        $blockwindow2 = $this->getFeedbackScheduleDB($debug, $intstart, $intend, $this->returnReminderUnit($data['units']), $numset, false);
+        if ($debug) { echo "<br/>\ngetFeedbackScheduleDB(blockwindow2):<br/>\n"; print_r($blockwindow2); }
         if ($debug) {
             $schedtext = array();
             $text2 = array();
@@ -419,37 +423,22 @@ trait LegacyProcessObsRemindersTrait
 
         #-----------------------------------------------
         #-- determine what programs need to have emails sent
-        $curprogram = "";
-        $j = 0;
-        $maxj = count($blockwindow1);
+        #-- an email gets sent for a program in blockwindow1 if there is no matching program in blockwindow2
         $anncemails = array();
-        foreach ($blockwindow2 as $key => $value) {
-            #if ($curprogram == $key) { continue; }
-            if ($debug) { echo "\n\n<h1>blockwindow2[{$key}]:</h1>\n"; }
-            #$curprogram = $key;
-
-            #for (; $j < $maxj; $j++) {
-            #-- check to see if blockwindow2['ProgramNumber'] exists in blockwindow1. both blockwindow arrays are
-            #-- sorted on ProgramNumber so if blockwindow2's ProgramNumber is less than blockwindow1's ProgramNumber,
-            #-- then the ProgramNumber isn't in blockwindow1;
-            #if ($debug) { echo "({{$blockwindow1[$j]['ProgramNumber']}}blockwindow1[j={$j}]['ProgramNumber'] > {{$value['ProgramNumber']}}value['ProgramNumber']) || (({{$blockwindow1[$j]['ProgramNumber']}}blockwindow1[j={$j}]['ProgramNumber'] == {{$value['ProgramNumber']}}value['ProgramNumber']) && ({{$value['reminderEmail']}}value['reminderEmail'] != 1) && ({{$value['comments']}}value['comments'] != 'Service Obs'))<br/>\n"; }
-            #if ($debug) { echo "({" . (isset($blockwindow1[$key]) ? "true" : "false") . "}isset(blockwindow1[{$key}]) === false) || (({" . (isset($blockwindow1[$key]) ? "true" : "false") . "}isset(blockwindow1[{$key}]) === true) && ({{$blockwindow1[$key][0]['reminderEmail']}}blockwindow1[$key][0]['reminderEmail'] != 1) && ({" . stripos($value[0]['comments'], 'Service Obs') . "}}stripos($value[0]['comments'], 'Service Obs') === false))<br/>\n"; }
-            if ($debug) { echo "({" . (isset($blockwindow1[$key]) ? "true" : "false") . "}isset(blockwindow1[{$key}]) === false) || (({" . (isset($blockwindow1[$key]) ? "true" : "false") . "}isset(blockwindow1[{$key}]) === true) && ({" . (isset($blockwindow1[$key]) ? "{$blockwindow1[$key][0]['reminderEmail']}" : "") . "}blockwindow1[$key][0]['reminderEmail'] != 1) && ({" . stripos($value[0]['comments'], 'Service Obs') . "}}stripos(value[0]['comments'], 'Service Obs') === false))<br/>\n"; }
-            #-- [(prog not in BW1)] OR [(prog in BW1) AND (BW1-sentemail != 1) AND (comment != 'service obs')]:
-            #if (($blockwindow1[$j]['ProgramNumber'] > $value['ProgramNumber']) ||
-            if ((isset($blockwindow1[$key]) === false) ||
-                ((isset($blockwindow1[$key]) === true) &&
-                ($blockwindow1[$key][0]['reminderEmail'] != 1) &&
-                (stripos($value[0]['comments'], "Service Obs") === false))) {
+        foreach ($blockwindow1 as $key => $value) {
+            if (array_key_exists($key, $blockwindow2) === true) {
+                if ($debug) { echo "<h1>[{$key}] KEY EXISTS! NO EMAIL!</h1>\n"; }
+            } else {
+                if ($debug) { echo "<h1>[{$key}] KEY DOES NOT EXISTS! SEND EMAIL!</h1>\n"; }
                 if ($data['emails'] == 1) {
                     if ($debug) { echo "if: data['emails'] == 1: {$data['emails']}<br/>\n"; }
                     #-- send real emails
-                    $anncemail = $this->generateEmailMessage($debug, $sendemails, $data['emails'], $title, $value, "obsremind");
+                    $anncemail = $this->generateEmailMessage($debug, $sendemails, $data['emails'], $title, $value, "feedremind");
                     #-- set reminderEmail = 1;
                 } elseif ($data['emails'] == 0) {
                     if ($debug) { echo "elseif: data['emails'] == 0: {$data['emails']}<br/>\n"; }
                     #-- send dummy emails
-                    $anncemail = $this->generateEmailMessage($debug, $sendemails, $data['emails'], $title, $value, "obsremind");
+                    $anncemail = $this->generateEmailMessage($debug, $sendemails, $data['emails'], $title, $value, "feedremind");
                     #-- set reminderEmail = 2;
                 } else {
                     if ($debug) { echo "foreach inner else: no emails sent<br/>\n"; }
@@ -457,66 +446,58 @@ trait LegacyProcessObsRemindersTrait
                     #-- leave reminderEmail = 0;
                 }
                 if (!is_array($anncemail)) {
-                    $message .= "<p align='center' style='color:red'>There was a problem generating the observing reminder email for record " . ($key + 1) . " (Program {$value['ProgramNumber']}).</p>\n";
+                    $message .= "<p align='center' style='color:red'>There was a problem generating the feedback reminder email for Program {$key}.</p>\n";
                     #$proposals -= 1;
                 } else {
                     $proposals += 1;
                 }
                 $value[0]['message'] = $anncemail['message'][1];
                 $anncemails[] = $value[0];
-                #break;
-                continue;
-            } else {
-                if ($debug) { echo "foreach outer else: no emails sent<br/>\n"; }
-                #-- send no emails at all
-                #-- leave reminderEmail = 0;
             }
-            #}
         }
 
         #-----------------------------------------------
         #-- update status to page
         if ($proposals == 1) {
-            $message .= "<p align='center'>{$proposals} observing reminder email was added to the preview list.</p>\n";
+            $message .= "<p align='center'>{$proposals} feedback reminder email was added to the preview list.</p>\n";
         } else {
-            $message .= "<p align='center'>{$proposals} observing reminder emails were added to the preview list.</p>\n";
+            $message .= "<p align='center'>{$proposals} feedback reminder emails were added to the preview list.</p>\n";
         }
-        if ($debug) { echo "<h1>RETURN: processObsReminderPreviewEmails({$debug}, {$title}, data, {$sendemails})</h1>\n\n\n"; }
+        if ($debug) { echo "<h1>RETURN: processFeedReminderPreviewEmails({$debug}, {$title}, data, {$sendemails})</h1>\n\n\n"; }
         return array($message, $anncemails);
     }
-    #-- end of processObsReminderPreviewEmails
+    #-- end of processFeedReminderPreviewEmails
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
-    #-- start of initialObsReminderData
-    function initialObsReminderData($debug)
-    {
-        if ($debug) { echo "<br/>\n<hr/>\n\n\n<h1>START: initialObsReminderData({$debug})</h1>\n"; }
+    #-- start of initialFeedReminderData
+    function initialFeedReminderData($debug) {
+        if ($debug) { echo "<br/>\n<hr/>\n\n\n<h1>START: initialFeedReminderData({$debug})</h1>\n"; }
 
         #-- initialize form data
-        $data['emailLeadTime'] = 3;
-        $data['blockWindow']   = 10;
+        $data['emailLeadTime'] = -1; // collect programs from emailleadtime and back one day
+        $data['blockWindow']   = 16; // bobby wants a 15-day look-ahead window, so added to the -1 gives us 16 here;
         $data['serviceObsCm']  = "Service Obs.";
         $data['units']         = 1; // 1 = DAY, 0 = WEEK
         $data['emails']        = 0; // 1 = send emails, 0 = dummy emails
 
         if ($debug) {
-            echo "<h1>initialObsReminderData() - INITIALIZED mydata ARRAY OUTPUT:</h1>\n";
+            echo "<h1>initialFeedReminderData() - INITIALIZED mydata ARRAY OUTPUT:</h1>\n";
             print_r($data);
         }
 
         #-- return harvested array
-        if ($debug) { echo "<h1>RETURN: initialObsReminderData({$debug})</h1>\n\n\n"; }
+        if ($debug) { echo "<h1>RETURN: initialFeedReminderData({$debug})</h1>\n\n\n"; }
         return $data;
     }
-    #-- end of initialObsReminderData
+    #-- end of initialFeedReminderData
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
-    #-- start of harvestObsReminderData
-    function harvestObsReminderData($debug, $datadst, $datasrc)
+    #-- start of harvestFeedReminderData
+    function harvestFeedReminderData($debug, $datadst, $datasrc)
     {
-        if ($debug) { echo "<br/>\n<hr/>\n\n\n<h1>START: harvestObsReminderData({$debug})</h1>\n"; }
+        if ($debug) { echo "<br/>\n<hr/>\n\n\n<h1>START: harvestFeedReminderData({$debug})</h1>\n"; }
 
         #-- harvest form data
         $datadst['emailLeadTime'] = $datasrc['emailLeadTime'];
@@ -526,87 +507,99 @@ trait LegacyProcessObsRemindersTrait
         $datadst['emails']        = $datasrc['emails'];
 
         if ($debug) {
-            echo "<h1>harvestObsReminderData() - HARVESTED mydata ARRAY OUTPUT:</h1>\n";
+            echo "<h1>harvestFeedReminderData() - HARVESTED mydata ARRAY OUTPUT:</h1>\n";
             print_r($datadst);
         }
 
         #-- return harvested array
-        if ($debug) { echo "<h1>RETURN: harvestObsReminderData({$debug})</h1>\n\n\n"; }
+        if ($debug) { echo "<h1>RETURN: harvestFeedReminderData({$debug})</h1>\n\n\n"; }
         return $datadst;
     }
-    #-- end of harvestObsReminderData
+    #-- end of harvestFeedReminderData
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
-    # Marks the given schedule slots as having had the observing reminder email sent
+    # Marks the given schedule slots as having had the feedback reminder email sent
     #
-    function updateDBObsReminderEmail( $debug, $data, $key )
+    function updateDBFeedReminderEmail($debug, $data, $key)
     {
-        if ( $debug ) { echo "<br/>\n\n\n<h1>START: updateDBObsReminderEmail( {$debug}, data, {$key} )</h1>\n"; }
+        if ($debug) { echo "<br/>\n\n\n<h1>START: updateDBFeedReminderEmail({$debug}, data, {$key})</h1>\n"; }
 
-        #-- mark this proposal as obsremind-emailed (0 = no-email, 1 = real-email, 2 = dummy-email)
-        foreach ( $data as $inx => $value ) {
-            if ( !is_numeric($inx) ) { continue; }
-            #if ( $debug ) { echo "\ndata[{$inx}]: \n" . print_r($value,true) . "<br/>\n"; }
-            #$sql[] = "UPDATE ScheduleObs SET reminderEmail = {$key} WHERE startTime = '{$value['startTime']}' AND programID = '{$value['programID']}' AND semesterID = '{$value['semesterID']}';";
-            #$sql[] = "UPDATE ObsReminders SET reminderEmail = {$key}, reminderDate = " . time() . " WHERE startTime = '{$value['startTime']}' AND programID = '{$value['programID']}' AND semesterID = '{$value['semesterID']}' AND reminderEmail <> '1';";
-            if ( $key == 2 ) {
+        #-- mark this proposal as feedremind-emailed (0 = no-email, 1 = real-email, 2 = dummy-email)
+        foreach ($data as $inx => $value) {
+            if (!is_numeric($inx)) { continue; }
+            #if ($debug) { echo "\ndata[{$inx}]: \n" . print_r($value,true) . "<br/>\n"; }
+            #$sql[] = "UPDATE FeedReminders SET reminderEmail = {$key}, reminderDate = " . time() . " WHERE startTime = '{$value['startTime']}' AND programID = '{$value['programID']}' AND semesterID = '{$value['semesterID']}' AND reminderEmail <> '1';";
+            if ($key == 2) {
                 $str = "logID = '{$value['logID']}', programID = '{$value['programID']}', semesterID = '{$value['semesterID']}', startTime = '{$value['startTime']}', endTime = '{$value['endTime']}', reminderEmail = {$key}";
-                $sql[] = "INSERT INTO ObsReminders SET {$str}, reminderDate = " . time() . " ON DUPLICATE KEY UPDATE {$str};";
+                $sql[] = "INSERT INTO FeedReminders SET {$str}, reminderDate = " . time() . " ON DUPLICATE KEY UPDATE {$str};";
             } else {
                 $str = "logID = '{$value['logID']}', programID = '{$value['programID']}', semesterID = '{$value['semesterID']}', startTime = '{$value['startTime']}', endTime = '{$value['endTime']}', reminderEmail = {$key}, reminderDate = " . time();
-                $sql[] = "INSERT INTO ObsReminders SET {$str} ON DUPLICATE KEY UPDATE {$str};";
+                $sql[] = "INSERT INTO FeedReminders SET {$str} ON DUPLICATE KEY UPDATE {$str};";
             }
         }
-        if ( $debug ) { echo "\n<p>sql:\n" . print_r($sql,true) . "\n</p>\n\n\n"; }
+        if ($debug) { echo "\n<p>sql:\n" . print_r($sql,true) . "\n</p>\n\n\n"; }
         $result = "";
-        $dbc = connectDBtroublelog( $debug );
-        foreach ( $sql as $inx => $value ) {
-            if ( !is_numeric($inx) ) { continue; }
-            if ( $debug ) { echo "{$value}<br/>\n"; }
-            $result = mysqli_query( $dbc, $value ) or die ( "Error marking observing time slot as emailed in the database: " . mysqli_error() );
-            if ( $debug ) { echo "res: [{$result}]<br/>\n"; }
+        $dbc = connectDBtroublelog($debug);
+        foreach ($sql as $inx => $value) {
+            if (!is_numeric($inx)) { continue; }
+            if ($debug) { echo "{$value}<br/>\n"; }
+            $result = mysqli_query($dbc, $value) or die ("Error marking observing time slot as emailed in the database: " . mysqli_error());
+            if ($debug) { echo "res: [{$result}]<br/>\n"; }
         }
-        disconnectMysql( $debug, $dbc, $result );
+        disconnectMysql($debug, $dbc, $result);
 
-        if ( $debug ) { echo "<h1>RETURN: updateDBObsReminderEmail( {$debug}, data, {$key} )</h1>\n\n\n<br/>\n"; }
+        if ($debug) { echo "<h1>RETURN: updateDBFeedReminderEmail({$debug}, {$data}, {$key})</h1>\n\n\n<br/>\n"; }
     }
-    #-- end of updateDBObsReminderEmail
+    #-- end of updateDBFeedReminderEmail
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
-    # Generates the observer reminder specific email parts
+    # Generates the feedback reminder specific email parts
     #
-    function generateEmailObserverReminder( $debug, $sendemails1, $sendemails2, $header, $data ) {
+    function generateEmailFeedbackReminder($debug, $sendemails1, $sendemails2, $header, $data)
+    {
+        if ($debug) { echo "<br/>\n\n\n<h1>START: generateEmailFeedbackReminder({$debug}, {$sendemails1}, {$sendemails2}, {$header}, data)</h1>\n"; }
 
-        if ( $debug ) { echo "<br/>\n\n\n<h1>START: generateEmailObserverReminder( {$debug}, {$sendemails1}, {$sendemails2}, header, data )</h1>\n"; }
-
-        if ( $debug ) {
-            echo "\ngenerateEmailObserverReminder() - headers = \n";
-            print_r( $header );
-            echo "\ngenerateEmailObserverReminder() - data = \n";
-            print_r( $data );
+        if ($debug) {
+            echo "\ngenerateEmailFeedbackReminder() - headers = \n";
+            print_r($header);
+            echo "\ngenerateEmailFeedbackReminder() - data = \n";
+            print_r($data);
         }
 
         #------------------------------------------------------
-        #-- reminder information about imminent observing time (sent from miranda)
+        #-- reminder information about observer feedback (sent from miranda)
 
         #-- retrieve schedule information for this program
-        $progsched = $this->getProgramScheduleDB( $debug, $data[0]['ProgramNumber'], true );
-        if ( count( $progsched ) > 0 ) {
-            $schedtext = $this->returnMiniSchedule( $debug, $progsched, false );
-        } else {
-            $schedtext = array( "--- no entries currently present on schedule ---" );
-        }
+        $progsched = $this->getProgramScheduleDB($debug, $data[0]['ProgramNumber'], true);
+        $schedtext = $this->returnMiniSchedule($debug, $progsched, false);
+        #if (count($progsched) > 0) {
+        #   $schedtext = returnMiniSchedule($debug, $progsched, false);
+        #} else {
+        #   $schedtext = array("--- no entries currently present on schedule ---");
+        #}
         #-- schd[0] is plaintext, schd[1] is html coloured
-        $schdbody1 = implode( "\n", $schedtext[0] );
-        $schdbody2 = implode( "\n", $schedtext[1] );
-        #$interval  = floor(($data[0]['logID'] - time()) / 86400);
-        $interval  = date("D, M d Y H:i:s T", $data[0]['startTime']);
+        $schdbody1 = implode("\n", $schedtext[0]);
+        $schdbody2 = implode("\n", $schedtext[1]);
+        #$interval1 = floor(($data[0]['logID'] - time()) / 86400);
+        #$interval1 = date("D, M d Y H:i:s T", $data[0]['endTime']);
+        $interval1 = date("D, M d Y", $data[0]['endTime']);
+        #$interval1 = date("D, M d Y", $schedtext[2]['endTime']);
         $removal   = date("D, M d Y", $data[0]['startTime'] + (DATA_GRACE_DAYS * 86400));
+        if ($schedtext[2]['startTime'] != -1) {
+            $interval2 = date("D, M d Y", $schedtext[2]['startTime']);
+            $nextobs[0] = "\n\nAs a reminder, the next observations for program {$data[0]['ProgramNumber']} are scheduled for {$interval2}.\n\n";
+            $nextobs[1] = "\n\n<p style='text-align: justify;'>\nAs a reminder, the next observations for program {$data[0]['ProgramNumber']} are scheduled for <span style='color: blue;'>{$interval2}</span>.\n</p>\n";
+        } else {
+            #$nextobs[0] = "\n\nAs a reminder, there are no additional observations for program {$data[0]['ProgramNumber']} in the {$data[0]['semesterID']} semester.\n\n";
+            #$nextobs[1] = "\n\n<p style='text-align: justify;'>\nAs a reminder, there are no additional observations for program {$data[0]['ProgramNumber']} in the {$data[0]['semesterID']} semester.\n</p>\n";
+            $nextobs[0] = "";
+            $nextobs[1] = "";
+        }
 
         #-- set from address, since different from default
-        if ( $debug ) {
+        if ($debug) {
             $header['fromaddr'] = "{$header['sys']['ademail']}";
             $header['fromname'] = "{$header['sys']['name']}";
             $header['replyto']  = "{$header['sys']['name']} <{$header['sys']['ademail']}>";
@@ -624,11 +617,11 @@ trait LegacyProcessObsRemindersTrait
         #$sendemails2 = 2;
 
         #-- set addressee
-        if ( $data[0]['Email1'] != "" && !$debug ) {
-            $header['addressee'] = replaceDoubleQuotes( $data[0]['Email1'] );
-            for ( $i = 2; $i <= 5; $i++ ) {
+        if ($data[0]['Email1'] != "" && !$debug) {
+            $header['addressee'] = "{$data[0]['Email1']}";
+            for ($i = 2; $i <= 5; $i++) {
                 $inx = "Email{$i}";
-                if ( isset($data[0][$inx]) && $data[0][$inx] != "" ) { $header['addressee'] = "{$header['addressee']}, " . replaceDoubleQuotes( $data[0][$inx] ); }
+                if (isset($data[0][$inx]) && $data[0][$inx] != "") { $header['addressee'] = "{$header['addressee']}, {$data[0][$inx]}"; }
             }
             $header['addressee'] = "{$header['addressee']}, {$header['replyto']}";
         } else { $header['addressee'] = $header['replyto']; }
@@ -636,62 +629,36 @@ trait LegacyProcessObsRemindersTrait
         $data['code']    = $data[0]['code'];
 
         #-- set subject
-        #$header['subject'] = "Observing time reminder for IRTF Program {$data[0]['ProgramNumber']} (" . replaceDoubleQuotes( $data[0]['projectPI'] ) . ")";
-        #$header['subject'] = "IRTF Observing Reminder (Program {$data[0]['ProgramNumber']} " . replaceDoubleQuotes( $data[0]['projectPI'] ) . ")";
-        #$header['subject'] = "IRTF Observing Reminder ({$data[0]['ProgramNumber']} " . replaceDoubleQuotes( $data[0]['projectPI'] ) . ")";
-        $header['subject'] = "IRTF Observing and ORF Reminder ({$data[0]['ProgramNumber']} " . replaceDoubleQuotes( $data[0]['projectPI'] ) . ")";
+        #$header['subject'] = "Observing time reminder for IRTF Program {$data[0]['ProgramNumber']} (" . replaceDoubleQuotes($data[0]['projectPI']) . ")";
+        #$header['subject'] = "IRTF Observing Reminder (Program {$data[0]['ProgramNumber']} " . replaceDoubleQuotes($data[0]['projectPI']) . ")";
+        $header['subject'] = "IRTF Feedback Reminder ({$data[0]['ProgramNumber']} " . replaceDoubleQuotes($data[0]['projectPI']) . ")";
 
         #-- set pdf link
         $header['pdfdir'] = "proposals/";
 
+        #-- set urls
+        $feedurl = "http://irtfweb.ifa.hawaii.edu" . substr(trim(returnFeedback(), "'"), 6);
+
         #-- set message body
-        $header['msgbody1'] = "This automated email has been sent by the IRTF system to remind you that Program {$data[0]['ProgramNumber']} has observing time scheduled on the IRTF starting {$interval}.
+        $header['msgbody1'] = "This automated email has been sent by the IRTF system. We hope that the observing run for your IRTF program, {$data[0]['ProgramNumber']}, that ended on {$interval1}, was successful. We would greatly appreciate you taking time to submit a short feedback form that will help us improve IRTF operations:
 
-ORFs are required for all programs. If you are observing remotely and have not yet completed your ORF, please do so as soon as possible using the form here: http://irtfweb.ifa.hawaii.edu/observing/orf
+{$feedurl}
 
-Here is the schedule excerpt listing all {$data[0]['semesterID']} time for this program. Blue indicates future observing time:
-{$schdbody1}
-
-If you are remote observing with the IRTF, please refer to the vnc page ( http://irtfweb.ifa.hawaii.edu/observing/computer/vnc.php#1.2) and pay particular attention to the requirements.
-
-If you have forgotten or do not know how to operate your scheduled instrument, please contact your support astronomer.
-
-Also, please be aware that data files remain in /scrs1 for " . DATA_GRACE_DAYS . " days before they are removed by the automatic cleanup script. Be sure to download your data prior to its removal around {$removal}.
+Also, please be sure to download your data from /scrs1 within " . DATA_GRACE_DAYS . " days of the date it was taken.  It will be automatically removed from the /scrs1 area around {$removal}.{$nextobs[0]}
 
 Please feel free to contact me or your support astronomer should you have any questions.\n";
+
         $header['msgbody2'] = "<p style='text-align: justify;'>
-This automated email has been sent by the IRTF system to remind you that Program {$data[0]['ProgramNumber']} has observing time scheduled on the IRTF starting <span style='color: blue;'>{$interval}</span>.
-</p>
-
-<p style='text-align: justify; font-weight: bold; font-size: 115%; color: maroon;'>
-ORFs are required for all programs. If you are observing remotely and have not yet completed your ORF, please do so as soon as possible using the form here: <a href='http://irtfweb.ifa.hawaii.edu/observing/orf'>http://irtfweb.ifa.hawaii.edu/observing/orf</a>
+This automated email has been sent by the IRTF system. We hope that the observing run for your IRTF program, {$data[0]['ProgramNumber']}, that ended on <span style='color: blue;'>{$interval1}</span>, was successful. We would greatly appreciate you taking time to submit a short feedback form that will help us improve IRTF operations:
 </p>
 
 <p style='text-align: justify;'>
-Here is the schedule excerpt listing all {$data[0]['semesterID']} time for this program. Blue indicates future observing time:
-</p>
-
-<table>
-   <tr>
-      <td>
-<pre>
-{$schdbody2}
-</pre>
-      </td>
-   </tr>
-</table>
-
-<p style='text-align: justify;'>
-If you are remote observing with the IRTF, please refer to the vnc page (<a href='http://irtfweb.ifa.hawaii.edu/observing/computer/vnc.php#1.2'>http://irtfweb.ifa.hawaii.edu/observing/computer/vnc.php#1.2</a>) and pay particular attention to the requirements.
+<a href='{$feedurl}'>{$feedurl}</a>
 </p>
 
 <p style='text-align: justify;'>
-If you have forgotten or do not know how to operate your scheduled instrument, please contact your support astronomer.
-</p>
-
-<p style='text-align: justify;'>
-Also, please be aware that data files remain in /scrs1 for " . DATA_GRACE_DAYS . " days before they are removed by the automatic cleanup script. Be sure to download your data prior to its removal around <span style='color: blue;'>{$removal}</span>.
-</p>
+Also, please be sure to download your data from /scrs1 within <span style='color: blue;'>" . DATA_GRACE_DAYS . " days</span> of the date it was taken.  It will be automatically removed from the /scrs1 area around <span style='color: blue;'>{$removal}</span>.
+</p>{$nextobs[1]}
 
 <p style='text-align: justify;'>
 Please feel free to contact me or your support astronomer should you have any questions.
@@ -705,6 +672,7 @@ Network Engineer | NASA IRTF, MKOCN
 Institute for Astronomy | hawarden@hawaii.edu
 640 North Aohoku Place; Hilo, HI 96720
 ";
+
         $header['footer2'] = "<p>\nThanks!<br/>
 Miranda</p>
 <p>
@@ -715,11 +683,11 @@ Institute for Astronomy | <a href='mailto:hawarden@hawaii.edu'>hawarden@hawaii.e
 </p>
 ";
 
-        if ( $debug ) { echo "<h1>RETURN: generateEmailObserverReminder( {$debug}, {$sendemails1}, {$sendemails2}, header, data )</h1>\n\n\n"; }
+        if ($debug) { echo "<h1>RETURN: generateEmailFeedbackReminder({$debug}, {$sendemails1}, {$sendemails2}, {$header}, {$data})</h1>\n\n\n"; }
 
-        return array( 'headers' => $header, 'data' => $data );
+        return array('headers' => $header, 'data' => $data);
     }
-    #-- end of generateEmailObserverReminder
+    #-- end of generateEmailFeedbackReminder
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
@@ -818,10 +786,10 @@ E-mail:  <a href='mailto:{$header['adm']['ifaemail']}'>{$header['adm']['ifaemail
 
         #-- set the values that differ for the various emails
         switch ($emailflag) {
-            case "obsremind":
+            case "feedremind":
                 #------------------------------------------------------
-                #-- reminder information about imminent observing time (sent from miranda)
-                $tmp = $this->generateEmailObserverReminder($debug, $sendemails1, $sendemails2, $header, $data);
+                #-- reminder information about feedback submission (sent from miranda)
+                $tmp = $this->generateEmailFeedbackReminder($debug, $sendemails1, $sendemails2, $header, $data);
                 $header = $tmp['headers'];
                 $data   = $tmp['data'];
                 break;
@@ -857,7 +825,7 @@ E-mail:  <a href='mailto:{$header['adm']['ifaemail']}'>{$header['adm']['ifaemail
         if ($emailflag != "accepted" && $emailflag != "rejected" &&
             $emailflag != "confirm" && $emailflag != "guestacct" &&
             $emailflag != "obsremind" && $emailflag != "feedremind" &&
-            isset($data['PIEmail']) && $data['PIEmail'] != "" ) {
+            isset($data['PIEmail']) && $data['PIEmail'] != "") {
             $piemail1 = "\nPI EMAIL: {$data['PIEmail']}\n";
             $piemail2 = "\n<p><strong>PI EMAIL</strong>: {$data['PIEmail']}</p>\n";
         } else { $piemail1 = ""; $piemail2 = ""; }
@@ -873,7 +841,7 @@ E-mail:  <a href='mailto:{$header['adm']['ifaemail']}'>{$header['adm']['ifaemail
         if ($emailflag == "submit" || $emailflag == "save" || $emailflag == "confirm") {
             #-- construct the SessionID/ProgramNum section
             if ($emailflag == "confirm") {
-                if (isset($data['ProgramNumber']) && $data['ProgramNumber'] != "" ) {
+                if (isset($data['ProgramNumber']) && $data['ProgramNumber'] != "") {
                     $code1 = "\nPROPOSAL NO.: {$data['semesterYear']}{$data['semesterCode']}" . sprintf("%03d", $data['ProgramNumber']) . "\n";
                     $code2 = "\n<p><strong>PROPOSAL NO.</strong>: {$data['semesterYear']}{$data['semesterCode']}" . sprintf("%03d", $data['ProgramNumber']) . "</p>\n";
                 } else { $code1 = ""; $code2 = ""; }
@@ -898,7 +866,7 @@ E-mail:  <a href='mailto:{$header['adm']['ifaemail']}'>{$header['adm']['ifaemail
             } else { $pdffileemail1 = ""; $pdffileemail2 = ""; $pdffilelink = ""; $userpwd1 = ""; $userpwd2 = ""; }
         } elseif ($emailflag == "guestacct") {
             #-- construct the SessionID/ProgramNum section
-            if (isset($data['ProgramNumber']) && $data['ProgramNumber'] != "" ) {
+            if (isset($data['ProgramNumber']) && $data['ProgramNumber'] != "") {
                 $code1 = "\nPROPOSAL NO.: {$data['semesterYear']}{$data['semesterCode']}" . sprintf("%03d", $data['ProgramNumber']) . "\n";
                 $code2 = "\n<p><strong>PROPOSAL NO.</strong>: {$data['semesterYear']}{$data['semesterCode']}" . sprintf("%03d", $data['ProgramNumber']) . "</p>\n";
             } else { $code = ""; }
@@ -942,16 +910,16 @@ E-mail:  <a href='mailto:{$header['adm']['ifaemail']}'>{$header['adm']['ifaemail
                     echo generateErrorPage($debug, $title, $error, 8, $data);
                 }
                 return 0;
-            } elseif ($emailflag == "obsremind") {
+            } elseif ($emailflag == "feedremind") {
                 #-- mark this program/schedule as real-obsremind-emailed
-                $this->updateDBObsReminderEmail($debug, $data, 1);
+                $this->updateDBFeedReminderEmail($debug, $data, 1);
             }
         } elseif ($sendemails1 == 2 && $sendemails2 == 2) {
             #-- this email request is coded as "dummy" and no emails should
             #-- be sent, but the message should be returned for previewing
-            #if ($emailflag == "obsremind") {
-                #-- mark this program/schedule as not-obsremind-emailed
-                #$this->updateDBObsReminderEmail($debug, $data, 0);
+            #if ($emailflag == "feedremind") {
+                #-- mark this program/schedule as not-feedremind-emailed
+                #updateDBFeedReminderEmail($debug, $data, 0);
             #}
         } else {
             $header['addressee'] = "{$header['replyto']}";
@@ -961,9 +929,9 @@ E-mail:  <a href='mailto:{$header['adm']['ifaemail']}'>{$header['adm']['ifaemail
                     echo generateErrorPage($debug, $title, $error, 8, $data);
                 }
                 return 0;
-            } elseif ($emailflag == "obsremind") {
-                #-- mark this program/schedule as dummy-obsremind-emailed
-                $this->updateDBObsReminderEmail($debug, $data, 2);
+            } elseif ($emailflag == "feedremind") {
+                #-- mark this program/schedule as dummy-feedremind-emailed
+                $this->updateDBFeedReminderEmail($debug, $data, 2);
             }
         }
 
@@ -985,101 +953,90 @@ E-mail:  <a href='mailto:{$header['adm']['ifaemail']}'>{$header['adm']['ifaemail
     #---------------------------------------------------------------------------
     # Return the schedule select results from the database
     #
-    #function getIntervalScheduleDB($debug, $emailleadtime, $blockwindow, $unittype) {
-    function getIntervalScheduleDB($debug, $schedintstart, $schedintend, $unittype, $addemail = false)
+    function getFeedbackScheduleDB($debug, $schedintstart, $schedintend, $unittype, $prgnmset, $addemail = false)
     {
-        if ($debug) { echo "<br/>\n<hr/>\n\n\n<h1>START: getIntervalScheduleDB({$debug}, {$schedintstart}, {$schedintend}, {$unittype}, {$addemail})</h1>\n"; }
+        if ($debug) { echo "<br/>\n<hr/>\n\n\n<h1>START: getFeedbackScheduleDB({$debug}, {$schedintstart}, {$schedintend}, {$unittype}, {$prgnmset}, {$addemail})</h1>\n"; }
 
         $schedule = array();
         #$schedintstart = $emailleadtime - $blockwindow;
         #$schedintend = $emailleadtime;
         $schedinttype = strtoupper($unittype);
+        $where = "";
+        $programset = "";
+        if (is_array($prgnmset)) { $programset = implode(", ", $prgnmset); }
+        if ($programset != "") { $where = "\n   ScheduleObs.programID IN ({$programset}) AND"; }
 
-        if ($addemail) {
-            #$stx1 = "\n   ObsReminders.reminderEmail <> '1' AND";
-            $stx1 = "";
-            $stx2 = "NULL AS ";
-            $from = "ScheduleObs, DailyInstrument, Program, GuestAccts";
-            $where = "";
-        } else {
-            $stx1 = "";
-            $stx2 = "ObsReminders.";
-            $from = "ScheduleObs, ObsReminders, DailyInstrument, Program, GuestAccts";
-            $where = "\n   ScheduleObs.semesterID = ObsReminders.semesterID AND\n   ScheduleObs.programID = ObsReminders.programID AND\n   ScheduleObs.startTime = ObsReminders.startTime AND";
-        }
-
+        $from = "ScheduleObs, DailyInstrument, Program, GuestAccts";
         $sql1 = "
 SELECT DISTINCT
-    ScheduleObs.semesterID,
-    ScheduleObs.logID,
-    ScheduleObs.startTime,
-    ScheduleObs.endTime,
-    (SELECT GROUP_CONCAT(operatorCode ORDER BY overlap ASC SEPARATOR ',')
-     FROM DailyOperator, Operator
-     WHERE DailyOperator.startTime = ScheduleObs.startTime
-     AND DailyOperator.operatorID = Operator.operatorID
-     GROUP BY DailyOperator.startTime
+   ScheduleObs.semesterID,
+   ScheduleObs.logID,
+   ScheduleObs.startTime,
+   ScheduleObs.endTime,
+   (SELECT GROUP_CONCAT(operatorCode ORDER BY overlap ASC SEPARATOR ',')
+    FROM DailyOperator, Operator
+    WHERE DailyOperator.startTime = ScheduleObs.startTime
+    AND DailyOperator.operatorID = Operator.operatorID
+    GROUP BY DailyOperator.startTime
   ) AS Operators,
-    ScheduleObs.remoteObs,
-    ScheduleObs.programID,
-    (SELECT GROUP_CONCAT(itemName SEPARATOR '/')
-     FROM DailyInstrument, Hardware
-     WHERE DailyInstrument.startTime = ScheduleObs.startTime
-     AND DailyInstrument.hardwareID = Hardware.hardwareID
-     GROUP BY DailyInstrument.startTime
+   ScheduleObs.remoteObs,
+   ScheduleObs.programID,
+   (SELECT GROUP_CONCAT(itemName SEPARATOR '/')
+    FROM DailyInstrument, Hardware
+    WHERE DailyInstrument.startTime = ScheduleObs.startTime
+    AND DailyInstrument.hardwareID = Hardware.hardwareID
+    GROUP BY DailyInstrument.startTime
   ) AS Instruments,
-    ScheduleObs.SupportAstronomerID,
-    ScheduleObs.daytimeObs,
-    ScheduleObs.firstTime,
-    ScheduleObs.comments,
-    {$stx2}reminderEmail,
-    {$stx2}reminderDate,
-    Program.projectMembers,
-    GuestAccts.username AS ProgramNumber,
-    GuestAccts.defaultpwd AS code,";
+   ScheduleObs.SupportAstronomerID,
+   ScheduleObs.daytimeObs,
+   ScheduleObs.firstTime,
+   ScheduleObs.comments,
+   Program.projectMembers,
+   GuestAccts.username AS ProgramNumber,
+   GuestAccts.defaultpwd AS code,";
 
         $sql2tac = "
-    Program.projectPI,
-    IF
+   Program.projectPI,
+   IF
       (
          (ObsApp.InvFirstName1 <=> '') OR
          (ObsApp.InvLastName1 <=> '') OR
          (ObsApp.Email1 <=> ''),
          NULL,
          CONCAT(ObsApp.InvFirstName1,' ',ObsApp.InvLastName1,' <',ObsApp.Email1,'>')
-    ) AS Email1,
-    IF
+     ) AS Email1,
+   IF
       (
          (ObsApp.InvFirstName2 <=> '') OR
          (ObsApp.InvLastName2 <=> '') OR
          (ObsApp.Email2 <=> ''),
          NULL,
          CONCAT(ObsApp.InvFirstName2,' ',ObsApp.InvLastName2,' <',ObsApp.Email2,'>')
-    ) AS Email2,
-    IF
+     ) AS Email2,
+   IF
       (
          (ObsApp.InvFirstName3 <=> '') OR
          (ObsApp.InvLastName3 <=> '') OR
          (ObsApp.Email3 <=> ''),
          NULL,
          CONCAT(ObsApp.InvFirstName3,' ',ObsApp.InvLastName3,' <',ObsApp.Email3,'>')
-    ) AS Email3,
-    IF
+     ) AS Email3,
+   IF
       (
          (ObsApp.InvFirstName4 <=> '') OR
          (ObsApp.InvLastName4 <=> '') OR
          (ObsApp.Email4 <=> ''),
          NULL,
          CONCAT(ObsApp.InvFirstName4,' ',ObsApp.InvLastName4,' <',ObsApp.Email4,'>')
-    ) AS Email4,
-    IF
+     ) AS Email4,
+   IF
       (
          (ObsApp.InvFirstName5 <=> '') OR
          (ObsApp.InvLastName5 <=> '') OR
          (ObsApp.Email5 <=> ''),
          NULL,
          CONCAT(ObsApp.InvFirstName5,' ',ObsApp.InvLastName5,' <',ObsApp.Email5,'>')
-    ) AS Email5
+     ) AS Email5
 
 FROM
    {$from}, ObsApp
@@ -1095,7 +1052,7 @@ WHERE
          (EngProgram.PIEmail <=> ''),
          NULL,
          CONCAT(EngProgram.PIName,' <',EngProgram.PIEmail,'>')
-    ) AS Email1,
+     ) AS Email1,
    NULL AS Email2,
    NULL AS Email3,
    NULL AS Email4,
@@ -1107,7 +1064,7 @@ WHERE
    ScheduleObs.semesterID = EngProgram.semesterID AND
    ScheduleObs.programID = EngProgram.programID AND";
 
-        $sql3 = "{$stx1}
+        $sql3 = "
    ScheduleObs.logID = DailyInstrument.logID AND
    ScheduleObs.programID = DailyInstrument.programID AND
    ScheduleObs.semesterID = Program.semesterID AND
@@ -1117,9 +1074,9 @@ WHERE
 
         $sql4 = "
 ORDER BY
-    ProgramNumber, logID, startTime;";
+   ProgramNumber, logID, startTime;";
 
-   #$sql = "{$sql1}{$sql2}{$sql3}{$sql4}";
+        #$sql = "{$sql1}{$sql2}{$sql3}{$sql4}";
 
         $sql = "
 ({$sql1}{$sql2eng}{$sql3}
@@ -1144,8 +1101,8 @@ UNION
         # retrieve data for this semester (returns result set)
         $result = mysqli_query($dbc, $sql) or die ("Error retrieving Schedule info from the database: " . mysqli_error($dbc));
         while ($row = mysqli_fetch_assoc($result)) {
-            #$schedule[$row['ProgramNumber']][] = $row;
             $schedule[$row['ProgramNumber']][] = returnQuotes(str_replace("INTERNALLINEFEEDHERE", "\n", $row));
+            print_r($row);
         }
         disconnectMysql($debug, $dbc, $result);
 
@@ -1155,35 +1112,35 @@ UNION
             echo "<hr/>\n";
             echo "<h1>Schedule information from the database:</h1>\n";
             foreach ($schedule as $i => $value) {
-                echo "Line [{$i}]: " . print_r($value,true) . " <br/>\n";
+                echo "Line [{$i}]: ".print_r($value,true)." <br/>\n";
                 if ($i > $keycut) { break; }
             }
             echo "<hr/>\n";
         }
 
-        if ($debug) { echo "<h1>RETURN: getIntervalScheduleDB({$debug}, {$schedintstart}, {$schedintend}, {$unittype}, {$addemail})</h1>\n\n\n"; }
+        if ($debug) { echo "<h1>RETURN: getFeedbackScheduleDB({$debug}, {$schedintstart}, {$schedintend}, {$unittype}, {$prgnmset}, {$addemail})</h1>\n\n\n"; }
         return $schedule;
     }
-    #-- end of getIntervalScheduleDB
+    #-- end of getFeedbackScheduleDB
     #---------------------------------------------------------------------------
 
     #---------------------------------------------------------------------------
     # Return the schedule select results from the database
     #
-    function getProgramScheduleDB( $debug, $program, $getOp = false ) {
-
-        if ( $debug ) { echo "<br/>\n<hr/>\n\n\n<h1>START: getProgramScheduleDB( {$debug}, {$program}, {$getOp} )</h1>\n"; }
+    function getProgramScheduleDB($debug, $program, $getOp = false)
+    {
+        if ($debug) { echo "<br/>\n<hr/>\n\n\n<h1>START: getProgramScheduleDB({$debug}, {$program}, {$getOp})</h1>\n"; }
 
         $schedule = array();
         $operator = "NULL AS Operators";
-        if ( $getOp !== false ) {
-        $operator = "(SELECT GROUP_CONCAT(operatorCode ORDER BY overlap ASC SEPARATOR ',')
+        if ($getOp !== false) {
+            $operator = "(SELECT GROUP_CONCAT(operatorCode ORDER BY overlap ASC SEPARATOR ',')
         FROM DailyOperator, Operator
         WHERE DailyOperator.startTime = ScheduleObs.startTime
         AND DailyOperator.operatorID = Operator.operatorID
         GROUP BY DailyOperator.startTime
-    ) AS Operators";
-    }
+  ) AS Operators";
+        }
 #   ScheduleObs.reminderEmail,
 
         $sql1 = "
@@ -1200,7 +1157,7 @@ SELECT DISTINCT
         WHERE DailyInstrument.startTime = ScheduleObs.startTime
         AND DailyInstrument.hardwareID = Hardware.hardwareID
         GROUP BY DailyInstrument.startTime
-    ) AS Instruments,
+  ) AS Instruments,
     ScheduleObs.SupportAstronomerID,
     ScheduleObs.daytimeObs,
     ScheduleObs.firstTime,
@@ -1218,7 +1175,7 @@ SELECT DISTINCT
             (ObsApp.Email1 <=> ''),
             NULL,
             CONCAT(ObsApp.InvFirstName1,' ',ObsApp.InvLastName1,' <',ObsApp.Email1,'>')
-        ) AS Email1,
+      ) AS Email1,
     IF
         (
             (ObsApp.InvFirstName2 <=> '') OR
@@ -1226,7 +1183,7 @@ SELECT DISTINCT
             (ObsApp.Email2 <=> ''),
             NULL,
             CONCAT(ObsApp.InvFirstName2,' ',ObsApp.InvLastName2,' <',ObsApp.Email2,'>')
-        ) AS Email2,
+      ) AS Email2,
     IF
         (
             (ObsApp.InvFirstName3 <=> '') OR
@@ -1234,7 +1191,7 @@ SELECT DISTINCT
             (ObsApp.Email3 <=> ''),
             NULL,
             CONCAT(ObsApp.InvFirstName3,' ',ObsApp.InvLastName3,' <',ObsApp.Email3,'>')
-        ) AS Email3,
+      ) AS Email3,
     IF
         (
             (ObsApp.InvFirstName4 <=> '') OR
@@ -1242,7 +1199,7 @@ SELECT DISTINCT
             (ObsApp.Email4 <=> ''),
             NULL,
             CONCAT(ObsApp.InvFirstName4,' ',ObsApp.InvLastName4,' <',ObsApp.Email4,'>')
-        ) AS Email4,
+      ) AS Email4,
     IF
         (
             (ObsApp.InvFirstName5 <=> '') OR
@@ -1250,7 +1207,7 @@ SELECT DISTINCT
             (ObsApp.Email5 <=> ''),
             NULL,
             CONCAT(ObsApp.InvFirstName5,' ',ObsApp.InvLastName5,' <',ObsApp.Email5,'>')
-        ) AS Email5
+      ) AS Email5
 
 FROM
     ScheduleObs, DailyInstrument, Program, GuestAccts, ObsApp
@@ -1266,7 +1223,7 @@ WHERE
             (EngProgram.PIEmail <=> ''),
             NULL,
             CONCAT(EngProgram.PIName,' <',EngProgram.PIEmail,'>')
-        ) AS Email1,
+      ) AS Email1,
     NULL AS Email2,
     NULL AS Email3,
     NULL AS Email4,
@@ -1301,7 +1258,7 @@ UNION
 )
 {$sql4}";
 
-        if ( $debug ) {
+        if ($debug) {
             echo "<hr/>\n";
             echo "<h1>SQL strings for database schedule selects:</h1>\n";
             echo "<h3>Schedule select:</h3>\n";
@@ -1310,27 +1267,27 @@ UNION
             echo "<hr/>\n";
         }
 
-        $dbc = connectDBtroublelog( $debug );
+        $dbc = connectDBtroublelog($debug);
         # retrieve data for this semester (returns result set)
-        $result = mysqli_query( $dbc, $sql ) or die ( "Error retrieving Schedule info from the database: " . mysqli_error( $dbc ) );
-        while ( $row = mysqli_fetch_assoc( $result ) ) {
-            $schedule[] = returnQuotes( str_replace( "INTERNALLINEFEEDHERE", "\n", $row ) );
+        $result = mysqli_query($dbc, $sql) or die ("Error retrieving Schedule info from the database: " . mysqli_error($dbc));
+        while ($row = mysqli_fetch_assoc($result)) {
+            $schedule[] = returnQuotes(str_replace("INTERNALLINEFEEDHERE", "\n", $row));
         }
-        disconnectMysql( $debug, $dbc, $result );
+        disconnectMysql($debug, $dbc, $result);
 
-        if ( $debug && isset( $schedule ) ) {
+        if ($debug && isset($schedule)) {
             $keycut = 20;
             $keycut = 50;
             echo "<hr/>\n";
             echo "<h1>Schedule information from the database:</h1>\n";
-            foreach ( $schedule as $i => $value ) {
+            foreach ($schedule as $i => $value) {
                 echo "Line [{$i}]: " . print_r($value,true) . " <br/>\n";
-                if ( $i > $keycut ) { break; }
+                if ($i > $keycut) { break; }
             }
             echo "<hr/>\n";
         }
 
-        if ( $debug ) { echo "<h1>RETURN: getProgramScheduleDB( {$debug}, {$program}, {$getOp} )</h1>\n\n\n"; }
+        if ($debug) { echo "<h1>RETURN: getProgramScheduleDB({$debug}, {$program}, {$getOp})</h1>\n\n\n"; }
         return $schedule;
     }
     #-- end of getProgramScheduleDB

@@ -6,11 +6,11 @@ namespace App\controllers\proposals;
 
 use Exception;
 use App\exceptions\ValidationException;
-use App\core\common\CustomDebug                                 as Debug;
-use App\domains\schedule\ScheduleManager                        as Manager;
-use App\models\proposals\ProcessObsRemindersModel               as Model;
-use App\views\forms\proposals\ProcessObsRemindersView           as View;
-use App\validators\forms\proposals\ProcessObsRemindersValidator as Validator;
+use App\core\common\CustomDebug                                  as Debug;
+use App\domains\schedule\ScheduleManager                         as Manager;
+use App\models\proposals\ProcessFeedRemindersModel               as Model;
+use App\views\forms\proposals\ProcessFeedRemindersView           as View;
+use App\validators\forms\proposals\ProcessFeedRemindersValidator as Validator;
 
 /**
  * Controller for handling the Update TAC Comments logic.
@@ -21,7 +21,7 @@ use App\validators\forms\proposals\ProcessObsRemindersValidator as Validator;
  * @version  1.0.0
  */
 
-class ProcessObsRemindersController
+class ProcessFeedRemindersController
 {
     private $formatHtml;
     private $debug;
@@ -146,12 +146,12 @@ class ProcessObsRemindersController
         // Process and then render the results page
         try {
             // Pass the file and form data off to the manager for processing
-            $results = $this->manager->handleRequest($validData, 'observing');
+            $results = $this->manager->handleRequest($validData, 'feedback');
             // Render the form with the results
             $this->renderResultsPage($results);
         } catch (Exception $e) {
             // Handle any errors during the data fetching process
-            $this->renderErrorPage('Error processing observing reminders: ', $e->getMessage());
+            $this->renderErrorPage('Error processing feedback reminders: ', $e->getMessage());
         }
     }
 
@@ -162,7 +162,7 @@ class ProcessObsRemindersController
         $this->debug->debug($debugHeading);
 
         // Logic to generate the first page form
-        $pageTitle = "IRTF Observing Reminder Emails";
+        $pageTitle = "IRTF Feedback Reminder Emails";
         $formAction = $_SERVER['PHP_SELF'];
         $dbData = [];
 
@@ -190,7 +190,7 @@ class ProcessObsRemindersController
         $this->debug->debugVariable($dataErrors, "{$debugHeading} -- dataErrors");
 
         // Logic to generate the first page form
-        $pageTitle = "IRTF Observing Reminder Emails";
+        $pageTitle = "IRTF Feedback Reminder Emails";
         $formAction = $_SERVER['PHP_SELF'];
         $fieldLabels = $this->view->getFieldLabels();
         $dbData = [];
@@ -215,7 +215,7 @@ class ProcessObsRemindersController
         $this->debug->debugVariable($resultMessages, "{$debugHeading} -- resultMessages");
 
         // Prepare to render the edit results page
-        $pageTitle = "IRTF Observing Reminder Emails";
+        $pageTitle = "IRTF Feedback Reminder Emails";
 
         // Call the view to render the results page
         echo $this->view->renderPageWithResults(
