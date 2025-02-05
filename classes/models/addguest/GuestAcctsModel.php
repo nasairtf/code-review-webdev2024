@@ -214,8 +214,14 @@ class GuestAcctsModel extends BaseModel
         $this->debug->debugVariable($results, "{$debugHeading} -- results");
 
         // Format the exception output
-        $input  = sprintf("<pre style='text-align: left; color: green;' class='result-messages'>\n%s\n</pre>", $results['input']);
-        $output = sprintf("<pre style='text-align: left; color: red;'   class='error-messages'>\n%s\n</pre>", implode("\n", $results['output']));
+        $input  = sprintf(
+            "<pre style='text-align: left; color: green;' class='result-messages'>\n%s\n</pre>",
+            $results['input']
+        );
+        $output = sprintf(
+            "<pre style='text-align: left; color: red;'   class='error-messages'>\n%s\n</pre>",
+            implode("\n", $results['output'])
+        );
 
         // Throw the exception
         throw new ExecutionException("Execution error", [$input, $output]);

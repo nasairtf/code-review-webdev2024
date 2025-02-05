@@ -430,4 +430,5 @@ abstract class BaseView
             false,
             $pad
         );
-    }}
+    }
+}
