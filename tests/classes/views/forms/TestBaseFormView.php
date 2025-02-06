@@ -71,8 +71,8 @@ class TestBaseFormView extends BaseFormView
      *
      * @return string The formatted HTML for the form contents.
      */
-    public function getContentsFormProxy(string $action, array $dbData, array $formData, int $pad = 0): string
+    public function getContentsFormProxy(string $action, array $dbData, array $formData, bool $methodPost, bool $targetBlank, int $pad = 0): string
     {
-        return $this->getContentsForm($action, $dbData, $formData, $pad);
+        return $this->getContentsForm($action, $dbData, $formData, $methodPost, $targetBlank, $pad);
     }
 }
