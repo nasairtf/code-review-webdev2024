@@ -52,7 +52,7 @@ class IrtfLinks12Test extends TestCase
     public function testGetEditSupportAstromers(): void
     {
         $this->assertEquals(
-            '/~proposal/schedule/EditSupportAstromers.php',
+            '/~proposal/schedule/EditSupportAstromersDB.php',
             IrtfLinks::getEditSupportAstromers()
         );
     }
@@ -60,7 +60,7 @@ class IrtfLinks12Test extends TestCase
     public function testGetEditOperators(): void
     {
         $this->assertEquals(
-            '/~proposal/schedule/EditOperators.php',
+            '/~proposal/schedule/EditOperatorsDB.php',
             IrtfLinks::getEditOperators()
         );
     }
@@ -68,7 +68,7 @@ class IrtfLinks12Test extends TestCase
     public function testGetEditInstruments(): void
     {
         $this->assertEquals(
-            '/~proposal/schedule/EditInstruments.php',
+            '/~proposal/schedule/EditInstrumentsDB.php',
             IrtfLinks::getEditInstruments()
         );
     }
