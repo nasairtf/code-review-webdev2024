@@ -44,10 +44,13 @@ jpgraph.tar.gz
 /old/
 /root-bin/
 
-# Composer-related files
+# Include composer-related files
 !composer.lock
 !composer.json
 !phpcs.xml
+
+# Include the deployment manifest file
+!deploy_manifest.conf
 
 # Data areas, generated graphs, etc
 data/
