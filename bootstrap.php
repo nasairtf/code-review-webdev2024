@@ -17,9 +17,9 @@ if (strpos($entryScript, '/home/webdev2024') === 0) {
     define('BASE_PATH', '/home/hawarden/src/webdev2024/');
     define('BASE_URL', '/~hawarden/src/webdev2024');
 } elseif (strpos($entryScript, '/home/agarwal/public_html/src/webdev2024') === 0) {
-    // Hawarden's development environment
+    // Agarwal's development environment
     define('APP_ENV', 'development');
-    define('BASE_PATH', '/home/agarwal/public_html/src/webdev2024/');
+    define('BASE_PATH', '/home/agarwal/src/webdev2024/');
     define('BASE_URL', '/~agarwal/src/webdev2024');
 } else {
     // Production environment
