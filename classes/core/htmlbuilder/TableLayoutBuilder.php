@@ -354,7 +354,7 @@ class TableLayoutBuilder
             $instructions,
             false,
             true,
-            ['colspan' => '6'],
+            ['colspan' => '7'],
             $tableCellPad,
             false
         );
