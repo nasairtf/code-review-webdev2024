@@ -323,6 +323,62 @@ class TableLayoutBuilder
     }
 
     /**
+     * Generates an HTML table layout listing proposals for a semester.
+     *
+     * Displays each proposal in its own row within a styled table.
+     *
+     * @param string $instructions  Instructions displayed at the top of the table.
+     * @param array  $proposals     Array of proposal data to be displayed in the table.
+     * @param array  $attributes    [optional] Additional attributes for the <table> element.
+     *                               Default is an empty array.
+     * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML string for the semester proposal list table.
+     */
+    public function buildSemesterProposalListPageTable(
+        string $instructions,
+        array $proposals,
+        array $attributes = [],
+        int $pad = 0
+    ): string {
+        $tablePad = $pad;
+        $tableRowPad = $pad + 2;
+        $tableCellPad = $pad + 4;
+        $colors = ['#CCCCCC', '#C0C0C0'];
+        $tableAttributes = array_merge(
+            ['width' => '100%', 'border' => '0', 'cellspacing' => '0', 'cellpadding' => '6'],
+            $attributes
+        );
+        $tableParts = [];
+        $instructionsCell = $this->htmlBuilder->getTableCell(
+            $instructions,
+            false,
+            true,
+            ['colspan' => '6'],
+            $tableCellPad,
+            false
+        );
+        $tableParts[] = $this->htmlBuilder->getTableRowFromCells(
+            [$instructionsCell],
+            ['style' => 'height: 45px;', 'align' => 'center', 'bgcolor' => '#C0C0C0' ],
+            $tableRowPad
+        );
+        foreach ($proposals as $index => $proposal) {
+            $color = $colors[$index % 2];
+            $tableParts[] = $this->formBuilder->buildSemesterProposalListPageRow(
+                $proposal,
+                $color,
+                $tableRowPad
+            );
+        }
+        return $this->htmlBuilder->getTableFromRows(
+            $tableParts,
+            $tableAttributes,
+            $tablePad
+        );
+    }
+
+    /**
      * Generates an HTML table layout for confirming a proposal update.
      *
      * Includes instructions, a customizable input field, and a submit button.

@@ -539,6 +539,32 @@ class CompositeBuilder
     }
 
     /**
+     * Generates the full HTML page for listing a semester's programs.
+     *
+     * This page includes instructions and rows listing proposals for the semester.
+     *
+     * @param string $instructions  Instructions to display at the top of the form.
+     * @param array  $proposals     Array of proposal data to be displayed in the table.
+     * @param array  $attributes    [optional] Additional attributes for the <table> element. Default is an empty array.
+     * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string The HTML for the semester lister page.
+     */
+    public function buildSemesterProposalListPageTable(
+        string $instructions,
+        array $proposals,
+        array $attributes = [],
+        int $pad = 0
+    ): string {
+        return $this->tableBuilder->buildSemesterProposalListPageTable(
+            $instructions,
+            $proposals,
+            $attributes,
+            $pad
+        );
+    }
+
+    /**
      * Generates a proposal confirmation form with a customizable input field.
      *
      * @param string $action        The form's action URL.
@@ -1195,6 +1221,32 @@ class CompositeBuilder
     ): string {
         return $this->layoutBuilder->buildSemesterProposalListForm(
             $action,
+            $instructions,
+            $proposals,
+            $attributes,
+            $pad
+        );
+    }
+
+    /**
+     * Generates the full HTML page for listing a semester's programs.
+     *
+     * This pages includes instructions and rows listing proposals for the semester.
+     *
+     * @param string $instructions  Instructions to display at the top of the form.
+     * @param array  $proposals     Array of proposal data to be displayed in the table.
+     * @param array  $attributes    [optional] Additional attributes for the <table> element. Default is an empty array.
+     * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string The HTML for the semester lister form.
+     */
+    public function buildSemesterProposalListPage(
+        string $instructions,
+        array $proposals,
+        array $attributes = [],
+        int $pad = 0
+    ): string {
+        return $this->layoutBuilder->buildSemesterProposalListPage(
             $instructions,
             $proposals,
             $attributes,

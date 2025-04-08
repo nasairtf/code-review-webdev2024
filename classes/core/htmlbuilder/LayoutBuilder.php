@@ -254,6 +254,32 @@ class LayoutBuilder
     }
 
     /**
+     * Constructs a page that lists semester programs based on provided proposal data.
+     * The page includes instructions and a styled HTML table for displaying proposals.
+     *
+     * @param string $instructions  Instructions displayed at the top of the form.
+     * @param array  $proposals     Array of proposal data to display in the table.
+     * @param array  $attributes    [optional] Additional attributes for the <table> element.
+     *                               Default is an empty array.
+     * @param int    $pad           [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the semester program list page.
+     */
+    public function buildSemesterProposalListPage(
+        string $instructions,
+        array $proposals,
+        array $attributes = [],
+        int $pad = 0
+    ): string {
+        return $this->tableBuilder->buildSemesterProposalListPageTable(
+            $instructions,
+            $proposals,
+            $attributes,
+            $pad
+        );
+    }
+
+    /**
      * Constructs a proposal confirmation form with a customizable input field for proposal details.
      *
      * @param string $action        The form's action URL.

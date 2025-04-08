@@ -40,6 +40,24 @@ class ObsAppService extends BaseService
     }
 
     /**
+     * Fetches semester proposal listing page data.
+     *
+     * @param int    $year      The year of the semester.
+     * @param string $semester  The semester code.
+     *
+     * @return array The fetched semester proposal data.
+     */
+    public function fetchSemesterProposalListingPageData(int $year, string $semester): array
+    {
+        return $this->fetchDataWithQuery(
+            $this->getProposalPageQuery('semester'),
+            [$year, $semester],
+            'is',
+            'No proposals found for the selected semester.'
+        );
+    }
+
+    /**
      * Fetches proposal listing form data for a specific session.
      *
      * @param int $obsAppId The ID of the proposal session.
@@ -144,6 +162,37 @@ class ObsAppService extends BaseService
     protected function getProposalQuery(string $condition = 'session'): string
     {
         $fields = 'ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate';
+
+        switch ($condition) {
+            case 'program':
+                $where = "WHERE semesterYear = ? AND semesterCode = ? AND ProgramNumber = ?";
+                break;
+
+            case 'semester':
+                $where = "WHERE semesterYear = ? AND semesterCode = ?";
+                break;
+
+            case 'session':
+                $where = "WHERE ObsApp_id = ?";
+                break;
+        }
+
+        return "SELECT {$fields} FROM ObsApp {$where} ORDER BY creationDate ASC;";
+    }
+
+    /**
+     * Returns a query string for fetching proposal listing or program data.
+     *
+     * @param string $condition The WHERE clause to use:
+     *                          - 'program':  Filter by semesterYear, semesterCode, and ProgramNumber.
+     *                          - 'semester': Filter by semesterYear and semesterCode.
+     *                          - 'session':  Filter by ObsApp_id.
+     * @return string The SQL query string.
+     */
+    protected function getProposalPageQuery(string $condition = 'session'): string
+    {
+        $fields = 'ObsApp_id, semesterYear, semesterCode, ProgramNumber, InvLastName1, code, creationDate, ' .
+            'FilePathName, UploadFileName, ProposalFileName';
 
         switch ($condition) {
             case 'program':

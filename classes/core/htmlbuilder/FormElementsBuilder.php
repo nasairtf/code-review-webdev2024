@@ -449,6 +449,43 @@ class FormElementsBuilder
     }
 
     /**
+     * Generates the PDF link element for a proposal.
+     *
+     * @param string $label          The label attribute for the URL.
+     * @param string $url            The url to display.
+     * @param int    $pad            [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the proposal PDF download link.
+     */
+    public function buildSemesterProposalListPdfLink(
+        string $label,
+        string $url,
+        int $pad = 0
+    ): string {
+        if (!empty($url)) {
+            $urlhtml = $this->htmlBuilder->getLink(
+                $url,   // valid PDF download link
+                $label, // text within the <a></a> tags
+                ['color' => 'green', 'target' => '_blank'], // link attributes
+                $pad,   // indent padding
+                false   // label is HTML
+            );
+        } else {
+            $missing = "{$label} PDF not found";
+            $urlhtml = $this->htmlBuilder->getSpan(
+                $missing, // text flagging the missing PDF
+                ['color' => 'red'], // flag attributes
+                $pad,   // indent padding
+                false   // label is HTML
+            );
+        }
+        return $this->htmlBuilder->formatParts(
+            [$urlhtml],
+            $this->formatOutput
+        );
+    }
+
+    /**
      * Generates a table row for a proposal lister, including a form for editing proposals.
      *
      * @param string $action   The form's action URL.
@@ -499,6 +536,112 @@ class FormElementsBuilder
             ),
             $this->htmlBuilder->getTableCell(
                 $editForm,
+                false,
+                false,
+                ['align' => 'right', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $proposalCode,
+                false,
+                true,
+                ['align' => 'center', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $programNumber,
+                false,
+                true,
+                ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $investigator,
+                false,
+                true,
+                ['align' => 'left', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                '&nbsp;',
+                false,
+                true,
+                ['style' => 'width: 75px;'],
+                $cellPad,
+                true
+            ),
+        ];
+        return $this->htmlBuilder->getTableRowFromCells(
+            $cells,
+            ['style' => 'height: 32px; background-color: ' . $bgColor],
+            $tableRowPad
+        );
+    }
+
+    /**
+     * Generates a table row for a proposal lister, including links for downloading proposals.
+     *
+     * @param array  $proposal Array containing proposal data (id, code, program number, investigator).
+     * @param string $bgColor  Background color for the row.
+     * @param int    $pad      [optional] Indentation level for formatted output. Default is 0.
+     *
+     * @return string HTML for the proposal lister row.
+     *
+     * @throws HtmlBuilderException If the proposal array is missing required entries.
+     */
+    public function buildSemesterProposalListPageRow(
+        array $proposal,
+        string $bgColor,
+        int $pad = 0
+    ): string {
+        // Validate proposal array elements
+        $this->validateProposalFields($proposal);
+
+        $cellPad = $pad + 2;
+        $formPad = $pad + 4;
+        $tableRowPad = $pad;
+        $proposalId = HtmlBuildUtility::escape((string) $proposal['ObsApp_id'], false);
+        $proposalCode = HtmlBuildUtility::escape((string) $proposal['code'], false);
+        $programNumber = HtmlBuildUtility::escape(
+            $proposal['semesterYear']
+                . $proposal['semesterCode']
+                . sprintf("%03d", $proposal['ProgramNumber']),
+            false
+        );
+        $investigator = HtmlBuildUtility::escape('(' . $proposal['InvLastName1'] . ')', false);
+        $addendum = $this->buildSemesterProposalListPdfLink(
+            "Addendum",
+            $proposal['AddendumToken'],
+            $formPad
+        );
+        $application = $this->buildSemesterProposalListPdfLink(
+            "Application",
+            $proposal['ApplicationToken'],
+            $formPad
+        );
+        $cells = [
+            $this->htmlBuilder->getTableCell(
+                '&nbsp;',
+                false,
+                true,
+                ['style' => 'width: 75px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $addendum,
+                false,
+                false,
+                ['align' => 'right', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],
+                $cellPad,
+                true
+            ),
+            $this->htmlBuilder->getTableCell(
+                $application,
                 false,
                 false,
                 ['align' => 'right', 'valign' => 'middle', 'style' => 'padding: 0px 5px 0px 5px;'],

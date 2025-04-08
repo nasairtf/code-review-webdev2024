@@ -1082,6 +1082,96 @@ class BaseFormValidator
         return $targetPath;
     }
 
+    /**
+     * Validates a url token.
+     */
+    protected function validateToken(
+        string $token,
+        array $tokenRules,
+        string $fieldKey = 'token',
+        bool $required = false
+    ): ?array {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateToken");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($token, "{$debugHeading} -- token");
+        $this->debug->debugVariable($tokenRules, "{$debugHeading} -- tokenRules");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate required field
+        $token = $this->validateRequiredField(
+            $token,
+            $required,
+            $fieldKey,
+            "Token is required."
+        );
+        if ($token === null) {
+            return null;
+        }
+
+        // Validate fields
+
+        // Decode the token
+        $decoded = base64_decode($token, true);
+        if ($decoded === false) {
+            $this->errors[$fieldKey] = "Token is not valid base64.";
+            return null;
+        }
+
+        // Decompose decoded token into its constituent parts
+        $parts = explode('|', $decoded);
+        if (count($parts) !== $tokenRules['count'] + 1) { // +1 for hash
+            $this->errors[$fieldKey] = "Token structure invalid.";
+            return null;
+        }
+
+        // Split into payload and hash
+        $payload = array_slice($parts, 0, $tokenRules['count']);
+        $providedHash = $parts[$tokenRules['count']];
+        $rawPayload = implode('|', $payload);
+
+        // Validate hash
+        $expectedHash = hash_hmac('sha256', $rawPayload, $tokenRules['hash']);
+        if (!hash_equals($expectedHash, $providedHash)) {
+            $this->errors[$fieldKey] = "Token hash mismatch.";
+            return null;
+        }
+
+        // Check structure labels
+        $validated = array_combine($tokenRules['parts'], $payload);
+        if (!$validated) {
+            $this->errors[$fieldKey] = "Token field mismatch.";
+            return null;
+        }
+
+        return $validated;
+    }
+
+    /**
+     * Validates a file download request.
+     */
+    protected function validateDownloadRequest(
+        string $type,
+        string $tokenType,
+        string $fieldKey = 'download'
+    ): ?bool {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateDownloadRequest");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($type, "{$debugHeading} -- type");
+        $this->debug->debugVariable($tokenType, "{$debugHeading} -- tokenType");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+
+        // Validate request type
+        if ($type !== $tokenType) {
+            $this->errors[$fieldKey] = "Download type request mismatch.";
+            return null;
+        }
+
+        return true;
+    }
+
     // Protected helper methods
 
     /**
