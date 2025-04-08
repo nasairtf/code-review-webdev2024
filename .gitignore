@@ -84,3 +84,5 @@ public_html/proposals/*.php
 !public_html/proposals/UploadTACScores.php
 !public_html/proposals/UploadTACFilemaker.php
 !public_html/proposals/ExportTACFilemaker.php
+!public_html/proposals/ListApplicationPdfs.php
+!public_html/proposals/DownloadApplicationPdfs.php
