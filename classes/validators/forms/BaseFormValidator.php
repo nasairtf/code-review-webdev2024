@@ -585,7 +585,7 @@ class BaseFormValidator
         // Debug output
         $debugHeading = $this->debug->debugHeading("Validator", "validateShortProgramNumber");
         $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($programNumber, "{$debugHeading} -- program");
+        $this->debug->debugVariable($program, "{$debugHeading} -- program");
         $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
         $this->debug->debugVariable($required, "{$debugHeading} -- required");
         $this->debug->debugVariable($minNumber, "{$debugHeading} -- minNumber");
