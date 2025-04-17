@@ -87,3 +87,4 @@ public_html/proposals/*.php
 !public_html/proposals/ListApplicationPdfs.php
 !public_html/proposals/DownloadApplicationPdfs.php
 !public_html/proposals/ObsDataRestorationRequest.php
+!public_html/proposals/QueueDataRestore.php

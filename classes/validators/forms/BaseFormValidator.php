@@ -994,7 +994,42 @@ class BaseFormValidator
         // Validate fields
         $allowed = [0, 1];
         $errorMsg = "Invalid interval unit type. Must be 0 or 1.";
-        $validatedResult = $this->validateSelection([$unitType], $allowed, $fieldKey, $required, $errorMsg)[0];
+        $validatedResult = $this->validateSelection(
+            [$unitType],
+            $allowed,
+            $fieldKey,
+            $required,
+            $errorMsg
+        )[0];
+        return (int) $validatedResult ?? null;
+    }
+
+    /**
+     * Validates the value for a on/off radio button.
+     *
+     */
+    protected function validateOnOffRadio(
+        int $radioOnOff,
+        string $fieldKey = 'units',
+        bool $required = false
+    ): ?int {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateOnOffRadio");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($radioOnOff, "{$debugHeading} -- radioOnOff");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate fields
+        $allowed = [0, 1];
+        $errorMsg = "Invalid on off radio. Must be 0 or 1.";
+        $validatedResult = $this->validateSelection(
+            [$radioOnOff],
+            $allowed,
+            $fieldKey,
+            $required,
+            $errorMsg
+        )[0];
         return (int) $validatedResult ?? null;
     }
 
@@ -1026,7 +1061,13 @@ class BaseFormValidator
 
         // Validate fields
         $errorMsg = "Invalid visitor instrument selected.";
-        return $this->validateSelection([$instrument], $allowed, $fieldKey, $required, $errorMsg);
+        return $this->validateSelection(
+            [$instrument],
+            $allowed,
+            $fieldKey,
+            $required,
+            $errorMsg
+        );
     }
 
     /**
@@ -1170,6 +1211,36 @@ class BaseFormValidator
         }
 
         return true;
+    }
+
+    /**
+     * Validates the value for a yes/no checkbox.
+     *
+     */
+    protected function validateYesNoCheckbox(
+        string $checked,
+        string $fieldKey = 'checkbox',
+        bool $required = false
+    ): ?int {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateYesNoCheckbox");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($checked, "{$debugHeading} -- checked");
+        $this->debug->debugVariable($fieldKey, "{$debugHeading} -- fieldKey");
+        $this->debug->debugVariable($required, "{$debugHeading} -- required");
+
+        // Validate fields
+        $allowed = ['no', 'yes'];
+        $errorMsg = "Invalid checkbox value. Must be 'yes' or 'no'.";
+        $validatedResult = $this->validateSelection(
+            [$checked],
+            $allowed,
+            $fieldKey,
+            $required,
+            $errorMsg,
+            false
+        )[0];
+        return (int) $validatedResult ?? null;
     }
 
     // Protected helper methods
