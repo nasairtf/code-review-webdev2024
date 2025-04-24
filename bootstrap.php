@@ -2,6 +2,14 @@
 
 declare(strict_types=1);
 
+// ---------------------------------------------------------------------
+//  Detect whether we’re running via the web server or the command line
+// ---------------------------------------------------------------------
+if (!defined('APP_MODE')) {
+    define('APP_MODE', PHP_SAPI === 'cli' ? 'cli' : 'web');   // 'cli' or 'web'
+}
+// ---------------------------------------------------------------------
+
 // Determine environment based on the path of the entry script
 $entryScript = $_SERVER['SCRIPT_FILENAME'];
 
