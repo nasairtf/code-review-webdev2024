@@ -7,7 +7,7 @@ namespace App\validators\forms\login;
 use Exception;
 use App\exceptions\ValidationException;
 use App\core\irtf\IrtfUtilities;
-use App\core\common\CustomDebug            as Debug;
+use App\core\common\AbstractDebug          as Debug;
 use App\validators\forms\BaseFormValidator as BaseValidator;
 
 /**

@@ -6,8 +6,8 @@ namespace App\models\addguest;
 
 use Exception;
 use App\exceptions\ExecutionException;
-use App\core\common\CustomDebug as Debug;
-use App\models\BaseModel        as BaseModel;
+use App\core\common\AbstractDebug as Debug;
+use App\models\BaseModel          as BaseModel;
 use App\legacy\traits\LegacyAddguestTrait;
 
 /**

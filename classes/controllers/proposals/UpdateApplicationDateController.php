@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\controllers\proposals;
 
 use Exception;
-use App\core\common\CustomDebug                                   as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                                 as Debug;
 use App\models\proposals\UpdateApplicationDateModel               as Model;
 use App\views\forms\proposals\UpdateApplicationDateView           as FormView;
 use App\views\pages\proposals\UpdateApplicationDateView           as ListView;
@@ -38,7 +39,7 @@ class UpdateApplicationDateController
         ?Validator $valid = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
 

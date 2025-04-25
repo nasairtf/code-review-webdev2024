@@ -40,7 +40,8 @@ namespace App\services\email;
 use Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
-use App\core\common\Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 
 class EmailService
 {
@@ -56,7 +57,8 @@ namespace Tests\classes\core\common;
 
 use PHPUnit\Framework\TestCase;
 use Mockery as Mockery;
-use App\core\common\Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 use App\exceptions\DatabaseException;
 use App\exceptions\EmailException;
 use App\exceptions\ValidationException;

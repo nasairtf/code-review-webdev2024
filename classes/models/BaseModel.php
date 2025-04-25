@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\models;
 
-use App\core\common\CustomDebug as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 
 /**
  * Model for handling common model logic.
@@ -31,7 +32,7 @@ abstract class BaseModel
         ?Debug $debug = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("BaseModel", "__construct");
         $this->debug->debug($debugHeading);
 

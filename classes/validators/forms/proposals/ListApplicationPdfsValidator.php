@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\validators\forms\proposals;
 
-use App\core\common\CustomDebug as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 
 /**
  * Validator for handling the List Application Pdfs logic.
@@ -23,7 +24,7 @@ class ListApplicationPdfsValidator
     public function __construct(
         ?Debug $debug = null
     ) {
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
     }
 
     /**

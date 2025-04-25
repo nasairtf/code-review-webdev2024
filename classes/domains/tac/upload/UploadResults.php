@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\domains\tac\upload;
 
 use Exception;
-use App\core\common\CustomDebug as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 use App\legacy\traits\LegacyTacUploadUploadResultsTrait;
 
 /**
@@ -32,7 +33,7 @@ class UploadResults
         ?Debug $debug = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('schedule', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('schedule', false, 0);
         $debugHeading = $this->debug->debugHeading("Manager", "__construct");
         $this->debug->debug($debugHeading);
 

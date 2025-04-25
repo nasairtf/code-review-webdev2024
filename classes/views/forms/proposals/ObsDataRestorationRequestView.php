@@ -6,7 +6,7 @@ namespace App\views\forms\proposals;
 
 use Exception;
 use App\exceptions\HtmlBuilderException;
-use App\core\common\CustomDebug           as Debug;
+use App\core\common\AbstractDebug         as Debug;
 use App\views\forms\BaseFormView          as BaseView;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;

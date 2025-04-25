@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\views;
 
 use App\exceptions\HtmlBuilderException;
-use App\core\common\CustomDebug           as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug         as Debug;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
 use App\legacy\IRTFLayout                 as IrtfBuilder;
@@ -104,7 +105,7 @@ abstract class BaseView
         ?IrtfBuilder $irtfBuilder = null  // Dependency injection to simplify unit testing
     ) {
         // Initialize debugging
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("BaseView", "__construct");
         $this->debug->debug($debugHeading);
 

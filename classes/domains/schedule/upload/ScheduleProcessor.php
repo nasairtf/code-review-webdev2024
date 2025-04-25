@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\domains\schedule\upload;
 
-use App\core\common\CustomDebug                     as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                   as Debug;
 use App\services\files\FileWriter                   as Writer;
 use App\domains\schedule\common\ScheduleUtility;
 use App\domains\schedule\upload\ScheduleUploadModel as Model;
@@ -33,7 +34,7 @@ class ScheduleProcessor
         ?Model $model = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('schedule', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('schedule', false, 0);
         $debugHeading = $this->debug->debugHeading("Processor", "__construct");
         $this->debug->debug($debugHeading);
 

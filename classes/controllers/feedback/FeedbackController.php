@@ -8,7 +8,8 @@ use Exception;
 use App\exceptions\ValidationException;
 use App\core\traits\LoginHelperTrait;
 use App\core\common\Config;
-use App\core\common\CustomDebug                     as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                   as Debug;
 use App\services\email\feedback\FeedbackService     as Email;
 use App\models\feedback\FeedbackModel               as Model;
 use App\views\forms\feedback\FeedbackView           as View;
@@ -57,7 +58,7 @@ class FeedbackController
         $this->sessionSetup();
 
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
 

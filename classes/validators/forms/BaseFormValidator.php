@@ -6,7 +6,8 @@ namespace App\validators\forms;
 
 use Exception;
 use App\exceptions\ValidationException;
-use App\core\common\CustomDebug as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 use App\core\irtf\IrtfUtilities;
 
 /**
@@ -43,7 +44,7 @@ class BaseFormValidator
         ?Debug $debug = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("BaseFormValidator", "__construct");
         $this->debug->debug($debugHeading);
 

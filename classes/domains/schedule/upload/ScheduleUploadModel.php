@@ -6,7 +6,8 @@ namespace App\domains\schedule\upload;
 
 use Exception;
 use App\exceptions\DatabaseException;
-use App\core\common\CustomDebug                                   as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                                 as Debug;
 use App\domains\schedule\common\ScheduleUtility;
 use App\services\database\troublelog\read\EngProgramService       as EngProgramRead;
 use App\services\database\troublelog\read\HardwareService         as HardwareRead;
@@ -56,7 +57,7 @@ class ScheduleUploadModel
         ?OperatorWrite $dbOperatWrite = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('schedule', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('schedule', false, 0);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
 

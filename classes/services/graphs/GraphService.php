@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\services\graphs;
 
 use Exception;
-use App\core\common\Debug;
+use App\core\common\DebugFactory;
 
 
 /**
@@ -38,7 +38,7 @@ class GraphService
         ?array $channelNames = null
     ) {
         // Debug output
-        $this->debug = new Debug('graph', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
+        $this->debug = DebugFactory::create('graph', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
         $debugHeading = $this->debug->debugHeading("Service", "__construct");
         $this->debug->debug($debugHeading);
 

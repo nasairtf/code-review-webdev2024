@@ -7,8 +7,8 @@ namespace App\models\proposals;
 use Exception;
 use App\exceptions\ExecutionException;
 use App\core\common\Config;
-use App\core\common\CustomDebug as Debug;
-use App\models\BaseModel        as BaseModel;
+use App\core\common\AbstractDebug                           as Debug;
+use App\models\BaseModel                                    as BaseModel;
 use App\services\database\troublelog\read\GuestAcctsService as DbRead;
 use App\legacy\traits\LegacyQueueDataRestoreTrait;
 

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\models\proposals;
 
 use Exception;
-use App\core\common\CustomDebug as Debug;
-use App\models\BaseModel        as BaseModel;
+use App\core\common\AbstractDebug as Debug;
+use App\models\BaseModel          as BaseModel;
 
 /**
  * Model for handling the Observer Data Restoration Request logic.

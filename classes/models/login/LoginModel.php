@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\models\login;
 
-use App\core\common\CustomDebug                             as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                           as Debug;
 use App\services\database\troublelog\read\GuestAcctsService as DbRead;
 
 /**
@@ -53,7 +54,7 @@ class LoginModel
         ?DbRead $dbRead = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('login', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('login', false, 0);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
 

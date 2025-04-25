@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\models\proposals;
 
-use App\core\common\Debug;
-use App\services\database\troublelog\read\ObsAppService as DbRead;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                        as Debug;
+use App\services\database\troublelog\read\ObsAppService  as DbRead;
 use App\services\database\troublelog\write\ObsAppService as DbWrite;
 
 /**
@@ -29,7 +30,7 @@ class UpdateApplicationDateModel
         ?DbWrite $dbWrite = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
 

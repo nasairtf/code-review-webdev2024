@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\models\proposals;
 
-use App\core\common\Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 
 /**
  * Model for updating the application date.
@@ -27,7 +28,7 @@ class ProcessObsRemindersModel
         ?DbWrite $dbWrite = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
 

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\domains\tac;
 
 use Exception;
-use App\core\common\CustomDebug          as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug        as Debug;
 use App\domains\tac\upload\UploadManager as Uploader;
 use App\domains\tac\export\ExportManager as Exporter;
 
@@ -32,7 +33,7 @@ class TACManager
         ?Debug $debug = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('schedule', $debugMode ?? false, $debugMode ? 1 : 0);
+        $this->debug = $debug ?? DebugFactory::create('schedule', $debugMode ?? false, $debugMode ? 1 : 0);
         $debugHeading = $this->debug->debugHeading("Manager", "__construct");
         $this->debug->debug($debugHeading);
 

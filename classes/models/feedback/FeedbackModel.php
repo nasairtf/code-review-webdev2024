@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace App\models\feedback;
 
-use App\core\common\Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                                  as Debug;
 use App\core\irtf\IrtfUtilities;
-use App\services\database\troublelog\read\EngProgramService as EngProgramServiceRead;
-use App\services\database\troublelog\read\HardwareService as HardwareServiceRead;
-use App\services\database\troublelog\read\ObsAppService as ObsAppServiceRead;
-use App\services\database\troublelog\read\OperatorService as OperatorServiceRead;
+use App\services\database\troublelog\read\EngProgramService        as EngProgramServiceRead;
+use App\services\database\troublelog\read\HardwareService          as HardwareServiceRead;
+use App\services\database\troublelog\read\ObsAppService            as ObsAppServiceRead;
+use App\services\database\troublelog\read\OperatorService          as OperatorServiceRead;
 use App\services\database\troublelog\read\SupportAstronomerService as SupportAstronomerServiceRead;
-use App\services\database\feedback\FeedbackService as BaseServiceWrite;
-use App\services\database\feedback\write\FeedbackService as FeedbackServiceWrite;
-use App\services\database\feedback\write\InstrumentService as InstrumentServiceWrite;
-use App\services\database\feedback\write\OperatorService as OperatorServiceWrite;
-use App\services\database\feedback\write\SupportService as SupportServiceWrite;
+use App\services\database\feedback\FeedbackService                 as BaseServiceWrite;
+use App\services\database\feedback\write\FeedbackService           as FeedbackServiceWrite;
+use App\services\database\feedback\write\InstrumentService         as InstrumentServiceWrite;
+use App\services\database\feedback\write\OperatorService           as OperatorServiceWrite;
+use App\services\database\feedback\write\SupportService            as SupportServiceWrite;
 
 /**
  * Model for the Feedback form.
@@ -46,7 +47,7 @@ class FeedbackModel
         ?Debug $debug = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
         // READ services
