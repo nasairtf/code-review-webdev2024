@@ -43,6 +43,7 @@ jpgraph.tar.gz
 /backups/
 /old/
 /root-bin/
+classes/validators/common/old/
 
 # Include composer-related files
 !composer.lock
