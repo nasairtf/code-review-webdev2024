@@ -80,6 +80,18 @@ class ValidationResult
     }
 
     /**
+     * Determines if any value has been recorded for the field.
+     *
+     * @param string $fieldKey The field name/key.
+     *
+     * @return bool True if set, or false if not found.
+     */
+    public function hasFieldValue(string $fieldKey): bool
+    {
+        return array_key_exists($fieldKey, $this->fieldValues);
+    }
+
+    /**
      * Determines if any errors have been recorded.
      *
      * @return bool True if there is at least one field error, false otherwise.
