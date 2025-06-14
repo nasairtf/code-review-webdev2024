@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\TokensBaseUtility;
 
@@ -16,7 +16,7 @@ use App\validators\common\TokensBaseUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreTokensBaseTrait
+trait TokensBaseTrait
 {
     /**
      * Validates that a token is properly base64-encoded and follows expected structure.

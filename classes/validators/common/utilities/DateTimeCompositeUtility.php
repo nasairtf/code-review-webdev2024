@@ -2,21 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
-
-use App\validators\common\DateTimeCompositeUtility;
+namespace App\validators\common\utilities;
 
 /**
- * ValidationCoreDateTimeCompositeTrait
+ * DateTimeCompositeUtility
  *
- * Provides wrapper methods for DateTimeCompositeUtility functionality.
- * Enables validation of full date ranges and semester/date consistency.
+ * Provides composite validation routines for date-related fields that require
+ * coordination of multiple date components or logic (e.g., comparing two dates,
+ * checking semester alignment).
  *
- * @category Validation
+ * This layer assumes atomic validation of individual fields has been delegated
+ * to DateTimeBaseUtility and focuses on orchestration of related data units.
+ *
+ * @category Validators
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreDateTimeCompositeTrait
+class DateTimeCompositeUtility
 {
     /**
      * Validates a date range to ensure the end date is not before the start date.
@@ -36,7 +38,7 @@ trait ValidationCoreDateTimeCompositeTrait
      *
      * @return ValidationResult Updated ValidationResult with any errors or stored values.
      */
-    public function validateDateRange(
+    public static function validateDateRange(
         ValidationResult $result,
         $startYear,
         $startMonth,
@@ -46,16 +48,41 @@ trait ValidationCoreDateTimeCompositeTrait
         $endDay,
         string $fieldKey
     ): ValidationResult {
-        return DateTimeCompositeUtility::validateDateRange(
+        // Validate component values
+        $res = DateTimeBaseUtility::validateFullDate(
             $result,
             $startYear,
             $startMonth,
             $startDay,
+            "{$fieldKey}_start"
+        );
+        $res = DateTimeBaseUtility::validateFullDate(
+            $res,
             $endYear,
             $endMonth,
             $endDay,
-            $fieldKey
+            "{$fieldKey}_end"
         );
+
+        // Short-circuit and return if component validations failed
+        if ($res->hasErrors()) {
+            return $res;
+        }
+
+        // Retrieve unix timestamps after validation passed
+        $startTimestamp = (int) $res->getFieldValue("{$fieldKey}_start_timestamp");
+        $endTimestamp   = (int) $res->getFieldValue("{$fieldKey}_end_timestamp");
+
+        // Validate timestamp order
+        if ($endTimestamp < $startTimestamp) {
+            return $res->addFieldError(
+                $fieldKey,
+                "End date cannot be before start date."
+            );
+        }
+
+        // Return validation result
+        return $res;
     }
 
     /**
@@ -74,7 +101,7 @@ trait ValidationCoreDateTimeCompositeTrait
      *
      * @return ValidationResult Updated ValidationResult with either validation errors or validated fields.
      */
-    public function validateDateSemester(
+    public static function validateDateSemester(
         ValidationResult $result,
         $yearValue,
         $monthValue,
@@ -82,13 +109,42 @@ trait ValidationCoreDateTimeCompositeTrait
         $semesterValue,
         string $fieldKey
     ): ValidationResult {
-        return DateTimeCompositeUtility::validateDateSemester(
+        // Validate component values
+        $res = DateTimeBaseUtility::validateFullDate(
             $result,
             $yearValue,
             $monthValue,
             $dayValue,
-            $semesterValue,
-            $fieldKey
+            "{$fieldKey}_date"
         );
+        $res = TextCompositeUtility::validateSemesterField(
+            $res,
+            $semesterValue,
+            "{$fieldKey}_semester"
+        );
+
+        // Short-circuit and return if component validations failed
+        if ($res->hasErrors()) {
+            return $res;
+        }
+
+        // Retrieve and calculate semesters after validation passed
+        $semesterValue = (string) $semesterValue;
+        $dateSemester = IrtfUtilities::returnSemester(
+            (int) $monthValue,
+            (int) $dayValue,
+            (int) $yearValue
+        );
+
+        // Validate whether the semester values match
+        if ($semesterValue !== $dateSemester) {
+            return $res->addFieldError(
+                $fieldKey,
+                sprintf("Date must fall within %s semester.", $semesterValue)
+            );
+        }
+
+        // Return validation result
+        return $res;
     }
 }

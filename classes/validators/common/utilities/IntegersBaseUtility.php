@@ -2,64 +2,64 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\utilities;
 
 /**
- * FloatsBaseUtility
+ * IntegersBaseUtility
  *
- * Provides methods for basic float (decimal number) validations:
- * - Float type checking
- * - Float range checking
+ * Provides methods for basic integer validations:
+ * - Integer type checking
+ * - Integer range checking
  *
  * @category Validators
  * @package  IRTF
  * @version  1.0.0
  */
-class FloatsBaseUtility
+class IntegersBaseUtility
 {
     /**
-     * Validates that a value is a proper float.
+     * Validates that a value is a proper integer.
      *
      * @param ValidationResult  $result    The ValidationResult instance to update.
      * @param mixed             $value     The value to validate.
      * @param string            $fieldKey  The field key associated with the value.
      *
-     * @return ValidationResult Updated ValidationResult containing either validation errors or the validated float value.
+     * @return ValidationResult Updated ValidationResult containing either validation errors or the validated integer value.
      */
-    public static function validateFloat(
+    public static function validateInteger(
         ValidationResult $result,
         $value,
         string $fieldKey
     ): ValidationResult {
-        // Ensure value is numeric
-        if (!is_numeric($value)) {
+        // Ensure value is numeric and an integer (ignoring scientific notation unless it's fractional)
+        if (!is_numeric($value) || (int) $value != $value) {
             return $result->addFieldError(
                 $fieldKey,
-                "Value must be a valid number."
+                "Value must be a valid integer."
             );
         }
 
         // Store the validated value
-        return $result->setFieldValue($fieldKey, (float) $value);
+        return $result->setFieldValue($fieldKey, (int) $value);
     }
 
     /**
-     * Validates that a float is within an optional minimum and/or maximum range.
+     * Validates that an integer is within an optional minimum and/or maximum range.
      *
      * @param ValidationResult  $result    The ValidationResult instance to update.
-     * @param float             $value     The float value to validate.
+     * @param int               $value     The integer value to validate.
      * @param string            $fieldKey  The field key associated with the value.
-     * @param float|null        $minValue  Optional minimum allowed value.
-     * @param float|null        $maxValue  Optional maximum allowed value.
+     * @param int|null          $minValue  Optional minimum allowed value.
+     * @param int|null          $maxValue  Optional maximum allowed value.
      *
      * @return ValidationResult Updated ValidationResult containing either validation errors or the validated value.
      */
-    public static function validateFloatRange(
+    public static function validateIntegerRange(
         ValidationResult $result,
-        float $value,
+        int $value,
         string $fieldKey,
-        ?float $minValue = null,
-        ?float $maxValue = null
+        ?int $minValue = null,
+        ?int $maxValue = null
     ): ValidationResult {
         // If both minValue and maxValue are set, validate against full range
         if ($minValue !== null && $maxValue !== null) {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\TextCompositeUtility;
 
@@ -16,7 +16,7 @@ use App\validators\common\TextCompositeUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreTextCompositeTrait
+trait TextCompositeTrait
 {
     /**
      * Validates that a text field does not exceed the specified maximum length.

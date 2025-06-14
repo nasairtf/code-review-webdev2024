@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\SelectionBaseUtility;
 
@@ -16,7 +16,7 @@ use App\validators\common\SelectionBaseUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreSelectionBaseTrait
+trait SelectionBaseTrait
 {
     /**
      * Validates that a set of submitted options match allowed values.

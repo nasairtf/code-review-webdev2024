@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\IntegersBaseUtility;
 use App\validators\common\TextCompositeUtility;
@@ -19,7 +19,7 @@ use App\validators\common\SelectionCompositeUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreConvenienceWrapperTrait
+trait ConvenienceWrapperTrait
 {
     /**
      * Validates an ObsAppID field as a basic integer.

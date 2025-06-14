@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\RequiredFieldUtility;
 
@@ -16,7 +16,7 @@ use App\validators\common\RequiredFieldUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreRequiredFieldTrait
+trait RequiredFieldTrait
 {
     /**
      * Validates that a required field is set and contains meaningful content.

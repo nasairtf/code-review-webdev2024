@@ -2,21 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
-
-use App\validators\common\NumericCompositeUtility;
+namespace App\validators\common\utilities;
 
 /**
- * ValidationCoreNumericCompositeTrait
+ * NumericCompositeUtility
  *
- * Provides wrapper methods for NumericCompositeUtility functionality.
- * Encapsulates domain-specific numeric validations (e.g., program number ranges).
+ * Provides composite validations for numeric fields that require
+ * specific real-world constraints beyond basic integer/float checks.
  *
- * @category Validation
+ * @category Validators
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreNumericCompositeTrait
+class NumericCompositeUtility
 {
     /**
      * Validates a short program number field (integer between 1 and 999).
@@ -29,15 +27,35 @@ trait ValidationCoreNumericCompositeTrait
      *
      * @return ValidationResult Updated ValidationResult containing either validation errors or the validated number.
      */
-    public function validateShortProgramNumberField(
+    public static function validateShortProgramNumberField(
         ValidationResult $result,
         $value,
         string $fieldKey,
         ?int $minNumber = null,
         ?int $maxNumber = null
     ): ValidationResult {
-        return NumericCompositeUtility::validateShortProgramNumberField(
+        // Validate value is an integer
+        $res = IntegersBaseUtility::validateInteger(
             $result,
+            $value,
+            $fieldKey
+        );
+
+        // Short-circuit and return if integer validation failed
+        if ($res->hasErrors()) {
+            return $res;
+        }
+
+        // Prepare value for validation
+        $value = (int) $value;
+
+        // Clamp the min/max to a sane range just in case
+        $minNumber = max(1, $minNumber ?? 1);     // Ensure minimum is at least  1
+        $maxNumber = min(999, $maxNumber ?? 999); // Ensure maximum is at most 999
+
+        // Validate value is within the necessary bounds
+        return IntegersBaseUtility::validateIntegerRange(
+            $res,
             $value,
             $fieldKey,
             $minNumber,

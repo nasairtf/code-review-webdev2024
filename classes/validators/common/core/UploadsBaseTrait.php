@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\UploadsBaseUtility;
 
@@ -16,7 +16,7 @@ use App\validators\common\UploadsBaseUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreUploadsBaseTrait
+trait UploadsBaseTrait
 {
     /**
      * Validates an uploaded file's basic upload status and MIME type.

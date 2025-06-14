@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\utilities;
 
 /**
  * DateTimeBaseUtility

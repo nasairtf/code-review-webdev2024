@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\utilities;
 
 /**
  * RequiredFieldUtility
@@ -20,7 +20,7 @@ class RequiredFieldUtility
      *
      * Handles special cases for strings, arrays, and non-numeric empty values.
      * If $required is true and the value is empty/null, an error is recorded under $fieldKey.
-     * Otherwise, the original $value is stored in the ValidationResult.
+     * Otherwise, the original $value is stored in the ValidationResult, even if empty/null.
      *
      * @param ValidationResult  $result       The ValidationResult instance to update.
      * @param mixed             $value        The field value to check.
@@ -43,7 +43,7 @@ class RequiredFieldUtility
             return $result->addFieldError($fieldKey, $errorMessage);
         }
 
-        // If not empty or not required, store the original value.
+        // If not required or value is not empty, store the original value (including null for optional fields).
         return $result->setFieldValue($fieldKey, $value);
     }
 

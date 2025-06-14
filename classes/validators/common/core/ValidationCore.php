@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
-use App\validators\common\RequiredFieldUtility;
-use App\validators\common\IntegersBaseUtility;
-use App\validators\common\FloatsBaseUtility;
-use App\validators\common\StringsBaseUtility;
-use App\validators\common\SelectionBaseUtility;
-use App\validators\common\DateTimeBaseUtility;
-use App\validators\common\UploadsBaseUtility;
-use App\validators\common\TokensBaseUtility;
-use App\validators\common\NumericCompositeUtility;
-use App\validators\common\TextCompositeUtility;
-use App\validators\common\SelectionCompositeUtility;
-use App\validators\common\DateTimeCompositeUtility;
-use App\validators\common\TokenCompositeUtility;
+use App\validators\common\utilities\RequiredFieldUtility;
+use App\validators\common\utilities\IntegersBaseUtility;
+use App\validators\common\utilities\FloatsBaseUtility;
+use App\validators\common\utilities\StringsBaseUtility;
+use App\validators\common\utilities\SelectionBaseUtility;
+use App\validators\common\utilities\DateTimeBaseUtility;
+use App\validators\common\utilities\UploadsBaseUtility;
+use App\validators\common\utilities\TokensBaseUtility;
+use App\validators\common\utilities\NumericCompositeUtility;
+use App\validators\common\utilities\TextCompositeUtility;
+use App\validators\common\utilities\SelectionCompositeUtility;
+use App\validators\common\utilities\DateTimeCompositeUtility;
+use App\validators\common\utilities\TokenCompositeUtility;
 
 /**
  * ValidationCore
@@ -42,26 +42,26 @@ class ValidationCore
 
     //** RequiredFieldUtility **//
     // public function validateRequiredField(...) {}
-    use ValidationCoreRequiredFieldTrait;
+    use RequiredFieldTrait;
 
     //** IntegersBaseUtility / FloatsBaseUtility **//
     // public function validateInteger(...) {}
     // public function validateFloat(...) {}
     // public function validateIntegerRange(...) {}
     // public function validateFloatRange(...) {}
-    use ValidationCoreIntegersBaseTrait;
-    use ValidationCoreFloatsBaseTrait;
+    use IntegersBaseTrait;
+    use FloatsBaseTrait;
 
     //** StringsBaseUtility **//
     // public function validateStringLength(...) {}
     // public function validateEmailFormat(...) {}
     // public function validateStringInSet(...) {}
     // public function validateAlphanumeric(...) {}
-    use ValidationCoreStringsBaseTrait;
+    use StringsBaseTrait;
 
     //** SelectionBaseUtility **//
     // public function validateSelection(...) {}
-    use ValidationCoreSelectionBaseTrait;
+    use SelectionBaseTrait;
 
     //** DateTimeBaseUtility *//
     // public function validateYear(...) {}
@@ -73,14 +73,14 @@ class ValidationCore
     // public function validateFullDate(...) {}
     // public function validateFullDateTime(...) {}
     // public function validateUnixTimestamp(...) {}
-    use ValidationCoreDateTimeBaseTrait;
+    use DateTimeBaseTrait;
 
     //** UploadsBaseUtility / TokensBaseUtility **//
     // public function validateUploadedFile(...) {}
     // public function validateTokenStructure(...) {}
     // public function validateTokenRequestType(...) {}
-    use ValidationCoreUploadsBaseTrait;
-    use ValidationCoreTokensBaseTrait;
+    use UploadsBaseTrait;
+    use TokensBaseTrait;
 
     // ============================================================================
     // COMPOSITE UTILITY CLASS METHODS
@@ -88,7 +88,7 @@ class ValidationCore
 
     //** NumericCompositeUtility **//
     // public function validateShortProgramNumberField(...) {}
-    use ValidationCoreNumericCompositeTrait;
+    use NumericCompositeTrait;
 
     //** TextCompositeUtility **//
     // public function validateTextField(...) {}
@@ -99,21 +99,21 @@ class ValidationCore
     // public function validateSemesterField(...) {}
     // public function validateProgramNumberField(...) {}
     // public function validateSessionCodeField(...) {}
-    use ValidationCoreTextCompositeTrait;
+    use TextCompositeTrait;
 
     //** SelectionCompositeUtility **//
     // public function validateRating(...) {}
     // public function validateBinaryOption(...) {}
-    use ValidationCoreSelectionCompositeTrait;
+    use SelectionCompositeTrait;
 
     //** DateTimeCompositeUtility **//
     // public function validateDateRange(...) {}
     // public function validateDateSemester(...) {}
-    use ValidationCoreDateTimeCompositeTrait;
+    use DateTimeCompositeTrait;
 
     //** TokenCompositeUtility **//
     // public function validateAuthorizedRequest(...) {}
-    use ValidationCoreTokenCompositeTrait;
+    use TokenCompositeTrait;
 
     // ============================================================================
     // FUNCTION-SPECIFIC WRAPPER METHODS
@@ -127,5 +127,5 @@ class ValidationCore
     // public function validateEmailsSendType(...) {}
     // public function validateIntervalUnitType(...) {}
     // public function validateOnOffRadio(...) {}
-    use ValidationCoreConvenienceWrapperTrait;
+    use ConvenienceWrapperTrait;
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\DateTimeBaseUtility;
 
@@ -16,7 +16,7 @@ use App\validators\common\DateTimeBaseUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreDateTimeBaseTrait
+trait DateTimeBaseTrait
 {
     /**
      * Validates that a year value is within an acceptable range.

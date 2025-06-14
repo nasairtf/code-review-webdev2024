@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\TokenCompositeUtility;
 
@@ -16,7 +16,7 @@ use App\validators\common\TokenCompositeUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreTokenCompositeTrait
+trait TokenCompositeTrait
 {
     /**
      * Validates that a token is structurally valid and matches the expected request type.

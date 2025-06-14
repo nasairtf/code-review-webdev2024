@@ -2,37 +2,37 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
-use App\validators\common\IntegersBaseUtility;
+use App\validators\common\FloatsBaseUtility;
 
 /**
- * ValidationCoreIntegersBaseTrait
+ * ValidationCoreFloatsBaseTrait
  *
- * Provides wrapper methods for IntegersBaseUtility functionality.
- * Supports integer validation and optional range enforcement.
+ * Provides wrapper methods for FloatsBaseUtility functionality.
+ * Supports float validation and optional range enforcement.
  *
  * @category Validation
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreIntegersBaseTrait
+trait FloatsBaseTrait
 {
     /**
-     * Validates that a value is a proper integer.
+     * Validates that a value is a proper float.
      *
      * @param ValidationResult  $result    The ValidationResult instance to update.
      * @param mixed             $value     The value to validate.
      * @param string            $fieldKey  The field key associated with the value.
      *
-     * @return ValidationResult Updated ValidationResult containing either validation errors or the validated integer value.
+     * @return ValidationResult Updated ValidationResult containing either validation errors or the validated float value.
      */
-    public function validateInteger(
+    public function validateFloat(
         ValidationResult $result,
         $value,
         string $fieldKey
     ): ValidationResult {
-        return IntegersBaseUtility::validateInteger(
+        return FloatsBaseUtility::validateFloat(
             $result,
             $value,
             $fieldKey
@@ -40,24 +40,24 @@ trait ValidationCoreIntegersBaseTrait
     }
 
     /**
-     * Validates that an integer is within an optional minimum and/or maximum range.
+     * Validates that a float is within an optional minimum and/or maximum range.
      *
      * @param ValidationResult  $result    The ValidationResult instance to update.
-     * @param int               $value     The integer value to validate.
+     * @param float             $value     The float value to validate.
      * @param string            $fieldKey  The field key associated with the value.
-     * @param int|null          $minValue  Optional minimum allowed value.
-     * @param int|null          $maxValue  Optional maximum allowed value.
+     * @param float|null        $minValue  Optional minimum allowed value.
+     * @param float|null        $maxValue  Optional maximum allowed value.
      *
      * @return ValidationResult Updated ValidationResult containing either validation errors or the validated value.
      */
-    public function validateIntegerRange(
+    public function validateFloatRange(
         ValidationResult $result,
-        int $value,
+        float $value,
         string $fieldKey,
-        ?int $minValue = null,
-        ?int $maxValue = null
+        ?float $minValue = null,
+        ?float $maxValue = null
     ): ValidationResult {
-        return IntegersBaseUtility::validateIntegerRange(
+        return FloatsBaseUtility::validateFloatRange(
             $result,
             $value,
             $fieldKey,

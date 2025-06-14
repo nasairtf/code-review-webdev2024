@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\SelectionCompositeUtility;
 
@@ -16,7 +16,7 @@ use App\validators\common\SelectionCompositeUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreSelectionCompositeTrait
+trait SelectionCompositeTrait
 {
     /**
      * Validates a rating field (0-5 or 1-5) depending on configuration.

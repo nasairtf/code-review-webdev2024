@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\validators\common;
+namespace App\validators\common\core;
 
 use App\validators\common\StringsBaseUtility;
 
@@ -16,7 +16,7 @@ use App\validators\common\StringsBaseUtility;
  * @package  IRTF
  * @version  1.0.0
  */
-trait ValidationCoreStringsBaseTrait
+trait StringsBaseTrait
 {
     /**
      * Validates that a string does not exceed the specified maximum length.
