@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\validators\common\utilities;
 
+use App\validators\common\ValidationResult;
+
 /**
  * SelectionCompositeUtility
  *

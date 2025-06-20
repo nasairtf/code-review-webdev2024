@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\validators\common\core;
 
-use App\validators\common\SelectionCompositeUtility;
+use App\validators\common\ValidationResult;
+use App\validators\common\utilities\SelectionCompositeUtility;
 
 /**
  * ValidationCoreSelectionCompositeTrait

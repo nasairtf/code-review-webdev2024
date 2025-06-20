@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\validators\common\core;
 
-use App\validators\common\IntegersBaseUtility;
-use App\validators\common\TextCompositeUtility;
-use App\validators\common\SelectionCompositeUtility;
+use App\validators\common\ValidationResult;
+use App\validators\common\utilities\IntegersBaseUtility;
+use App\validators\common\utilities\TextCompositeUtility;
+use App\validators\common\utilities\SelectionCompositeUtility;
 
 /**
  * ValidationCoreConvenienceWrapperTrait

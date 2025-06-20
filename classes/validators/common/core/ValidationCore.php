@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\validators\common\core;
 
+use App\validators\common\ValidationResult;
 use App\validators\common\utilities\RequiredFieldUtility;
 use App\validators\common\utilities\IntegersBaseUtility;
 use App\validators\common\utilities\FloatsBaseUtility;
