@@ -400,7 +400,7 @@ class LoginController
         $this->debug->debug($debugHeading);
 
         // Validate form inputs
-        $validData = $this->valid->validateFormData($formData);
+        $validData = $this->valid->validateData($formData);
         $this->debug->debugVariable($validData, "{$debugHeading} -- validData");
 
         // Check credentials with model
