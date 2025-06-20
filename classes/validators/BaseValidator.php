@@ -1,0 +1,220 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\validators;
+
+use Exception;
+use App\exceptions\ValidationException;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug             as Debug;
+use App\validators\common\AbstractValidator;
+use App\validators\common\ValidationResult    as Result;
+use App\validators\common\core\ValidationCore as Core;
+
+/**
+ * BaseValidator serves as the validation orchestrator for all concrete validators.
+ *
+ * It coordinates context and validation plans, executes validation routines
+ * via ValidationCore, and manages ValidationResult and Debug.
+ *
+ * Concrete validators define the validation plan and output formatting logic.
+ *
+ * @category Validators
+ * @package  IRTF
+ * @version  1.0.0
+ */
+abstract class BaseValidator extends AbstractValidator
+{
+    /** @var Debug Debugging/tracing interface */
+    protected $debug;
+
+    /** @var Core ValidationCore: orchestrates utility-backed validation methods */
+    protected $core;
+
+    /** @var Result ValidationResult: accumulates field values and validation errors */
+    protected $result;
+
+    /**
+     * BaseValidator constructor with optional dependency injection.
+     *
+     * @param Debug|null  $debug  Debug instance for output tracing
+     * @param Core|null   $core   ValidationCore instance
+     * @param Result|null $result ValidationResult to populate
+     */
+    public function __construct(
+        ?Debug $debug = null,
+        ?Core $core = null,
+        ?Result $result = null
+    ) {
+        // Initialize debugging
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
+        $debugHeading = $this->debug->debugHeading("BaseValidator", "__construct");
+        $this->debug->debug($debugHeading);
+
+        // Initialise dependencies with fallbacks
+        $this->core = $core ?? new Core();
+        $this->result = $result ?? new Result();
+        $this->debug->debug("{$debugHeading} -- Core, Result classes successfully initialised.");
+
+        // Constructor completed
+        $this->debug->debug("{$debugHeading} -- Parent Validator initialisation complete.");
+    }
+
+    /**
+     * Main execution method: validates input data against a field plan.
+     *
+     * Runs required checks, dispatches validation methods, and throws
+     * a formatted ValidationException if any field fails.
+     *
+     * @param array $data    Input data to validate
+     * @param array $context Supplemental data to build the validation plan
+     *
+     * @return array Clean, validated controller-ready values
+     *
+     * @throws ValidationException If any validation fails
+     */
+    public function validateData(
+        array $data,
+        array $context = []
+    ): array {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseValidator", "validateData");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($data, "{$debugHeading} -- data");
+        $this->debug->debugVariable($context, "{$debugHeading} -- context");
+
+        $plan = $this->getValidationPlan($data, $context);
+        $normalizedPlan = $this->normalizeValidationPlan($plan);
+        $this->debug->debugVariable($plan, "{$debugHeading} -- plan");
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
+
+        foreach ($normalizedPlan as $step) {
+            $field       = $step['field'];
+            $method      = $step['method'];
+            $args        = $step['args'];
+            $isRequired  = $step['required'];
+            $requiredMsg = $step['required_msg'];
+
+            $value = $data[$field] ?? null;
+
+            // Enforce presence check and store field if required OR provided [result instance is returned]
+            $this->core->validateRequiredField(
+                $this->result,
+                $value,
+                $isRequired,
+                $field,
+                $requiredMsg
+            );
+
+            // If value is required but missing, skip further validation for this field
+            if ($isRequired && !$this->result->hasFieldValue($field)) {
+                $this->debug->debug("{$debugHeading} -- Skipping '{$method}' for field '{$field}' (missing required value)");
+                continue;
+            }
+
+            // Confirm given method exists in ValidationCore prior to constructing arguments
+            if (!method_exists($this->core, $method)) {
+                $this->debug->fail("Method '{$method}' does not exist on ValidationCore.");
+            }
+
+            // Build method arguments: [result, value, field, ...additional args]
+            $methodArgs = array_merge([$this->result, $value, $field], $args);
+
+            // All core methods return the same result instance passed in (mutable)
+            call_user_func_array([$this->core, $method], $methodArgs);
+        }
+
+        // Final check; returns formatted errors array with the thrown exception
+        $this->throwIfErrors($normalizedPlan);
+
+        // Return formatted validated data array
+        return $this->formatValidData($normalizedPlan);
+    }
+
+    /**
+     * Validates and normalizes the raw validation plan structure.
+     *
+     * Ensures field entries are complete and consistently typed, and fills in
+     * any missing optional keys with sane defaults.
+     *
+     * @param array $rawPlan Raw validation plan from getValidationPlan()
+     *
+     * @return array Normalized plan with explicit structure
+     */
+    protected function normalizeValidationPlan(
+        array $rawPlan
+    ): array {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseValidator", "normalizeValidationPlan");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($rawPlan, "{$debugHeading} -- rawPlan");
+
+        $normalized = [];
+
+        // Ensure each field's plan piece is complete
+        foreach ($rawPlan as $index => $step) {
+            // Required: must exist
+            if (!isset($step['field'], $step['method'])) {
+                $this->debug->fail("Validation step at index ${index} is missing 'field' or 'method'");
+            }
+
+            $field = $step['field'];
+            $method = $step['method'];
+
+            if (!is_string($field)) {
+                $this->debug->fail("'field' must be a string at step index ${index}");
+            }
+
+            if (!is_string($method)) {
+                $this->debug->fail("'method' must be a string at step index ${index}");
+            }
+
+            if (isset($step['args']) && !is_array($step['args'])) {
+                $this->debug->fail("'args' must be an array for field '${field}'");
+            }
+
+            if (isset($step['required']) && !is_bool($step['required'])) {
+                $this->debug->fail("'required' must be a boolean for field '${field}'");
+            }
+
+            if (isset($step['required_msg']) && !is_string($step['required_msg'])) {
+                $this->debug->fail("'required_msg' must be a string for field '${field}'");
+            }
+
+            $normalized[] = [
+                'field'         => $field,
+                'method'        => $method,
+                'args'          => $step['args'] ?? [],
+                'required'      => $step['required'] ?? false,
+                'required_msg'  => $step['required_msg'] ?? 'This field is required',
+            ];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Throws a ValidationException if errors exist after validation execution.
+     *
+     * Converts internal ValidationResult format into controller-facing structure
+     * via formatErrors(), and halts control flow on failure.
+     *
+     * @param array $normalizedPlan The resolved validation plan for this execution
+     *
+     * @throws ValidationException If any validation failed
+     */
+    protected function throwIfErrors(array $normalizedPlan): void
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseValidator", "throwIfErrors");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
+        $this->debug->debugVariable($this->result->hasErrors(), "{$debugHeading} -- result->hasErrors()");
+
+        if ($this->result->hasErrors()) {
+            $errors = $this->formatErrors($normalizedPlan);
+            throw new ValidationException('Validation errors occurred.', $errors);
+        }
+    }
+}
