@@ -145,7 +145,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if format validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -159,7 +159,7 @@ class TextCompositeUtility
             );
 
             // Short-circuit and return if length validation failed
-            if ($res->hasErrors()) {
+            if ($res->hasFieldErrors($fieldKey)) {
                 return $res;
             }
         }
@@ -202,7 +202,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if length validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -253,7 +253,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if length validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -274,7 +274,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if year validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors("{$fieldKey}_year")) {
             return $res;
         }
 
@@ -286,7 +286,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if tag validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors("{$fieldKey}_tag")) {
             return $res;
         }
 
@@ -328,7 +328,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if length validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -350,7 +350,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if year validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors("{$fieldKey}_year")) {
             return $res;
         }
 
@@ -362,7 +362,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if tag validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors("{$fieldKey}_tag")) {
             return $res;
         }
 
@@ -374,7 +374,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if number validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors("{$fieldKey}_number")) {
             return $res;
         }
 
@@ -417,7 +417,7 @@ class TextCompositeUtility
         );
 
         // Short-circuit and return if length validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 

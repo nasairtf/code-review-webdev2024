@@ -56,7 +56,7 @@ class SelectionBaseUtility
         }
 
         // Store values if validation passed
-        if (!$result->hasErrors()) {
+        if (!$result->hasFieldErrors($fieldKey)) {
             $result = $result->setFieldValue($fieldKey, $validatedOptions);
         }
 

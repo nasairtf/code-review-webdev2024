@@ -56,7 +56,7 @@ class DateTimeBaseUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -105,7 +105,7 @@ class DateTimeBaseUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -154,7 +154,7 @@ class DateTimeBaseUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -203,7 +203,7 @@ class DateTimeBaseUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -252,7 +252,7 @@ class DateTimeBaseUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -301,7 +301,7 @@ class DateTimeBaseUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -360,7 +360,11 @@ class DateTimeBaseUtility
         );
 
         // Short-circuit and return if component validations failed
-        if ($res->hasErrors()) {
+        if ($res->hasAnyFieldErrors([
+            "{$fieldKey}_year",
+            "{$fieldKey}_month",
+            "{$fieldKey}_day",
+        ])) {
             return $res;
         }
 
@@ -456,7 +460,14 @@ class DateTimeBaseUtility
         );
 
         // Short-circuit and return if component validations failed
-        if ($res->hasErrors()) {
+        if ($res->hasAnyFieldErrors([
+            "{$fieldKey}_year",
+            "{$fieldKey}_month",
+            "{$fieldKey}_day",
+            "{$fieldKey}_hour",
+            "{$fieldKey}_minute",
+            "{$fieldKey}_second",
+        ])) {
             return $res;
         }
 
@@ -534,7 +545,7 @@ class DateTimeBaseUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 

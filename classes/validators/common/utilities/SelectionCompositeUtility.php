@@ -44,7 +44,7 @@ class SelectionCompositeUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 
@@ -90,7 +90,7 @@ class SelectionCompositeUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 

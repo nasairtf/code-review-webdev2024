@@ -34,7 +34,9 @@ class IntegersBaseUtility
         string $fieldKey
     ): ValidationResult {
         // Ensure value is numeric and an integer (ignoring scientific notation unless it's fractional)
-        if (!is_numeric($value) || (int) $value != $value) {
+        //if (!is_numeric($value) || (int) $value != $value) {
+        // Modification to handle stringified integers from web-forms
+        if (!is_numeric($value) || (string)(int) $value != (string) $value) {
             return $result->addFieldError(
                 $fieldKey,
                 "Value must be a valid integer."

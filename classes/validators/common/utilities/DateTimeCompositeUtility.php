@@ -67,7 +67,10 @@ class DateTimeCompositeUtility
         );
 
         // Short-circuit and return if component validations failed
-        if ($res->hasErrors()) {
+        if ($res->hasAnyFieldErrors([
+            "{$fieldKey}_start",
+            "{$fieldKey}_end",
+        ])) {
             return $res;
         }
 
@@ -126,7 +129,10 @@ class DateTimeCompositeUtility
         );
 
         // Short-circuit and return if component validations failed
-        if ($res->hasErrors()) {
+        if ($res->hasAnyFieldErrors([
+            "{$fieldKey}_date",
+            "{$fieldKey}_semester",
+        ])) {
             return $res;
         }
 

@@ -54,6 +54,35 @@ class ValidationResult
     }
 
     /**
+     * Determines if any error has been recorded for the field.
+     *
+     * @param string $fieldKey The field name/key.
+     *
+     * @return bool True if there is at least one field error, false otherwise.
+     */
+    public function hasFieldErrors(string $fieldKey): bool
+    {
+        return !empty($this->fieldErrors[$fieldKey] ?? []);
+    }
+
+    /**
+     * Determines if any errors have been recorded on a subset of fields.
+     *
+     * @param array $fields The array of field names/keys to be checked.
+     *
+     * @return bool True if there is at least one field error, false otherwise.
+     */
+    public function hasAnyFieldErrors(array $fields): array
+    {
+        foreach ($fields as $field) {
+            if ($this->hasFieldErrors($field)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Stores a sanitized/validated value for the specified field.
      *
      * @param string $fieldKey The field name/key.

@@ -44,7 +44,7 @@ class NumericCompositeUtility
         );
 
         // Short-circuit and return if integer validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors($fieldKey)) {
             return $res;
         }
 

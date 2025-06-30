@@ -64,7 +64,7 @@ class TokenCompositeUtility
         );
 
         // Short-circuit and return if request type validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors("{$fieldKey}_type")) {
             return $res;
         }
 
@@ -77,7 +77,7 @@ class TokenCompositeUtility
         );
 
         // Short-circuit and return if token structure validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors("{$fieldKey}_token")) {
             return $res;
         }
 
@@ -101,7 +101,7 @@ class TokenCompositeUtility
         );
 
         // Short-circuit and return if token type validation failed
-        if ($res->hasErrors()) {
+        if ($res->hasFieldErrors("{$fieldKey}_type_check")) {
             return $res;
         }
 
