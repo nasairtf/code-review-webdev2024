@@ -72,7 +72,7 @@ class ValidationResult
      *
      * @return bool True if there is at least one field error, false otherwise.
      */
-    public function hasAnyFieldErrors(array $fields): array
+    public function hasAnyFieldErrors(array $fields): bool
     {
         foreach ($fields as $field) {
             if ($this->hasFieldErrors($field)) {
