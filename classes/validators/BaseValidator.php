@@ -90,26 +90,10 @@ abstract class BaseValidator extends AbstractValidator
         $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
         foreach ($normalizedPlan as $step) {
-            $field       = $step['field'];
-            $method      = $step['method'];
-            $args        = $step['args'];
-            $isRequired  = $step['required'];
-            $requiredMsg = $step['required_msg'];
-
-            $value = $data[$field] ?? null;
-
-            // Enforce presence check and store field if required OR provided [result instance is returned]
-            $this->core->validateRequiredField(
-                $this->result,
-                $value,
-                $isRequired,
-                $field,
-                $requiredMsg
-            );
+            $method = $step['method'];
 
             // If value is required but missing, skip further validation for this field
-            if ($isRequired && !$this->result->hasFieldValue($field)) {
-                $this->debug->debug("{$debugHeading} -- Skipping '{$method}' for field '{$field}' (missing required value)");
+            if ($this->skipValidationIfMissing($step, $data)) {
                 continue;
             }
 
@@ -119,7 +103,7 @@ abstract class BaseValidator extends AbstractValidator
             }
 
             // Build method arguments: [result, value, field, ...additional args]
-            $methodArgs = array_merge([$this->result, $value, $field], $args);
+            $methodArgs = $this->buildMethodArgs($step, $data);
 
             // All core methods return the same result instance passed in (mutable)
             call_user_func_array([$this->core, $method], $methodArgs);
@@ -159,7 +143,8 @@ abstract class BaseValidator extends AbstractValidator
                 $this->debug->fail("Validation step at index ${index} is missing 'field' or 'method'");
             }
 
-            $field = $step['field'];
+            $field  = $step['field'];
+            $fields = $step['fields'] ?? (array) $step['field'];
             $method = $step['method'];
 
             if (!is_string($field)) {
@@ -168,6 +153,10 @@ abstract class BaseValidator extends AbstractValidator
 
             if (!is_string($method)) {
                 $this->debug->fail("'method' must be a string at step index ${index}");
+            }
+
+            if (!is_array($fields)) {
+                $this->debug->fail("'fields' must be an array at step index ${index}");
             }
 
             if (isset($step['args']) && !is_array($step['args'])) {
@@ -184,6 +173,7 @@ abstract class BaseValidator extends AbstractValidator
 
             $normalized[] = [
                 'field'         => $field,
+                'fields'        => $fields,
                 'method'        => $method,
                 'args'          => $step['args'] ?? [],
                 'required'      => $step['required'] ?? false,
@@ -192,6 +182,88 @@ abstract class BaseValidator extends AbstractValidator
         }
 
         return $normalized;
+    }
+
+    /**
+     * Determines whether a validation method should be skipped due to missing required inputs.
+     *
+     * Validates presence of each input field listed in 'fields' using validateRequiredField().
+     * Returns true if any required input is missing and records an error accordingly.
+     *
+     * @param array $step  Normalized validation step from the plan
+     * @param array $data  Raw submitted input data
+     *
+     * @return bool True if validation for this step should be skipped
+     */
+    protected function skipValidationIfMissing(
+        array $step,
+        array $data
+    ): bool {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseValidator", "skipValidationIfMissing");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($step, "{$debugHeading} -- step");
+        $this->debug->debugVariable($data, "{$debugHeading} -- data");
+
+        $fields      = $step['fields'];
+        $method      = $step['method'];
+        $isRequired  = $step['required'];
+        $requiredMsg = $step['required_msg'];
+
+        // Check field requirement(s) (handles both scalar and composite fields)
+        $missing = false;
+        // Determine if input is required and present
+        foreach ($fields as $f) {
+            $value = $data[$f] ?? null;
+
+            // Enforce presence check and store input if required OR provided [result instance is returned]
+            $this->core->validateRequiredField(
+                $this->result,
+                $value,
+                $isRequired,
+                $f,
+                $requiredMsg
+            );
+
+            // If input is required but missing, skip further validation for this field
+            if ($isRequired && !$this->result->hasFieldValue($f)) {
+                $this->debug->debug("{$debugHeading} -- Skipping '{$method}' for field '{$f}' (missing required value)");
+                $missing = true;
+            }
+        }
+        return $missing;
+    }
+
+    /**
+     * Constructs the argument list for a validation method.
+     *
+     * For scalar validations, pulls a single value from $data.
+     * For composite validations, pulls multiple values in field order.
+     *
+     * Resulting signature is:
+     *   [ValidationResult, <value(s)>, string $fieldKey, ...$args]
+     *
+     * @param array $step  Normalized validation step
+     * @param array $data  Raw submitted input data
+     *
+     * @return array Argument list for call_user_func_array()
+     */
+    protected function buildMethodArgs(
+        array $step,
+        array $data
+    ): array {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseValidator", "buildMethodArgs");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($step, "{$debugHeading} -- step");
+        $this->debug->debugVariable($data, "{$debugHeading} -- data");
+
+        // Build field validation method arguments
+        $values = [];
+        foreach ($step['fields'] as $f) {
+            $values[] = $data[$f] ?? null;
+        }
+        return array_merge([$this->result], $values, [$step['field']], $step['args']);
     }
 
     /**
