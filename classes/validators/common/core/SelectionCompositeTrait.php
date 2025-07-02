@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\SelectionCompositeUtility;
 
 /**
- * ValidationCoreSelectionCompositeTrait
+ * SelectionCompositeTrait
  *
  * Provides wrapper methods for SelectionCompositeUtility functionality.
  * Supports binary options and scaled ratings used across multiple validation contexts.
@@ -63,6 +63,44 @@ trait SelectionCompositeTrait
             $result,
             $value,
             $fieldKey
+        );
+    }
+
+    /**
+     * Validates that at least one valid instrument is selected from the
+     * facility and/or visitor instrument inputs.
+     *
+     * Filters out 'none' from visitor inputs, consolidates selected values,
+     * and verifies all submitted instruments are allowed.
+     * If required and no valid selections are found, an error is recorded.
+     *
+     * @param ValidationResult $result               ValidationResult instance to record results in.
+     * @param array            $facilityValues       Submitted values from facility instrument checkboxes.
+     * @param array            $visitorValues        Submitted values from visitor instrument pulldown.
+     * @param string           $fieldKey             Logical field name to associate errors and values with.
+     * @param array            $allowedFacilityValues Allowed facility instrument keys.
+     * @param array            $allowedVisitorValues  Allowed visitor instrument keys (may include 'none').
+     * @param bool             $isRequired           Whether at least one valid selection is required.
+     *
+     * @return ValidationResult Updated result object with validation outcome.
+     */
+    public function validateInstruments(
+        ValidationResult $result,
+        array $facilityValues,
+        array $visitorValues,
+        string $fieldKey,
+        array $allowedFacilityValues,
+        array $allowedVisitorValues,
+        bool $isRequired = false
+    ): ValidationResult {
+        return SelectionCompositeUtility::validateInstruments(
+            $result,
+            $facilityValues,
+            $visitorValues,
+            $fieldKey,
+            $allowedFacilityValues,
+            $allowedVisitorValues,
+            $isRequired
         );
     }
 }
