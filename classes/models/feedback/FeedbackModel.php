@@ -288,8 +288,8 @@ class FeedbackModel
             'operator_staff' => [],             // Telescope Operator(s)
 
             // Instruments
-            'instruments' => [],                // Instruments used during run
-            'visitor_instrument' => '',         // Visitor instruments used during run
+            'facility_instruments' => [],       // Facility instruments used during run
+            'visitor_instruments' => ['none'],  // Visitor instruments used during run
 
             // Technical Feedback
             'location' => 0,                    // Observing Location
