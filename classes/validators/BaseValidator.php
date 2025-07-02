@@ -86,11 +86,16 @@ abstract class BaseValidator extends AbstractValidator
 
         $plan = $this->getValidationPlan($data, $context);
         $normalizedPlan = $this->normalizeValidationPlan($plan);
-        $this->debug->debugVariable($plan, "{$debugHeading} -- plan");
         $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        foreach ($normalizedPlan as $step) {
+        foreach ($normalizedPlan as $key => $step) {
+            // Output the step to be processed
+            $this->debug->debug("{$debugHeading} -- normalizedPlan step[{$key}]: {$step['field']} [START]");
+            $this->debug->debugVariable($step, "{$debugHeading} -- step");
+
+            // Retrieve the method to be used for validating this step
             $method = $step['method'];
+            $this->debug->debugVariable($method, "{$debugHeading} -- method");
 
             // If value is required but missing, skip further validation for this field
             if ($this->skipValidationIfMissing($step, $data)) {
@@ -104,9 +109,14 @@ abstract class BaseValidator extends AbstractValidator
 
             // Build method arguments: [result, value, field, ...additional args]
             $methodArgs = $this->buildMethodArgs($step, $data);
+            $this->debug->debugVariable($methodArgs, "{$debugHeading} -- methodArgs");
 
             // All core methods return the same result instance passed in (mutable)
             call_user_func_array([$this->core, $method], $methodArgs);
+
+            // This step's processing is complete
+            $this->debug->debugVariable($this->result->getAllErrors(), "{$debugHeading} -- result->getAllErrors()");
+            $this->debug->debug("{$debugHeading} -- normalizedPlan step[{$key}]: {$step['field']} [COMPLETE]");
         }
 
         // Final check; returns formatted errors array with the thrown exception
@@ -276,17 +286,52 @@ abstract class BaseValidator extends AbstractValidator
      *
      * @throws ValidationException If any validation failed
      */
-    protected function throwIfErrors(array $normalizedPlan): void
-    {
+    protected function throwIfErrors(
+        array $normalizedPlan
+    ): void {
         // Debug output
         $debugHeading = $this->debug->debugHeading("BaseValidator", "throwIfErrors");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
         $this->debug->debugVariable($this->result->hasErrors(), "{$debugHeading} -- result->hasErrors()");
+        $this->debug->debugVariable($this->result->getAllErrors(), "{$debugHeading} -- result->getAllErrors()");
 
+        // Determine if there are errors in the result object and if so, rethrow them
         if ($this->result->hasErrors()) {
             $errors = $this->formatErrors($normalizedPlan);
             throw new ValidationException('Validation errors occurred.', $errors);
         }
+    }
+
+    /**
+     * Aggregates and returns all validation error messages that match a composite field prefix.
+     *
+     * This is used for cases where a logical field (e.g. "dates") is composed of several
+     * input fields (e.g. "dates_start", "dates_end"). The method looks for all error keys
+     * beginning with the given prefix and merges their first-level messages into a single string.
+     *
+     * @param string $fieldPrefix The prefix to match against field keys in ValidationResult.
+     *
+     * @return string Combined error message string.
+     */
+    protected function collectCompositeFieldErrors(
+        string $fieldPrefix
+    ): string {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseValidator", "collectCompositeFieldErrors");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($fieldPrefix, "{$debugHeading} -- fieldPrefix");
+
+        // Handle the result object errors that are not associated with inputs or fields
+        $allErrors = $this->result->getAllErrors();
+        $messages = [];
+        foreach ($allErrors as $key => $errors) {
+            if (strpos($key, $fieldPrefix) === 0 && is_array($errors)) {
+                foreach ($errors as $msg) {
+                    $messages[] = $msg;
+                }
+            }
+        }
+        return implode('; ', $messages);
     }
 }
