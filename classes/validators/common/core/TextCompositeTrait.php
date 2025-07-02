@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\TextCompositeUtility;
 
 /**
- * ValidationCoreTextCompositeTrait
+ * TextCompositeTrait
  *
  * Provides wrapper methods for TextCompositeUtility functionality.
  * Handles multi-step validations on user-facing text fields (e.g., usernames, emails, session codes).

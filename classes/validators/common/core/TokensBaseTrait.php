@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\TokensBaseUtility;
 
 /**
- * ValidationCoreTokensBaseTrait
+ * TokensBaseTrait
  *
  * Provides wrapper methods for TokensBaseUtility functionality.
  * Validates encoded tokens and ensures request type consistency with embedded metadata.

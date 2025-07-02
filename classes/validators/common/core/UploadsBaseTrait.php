@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\UploadsBaseUtility;
 
 /**
- * ValidationCoreUploadsBaseTrait
+ * UploadsBaseTrait
  *
  * Provides wrapper methods for UploadsBaseUtility functionality.
  * Enables consistent validation of uploaded file structure and MIME type.

@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\DateTimeCompositeUtility;
 
 /**
- * ValidationCoreDateTimeCompositeTrait
+ * DateTimeCompositeTrait
  *
  * Provides wrapper methods for DateTimeCompositeUtility functionality.
  * Enables validation of full date ranges and semester/date consistency.

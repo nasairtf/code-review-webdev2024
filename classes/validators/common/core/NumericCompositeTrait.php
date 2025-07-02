@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\NumericCompositeUtility;
 
 /**
- * ValidationCoreNumericCompositeTrait
+ * NumericCompositeTrait
  *
  * Provides wrapper methods for NumericCompositeUtility functionality.
  * Encapsulates domain-specific numeric validations (e.g., program number ranges).

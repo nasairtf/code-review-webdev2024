@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\RequiredFieldUtility;
 
 /**
- * ValidationCoreRequiredFieldTrait
+ * RequiredFieldTrait
  *
  * Provides wrapper methods for RequiredFieldUtility functionality.
  * Enables consistent handling of presence and non-empty validation across all forms.

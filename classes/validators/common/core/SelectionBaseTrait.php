@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\SelectionBaseUtility;
 
 /**
- * ValidationCoreSelectionBaseTrait
+ * SelectionBaseTrait
  *
  * Provides wrapper methods for SelectionBaseUtility functionality.
  * Enables option validation by value or key against allowed selections.

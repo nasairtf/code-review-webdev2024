@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\IntegersBaseUtility;
 
 /**
- * ValidationCoreIntegersBaseTrait
+ * IntegersBaseTrait
  *
  * Provides wrapper methods for IntegersBaseUtility functionality.
  * Supports integer validation and optional range enforcement.

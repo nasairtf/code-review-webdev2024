@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\TokenCompositeUtility;
 
 /**
- * ValidationCoreTokenCompositeTrait
+ * TokenCompositeTrait
  *
  * Provides wrapper methods for TokenCompositeUtility functionality.
  * Orchestrates token integrity, structure, and authorized request type validation.

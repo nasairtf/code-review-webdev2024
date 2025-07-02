@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\FloatsBaseUtility;
 
 /**
- * ValidationCoreFloatsBaseTrait
+ * FloatsBaseTrait
  *
  * Provides wrapper methods for FloatsBaseUtility functionality.
  * Supports float validation and optional range enforcement.

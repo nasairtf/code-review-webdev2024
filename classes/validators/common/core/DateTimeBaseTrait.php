@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\DateTimeBaseUtility;
 
 /**
- * ValidationCoreDateTimeBaseTrait
+ * DateTimeBaseTrait
  *
  * Provides wrapper methods for DateTimeBaseUtility functionality.
  * Handles atomic validation of individual date/time components and full timestamps.

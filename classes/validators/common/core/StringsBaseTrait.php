@@ -8,7 +8,7 @@ use App\validators\common\ValidationResult;
 use App\validators\common\utilities\StringsBaseUtility;
 
 /**
- * ValidationCoreStringsBaseTrait
+ * StringsBaseTrait
  *
  * Provides wrapper methods for StringsBaseUtility functionality.
  * Covers string length, formatting, and character set validation.

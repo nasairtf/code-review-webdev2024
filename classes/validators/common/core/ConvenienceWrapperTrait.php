@@ -10,7 +10,7 @@ use App\validators\common\utilities\TextCompositeUtility;
 use App\validators\common\utilities\SelectionCompositeUtility;
 
 /**
- * ValidationCoreConvenienceWrapperTrait
+ * ConvenienceWrapperTrait
  *
  * Provides convenience wrappers for application-specific validation tasks
  * that do not map directly to a single utility class. Designed to reduce
