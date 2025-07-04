@@ -20,7 +20,7 @@ use App\validators\BaseValidator;
  * @package  IRTF
  * @version  1.0.0
  */
-class FeedbackValidatorNew extends BaseValidator
+class FeedbackValidator extends BaseValidator
 {
     /**
      * Constructor for FeedbackValidator.
