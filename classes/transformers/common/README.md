@@ -1,7 +1,11 @@
 # README.md — App/transformers/common
 
 This directory contains all transformer-related classes used across the IRTF
-application, grouped into:
+application. Transformers handle the conversion of user input or context data
+into structured formats suitable for downstream processes such as validation,
+storage, or email output.
+
+Grouped into:
 
  - Utility Classes (e.g., LabelUtility, InstrumentUtility)
  - A unified API wrapper class (TransformerCore)
@@ -17,7 +21,7 @@ grouped into traits. Each trait wraps the corresponding utility class.
 
 For example:
 - Methods wrapping `LabelUtility` live in `LabelTrait`
-- Methods wrapping `TInstrumentUtility` live in `InstrumentTrait`
+- Methods wrapping `InstrumentUtility` live in `InstrumentTrait`
 
 These traits are then composed into `TransformerCore` via `use` statements.
 
@@ -33,7 +37,7 @@ a stable, consistent interface for all transformer operations across the system.
 
 ---
 
-## MAINTAINED TRAITS (as of current refactor):
+## TRAITS INCLUDED (as of current refactor):
 
 - LabelTrait
 - InstrumentTrait

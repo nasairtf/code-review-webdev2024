@@ -1,7 +1,9 @@
 # README.md — App/validators/common
 
 This directory contains all validation-related classes used across the IRTF
-application, grouped into:
+application, including utilities, traits, and orchestration layers.
+
+Grouped into:
 
  - Base Utility Classes (e.g., StringsBaseUtility, IntegersBaseUtility)
  - Composite Utility Classes (e.g., TextCompositeUtility, DateTimeCompositeUtility)
@@ -34,7 +36,7 @@ a stable, consistent interface for all validation operations across the system.
 
 ---
 
-## MAINTAINED TRAITS (as of current refactor):
+## TRAITS INCLUDED (as of current refactor):
 
 - RequiredFieldTrait
 - IntegersBaseTrait
