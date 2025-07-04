@@ -104,17 +104,6 @@ class FeedbackValidator extends BaseValidator
                 'required'      => true,
                 'required_msg'  => 'This field is required',
             ],
-            /*[
-                'field'         => 'instruments',
-                'fields'        => [
-                    'facility_instruments',
-                    'visitor_instruments',
-                ],
-                'method'        => 'validateInstruments',
-                'args'          => [$context['facility'], $context['visitor'], true],
-                'required'      => false,
-                'required_msg'  => 'At least one instrument must be selected',
-            ],*/
             [
                 'field'         => 'instruments',
                 'fields'        => ['instruments'],
