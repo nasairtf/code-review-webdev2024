@@ -14,7 +14,7 @@ use App\services\email\feedback\FeedbackService         as Email;
 use App\models\feedback\FeedbackModel                   as Model;
 use App\transformers\forms\feedback\FeedbackTransformer as Transformer;
 use App\views\forms\feedback\FeedbackView               as View;
-use App\validators\forms\feedback\FeedbackValidatorNew  as Validator;
+use App\validators\forms\feedback\FeedbackValidator     as Validator;
 
 /**
  * Controller for handling the Feedback form logic.
@@ -138,6 +138,16 @@ class FeedbackController
             // Integrity-check the hidden form fields against login-derived values
             $this->valid->validateProgramIntegrity($mergedData, $dbData['program']);
 
+            // Prepare the instrument data for validation
+            $instruments = $this->transform->transformInstruments(
+                $mergedData['facility_instruments'],
+                $mergedData['visitor_instruments'],
+                $dbData['facility'],
+                $dbData['visitor']
+            );
+            $mergedData['instruments'] = $instruments['values'] ?? [];
+            $dbData['instruments'] = $instruments['allowed'] ?? [];
+
             // Validate the form data
             $validData = $this->valid->validateData($mergedData, $dbData);
             $this->debug->debugVariable($validData, "{$debugHeading} -- validData");
@@ -146,11 +156,11 @@ class FeedbackController
             $this->debug->debug("{$debugHeading} -- Validation checks completed.");
 
             // Transform the validated data
-            #$transformedData = $this->transform->transformData($validData, $dbData);
-            #$this->debug->debugVariable($transformedData, "{$debugHeading} -- transformedData");
+            $transformedData = $this->transform->transformData($validData, $dbData);
+            $this->debug->debugVariable($transformedData, "{$debugHeading} -- transformedData");
 
             // If validation passes, proceed to processing the feedback data
-            #$this->processFormSubmit($transformedData);
+            $this->processFormSubmit($transformedData);
         } catch (ValidationException $e) {
             // Debug output
             $this->debug->debugVariable($e->getMessages(), "Validation Errors");
