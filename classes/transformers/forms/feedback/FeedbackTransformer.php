@@ -6,24 +6,36 @@ namespace App\transformers\forms\feedback;
 
 use App\core\common\DebugFactory;
 use App\core\common\AbstractDebug as Debug;
-use App\core\irtf\IrtfUtilities;
+use App\transformers\BaseTransformer;
 
-class FeedbackTransformer
+class FeedbackTransformer extends BaseTransformer
 {
-    protected $debug;
-
+    /**
+     * Constructor for FeedbackTransformer.
+     *
+     * @param Debug|null $debug Optional debugging utility instance.
+     */
     public function __construct(
         ?Debug $debug = null
     ) {
-        // Debug output
-        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
+        // Use parent class' constructor
+        parent::__construct($debug);
         $debugHeading = $this->debug->debugHeading("Transformer", "__construct");
         $this->debug->debug($debugHeading);
-
-        // Constructor completed
-        $this->debug->debug("{$debugHeading} -- Class initialisation complete.");
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
     }
 
+    /**
+     * Orchestrates transformation of validated data for backend use.
+     *
+     * Produces two parallel output formats: one structured for database
+     * insertion and another formatted for email display.
+     *
+     * @param array $data    The validated form data.
+     * @param array $context The trusted server-side context data.
+     *
+     * @return array An array containing 'db' and 'email' keys with transformed output.
+     */
     public function transformData(
         array $data,
         array $context
@@ -43,47 +55,17 @@ class FeedbackTransformer
         return ['db' => $dbData, 'email' => $emailData];
     }
 
-    public function transformInstruments(
-        array $facilityValues,
-        array $visitorValues,
-        array $allowedFacilityValues,
-        array $allowedVisitorValues
-    ): array {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Transformer", "transformInstruments");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($facilityValues, "{$debugHeading} -- facilityValues");
-        $this->debug->debugVariable($visitorValues, "{$debugHeading} -- visitorValues");
-        $this->debug->debugVariable($allowedFacilityValues, "{$debugHeading} -- allowedFacilityValues");
-        $this->debug->debugVariable($allowedVisitorValues, "{$debugHeading} -- allowedVisitorValues");
-
-        // Consolidate the selected instruments
-        $values = array_merge(
-            $facilityValues ?? [],
-            array_filter(
-                $visitorValues ?? [],
-                function ($v) {
-                    return $v !== 'none';
-                }
-            )
-        );
-
-        // Consolidate the allowed instruments
-        $allowedValues = array_merge(
-            $allowedFacilityValues ?? [],
-            array_filter(
-                $allowedVisitorValues ?? [],
-                function ($key) {
-                    return $key !== 'none';
-                },
-                ARRAY_FILTER_USE_KEY
-            )
-        );
-
-        // Return both arrays
-        return ['values' => $values ?? [], 'allowed' => $allowedValues ?? []];
-    }
-
+    /**
+     * Transforms validated input data into the structure required for database storage.
+     *
+     * Flattens composite fields and remaps input names to match expected
+     * database column schema.
+     *
+     * @param array $data    The validated form input.
+     * @param array $context The server-side trusted values for lookup.
+     *
+     * @return array Structured data ready for database persistence.
+     */
     private function transformDataForDatabase(
         array $data,
         array $context
@@ -136,6 +118,17 @@ class FeedbackTransformer
         return $dbData;
     }
 
+    /**
+     * Transforms validated input data into a human-readable format for email output.
+     *
+     * Converts selection keys and numeric codes into descriptive labels
+     * and formats timestamps as readable dates.
+     *
+     * @param array $data    The validated form input.
+     * @param array $context The server-side trusted values including label maps.
+     *
+     * @return array Structured data ready for inclusion in email body.
+     */
     private function transformDataForEmail(
         array $data,
         array $context
@@ -182,92 +175,5 @@ class FeedbackTransformer
         $email['suggestions'] = (string) ($data['comments'] ?? '');
 
         return $email;
-    }
-
-    // Protected helper methods
-
-    /**
-     * Converts a numeric rating to its descriptive text equivalent.
-     *
-     * @param int $rating The numeric rating (0-5).
-     *
-     * @return string The descriptive rating text, e.g., "Excellent".
-     */
-    protected function returnRatingText(
-        int $rating
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Transformer", "returnRatingText");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($rating, "{$debugHeading} -- rating");
-        // Method text
-        $ratingText = [
-            'N/A',
-            'Poor',
-            'Fair',
-            'Good',
-            'Very Good',
-            'Excellent',
-        ];
-        return $ratingText[$rating];
-    }
-
-    /**
-     * Converts a numeric location code to a descriptive text equivalent.
-     *
-     * @param int $location The location code (0 for "Remote", 1 for "Onsite").
-     *
-     * @return string The location description, either "Remote" or "Onsite".
-     */
-    protected function returnLocationText(
-        int $location
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Transformer", "returnLocationText");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($location, "{$debugHeading} -- location");
-        // Method text
-        $locationText = [
-            'Remote',
-            'Onsite',
-        ];
-        return $locationText[$location];
-    }
-
-    /**
-     * Retrieves the descriptive names for selected items and returns them as a comma-separated string.
-     *
-     * Maps each key in the options array to its corresponding value in the allowed
-     * array, then concatenates them into a single comma-separated string.
-     *
-     * @param array $options Selected option keys.
-     * @param array $allowed Associative array of allowed options with keys and names.
-     *
-     * @return string A comma-separated list of names for the selected options.
-     */
-    protected function returnSelectionText(
-        array $options,
-        array $allowed
-    ): string {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Transformer", "returnSelectionText");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($options, "{$debugHeading} -- options");
-        $this->debug->debugVariable($allowed, "{$debugHeading} -- allowed");
-        // Method text
-        return implode(
-            ', ',
-            array_map(
-                [IrtfUtilities::class, 'escape'],
-                array_intersect_key($allowed, array_flip($options))
-            )
-        );
-    }
-
-    protected function returnTextDate(
-        int $timestamp,
-        string $format = 'M d, Y'
-    ): string {
-        return date($format, $timestamp);
     }
 }
