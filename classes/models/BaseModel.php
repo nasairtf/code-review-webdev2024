@@ -55,7 +55,7 @@ abstract class BaseModel
     public function mergeNewDataWithDefaults(array $defaults, array $submitted): array
     {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Model", "mergeNewDataWithDefaults");
+        $debugHeading = $this->debug->debugHeading("BaseModel", "mergeNewDataWithDefaults");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($defaults, "{$debugHeading} -- defaults");
         $this->debug->debugVariable($submitted, "{$debugHeading} -- submitted");
