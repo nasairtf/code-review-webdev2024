@@ -13,7 +13,7 @@ namespace App\transformers\common;
  * Mirrors the architectural role of AbstractValidator, but should only be
  * implemented if needed—avoid introducing premature abstraction.
  */
-class AbstractTransformer
+abstract class AbstractTransformer
 {
     // Intentionally left empty as a structural placeholder
 }
