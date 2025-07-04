@@ -17,8 +17,8 @@ operations. To reduce file size and improve maintainability, its methods are
 grouped into traits. Each trait wraps the corresponding utility class.
 
 For example:
-- Methods wrapping `TextCompositeUtility` live in `ValidationCoreTextCompositeTrait`
-- Methods wrapping `TokensBaseUtility` live in `ValidationCoreTokensBaseTrait`
+- Methods wrapping `TextCompositeUtility` live in `TextCompositeTrait`
+- Methods wrapping `TokensBaseUtility` live in `TokensBaseTrait`
 
 These traits are then composed into `ValidationCore` via `use` statements.
 
@@ -27,7 +27,7 @@ These traits are then composed into `ValidationCore` via `use` statements.
 ## DEVELOPMENT NOTE
 
 If you add a new method to any *Utility class*, you MUST also add a corresponding
-wrapper method to the appropriate *ValidationCoreXXXTrait* file.
+wrapper method to the appropriate ValidationCore *XXXTrait* file.
 
 This ensures that the `ValidationCore` class stays up-to-date and provides
 a stable, consistent interface for all validation operations across the system.
@@ -36,17 +36,17 @@ a stable, consistent interface for all validation operations across the system.
 
 ## MAINTAINED TRAITS (as of current refactor):
 
-- ValidationCoreRequiredFieldTrait
-- ValidationCoreIntegersBaseTrait
-- ValidationCoreFloatsBaseTrait
-- ValidationCoreStringsBaseTrait
-- ValidationCoreSelectionBaseTrait
-- ValidationCoreDateTimeBaseTrait
-- ValidationCoreUploadsBaseTrait
-- ValidationCoreTokensBaseTrait
-- ValidationCoreNumericCompositeTrait
-- ValidationCoreTextCompositeTrait
-- ValidationCoreSelectionCompositeTrait
-- ValidationCoreDateTimeCompositeTrait
-- ValidationCoreTokenCompositeTrait
-- ValidationCoreConvenienceWrapperTrait
+- RequiredFieldTrait
+- IntegersBaseTrait
+- FloatsBaseTrait
+- StringsBaseTrait
+- SelectionBaseTrait
+- DateTimeBaseTrait
+- UploadsBaseTrait
+- TokensBaseTrait
+- NumericCompositeTrait
+- TextCompositeTrait
+- SelectionCompositeTrait
+- DateTimeCompositeTrait
+- TokenCompositeTrait
+- ConvenienceWrapperTrait
