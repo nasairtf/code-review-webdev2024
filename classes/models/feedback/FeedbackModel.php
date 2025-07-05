@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\models\feedback;
 
-use App\core\common\DebugFactory;
 use App\core\common\AbstractDebug                                  as Debug;
 use App\core\irtf\IrtfUtilities;
+use App\models\BaseModel;
 use App\services\database\troublelog\read\EngProgramService        as EngProgramServiceRead;
 use App\services\database\troublelog\read\HardwareService          as HardwareServiceRead;
 use App\services\database\troublelog\read\ObsAppService            as ObsAppServiceRead;
@@ -27,9 +27,8 @@ use App\services\database\feedback\write\SupportService            as SupportSer
  * @version  1.0.0
  */
 
-class FeedbackModel
+class FeedbackModel extends BaseModel
 {
-    private $debug;
     // READ services
     private $programRead;
     private $hardwareRead;
@@ -46,16 +45,19 @@ class FeedbackModel
     public function __construct(
         ?Debug $debug = null
     ) {
-        // Debug output
-        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
+        // Use parent class' constructor
+        parent::__construct($debug);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
+
         // READ services
         $this->hardwareRead = new HardwareServiceRead($this->debug->isDebugMode());
         $this->operatorRead = new OperatorServiceRead($this->debug->isDebugMode());
         $this->supportRead = new SupportAstronomerServiceRead($this->debug->isDebugMode());
         $this->programRead = new ObsAppServiceRead($this->debug->isDebugMode());
         $this->engProgRead = new EngProgramServiceRead($this->debug->isDebugMode());
+
         // WRITE services
         $this->feedbackWrite = new FeedbackServiceWrite($this->debug->isDebugMode());
         $this->instrumentWrite = new InstrumentServiceWrite($this->debug->isDebugMode());
@@ -68,6 +70,76 @@ class FeedbackModel
             $this->operatorWrite,                // App\services\database\feedback\write\OperatorService
             $this->supportWrite                  // App\services\database\feedback\write\SupportService
         );
+
+        // Class initialisation complete
+        $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
+    }
+
+    public function initializeDefaultData(?array $data = null): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Model", "initializeDefaultData");
+        $this->debug->debug($debugHeading);
+        // Calcualte necessary fields
+        $year = (int) date('Y');
+        $month = (int) date('m');
+        $day = (int) date('j');
+        $date = IrtfUtilities::returnUnixDate($month, $day, $year);
+        $semester = IrtfUtilities::returnSemester($month, $day, $year);
+        $program = $this->returnProgramFromLogin();
+        $num = (int) ltrim(substr($program, -3), '0');
+        // Return the data
+        return [
+            // Basic info
+            'respondent' => '',                 // Respondent Name
+            'email' => '',                      // E-mail Address
+
+            // Program Information
+            'semester' => $semester,            // Semester from current date
+            'program' => $program,              // Program Number
+            'a' => $program,                    // Program Number
+            'p' => $num,                        // Proposal Number
+            'i' => 0,                           // Program ObsApp_id
+            'n' => '',                          // Program PI Last Name
+            's' => '',                          // Program Semester
+
+            // Observing Dates
+            'startyear' => $year,               // Start Date - Year
+            'startmonth' => $month,             // Start Date - Month
+            'startday' => $day,                 // Start Date - Day
+            'start_date' => $date,              // Start Date
+            'endyear' => $year,                 // End Date - Year
+            'endmonth' => $month,               // End Date - Month
+            'endday' => $day,                   // End Date - Day
+            'end_date' => $date,                // End Date
+
+            // Support Staff
+            'support_staff' => [],              // Support Astronomer(s)
+
+            // Telescope Operators
+            'operator_staff' => [],             // Telescope Operator(s)
+
+            // Instruments
+            'facility_instruments' => [],       // Facility instruments used during run
+            'visitor_instruments' => ['none'],  // Visitor instruments used during run
+
+            // Technical Feedback
+            'location' => 0,                    // Observing Location
+            'experience' => 0,                  // Experience Rating
+            'technical' => '',                  // Technical Commentary
+
+            // Personnel Feedback
+            'scientificstaff' => 0,             // Scientific Staff Rating
+            'operators' => 0,                   // Operators Rating
+            'daycrew' => 0,                     // Daycrew Rating
+            'personnel' => '',                  // Personnel Commentary
+
+            // Scientific Results
+            'scientific' => '',                 // Scientific Results Commentary
+
+            // Suggestions
+            'comments' => '',                   // Comments and Suggestions
+        ];
     }
 
     public function saveFeedback(array $validData): bool
@@ -241,73 +313,6 @@ class FeedbackModel
             ];
         }
         return $list;
-    }
-
-    public function initializeDefaultFormData(): array
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Model", "initializeDefaultFormData");
-        $this->debug->debug($debugHeading);
-        // Calcualte necessary fields
-        $year = (int) date('Y');
-        $month = (int) date('m');
-        $day = (int) date('j');
-        $date = IrtfUtilities::returnUnixDate($month, $day, $year);
-        $semester = IrtfUtilities::returnSemester($month, $day, $year);
-        $program = $this->returnProgramFromLogin();
-        $num = (int) ltrim(substr($program, -3), '0');
-        // Return the data
-        return [
-            // Basic info
-            'respondent' => '',                 // Respondent Name
-            'email' => '',                      // E-mail Address
-
-            // Program Information
-            'semester' => $semester,            // Semester from current date
-            'program' => $program,              // Program Number
-            'a' => $program,                    // Program Number
-            'p' => $num,                        // Proposal Number
-            'i' => 0,                           // Program ObsApp_id
-            'n' => '',                          // Program PI Last Name
-            's' => '',                          // Program Semester
-
-            // Observing Dates
-            'startyear' => $year,               // Start Date - Year
-            'startmonth' => $month,             // Start Date - Month
-            'startday' => $day,                 // Start Date - Day
-            'start_date' => $date,              // Start Date
-            'endyear' => $year,                 // End Date - Year
-            'endmonth' => $month,               // End Date - Month
-            'endday' => $day,                   // End Date - Day
-            'end_date' => $date,                // End Date
-
-            // Support Staff
-            'support_staff' => [],              // Support Astronomer(s)
-
-            // Telescope Operators
-            'operator_staff' => [],             // Telescope Operator(s)
-
-            // Instruments
-            'facility_instruments' => [],       // Facility instruments used during run
-            'visitor_instruments' => ['none'],  // Visitor instruments used during run
-
-            // Technical Feedback
-            'location' => 0,                    // Observing Location
-            'experience' => 0,                  // Experience Rating
-            'technical' => '',                  // Technical Commentary
-
-            // Personnel Feedback
-            'scientificstaff' => 0,             // Scientific Staff Rating
-            'operators' => 0,                   // Operators Rating
-            'daycrew' => 0,                     // Daycrew Rating
-            'personnel' => '',                  // Personnel Commentary
-
-            // Scientific Results
-            'scientific' => '',                 // Scientific Results Commentary
-
-            // Suggestions
-            'comments' => '',                   // Comments and Suggestions
-        ];
     }
 
     /**

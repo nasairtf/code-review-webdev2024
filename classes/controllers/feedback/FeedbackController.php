@@ -13,8 +13,8 @@ use App\core\common\AbstractDebug                       as Debug;
 use App\services\email\feedback\FeedbackService         as Email;
 use App\models\feedback\FeedbackModel                   as Model;
 use App\transformers\forms\feedback\FeedbackTransformer as Transformer;
-use App\views\forms\feedback\FeedbackView               as View;
 use App\validators\forms\feedback\FeedbackValidator     as Validator;
+use App\views\forms\feedback\FeedbackView               as View;
 
 /**
  * Controller for handling the Feedback form logic.
@@ -123,11 +123,11 @@ class FeedbackController
         $this->debug->debugVariable($formData, "{$debugHeading} -- _POST");
 
         // Initialize with default structure
-        $cleanData = $this->model->initializeDefaultFormData();
+        $cleanData = $this->model->initializeDefaultData();
         $this->debug->debugVariable($cleanData, "{$debugHeading} -- cleanData");
 
         // Merge the form data into the cleanData array
-        $mergedData = $this->mergeFormDataWithDefaults($cleanData, $formData);
+        $mergedData = $this->mergeNewDataWithDefaults($cleanData, $formData);
         $this->debug->debugVariable($mergedData, "{$debugHeading} -- mergedData");
 
         try {
@@ -246,7 +246,7 @@ class FeedbackController
         $formAction = $_SERVER['PHP_SELF'];
 
         // data for the form
-        $formData = $this->model->initializeDefaultFormData();
+        $formData = $this->model->initializeDefaultData();
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
 
         // retrieve data lists
@@ -321,7 +321,7 @@ class FeedbackController
      * @param array $submitted The user-submitted data array (e.g., $_POST).
      * @return array The merged array with defaults filled where missing.
      */
-    private function mergeFormDataWithDefaults(array $defaults, array $submitted): array
+    private function mergeNewDataWithDefaults(array $defaults, array $submitted): array
     {
         // Debug output
         $debugHeading = $this->debug->debugHeading("Controller", "mergeFormDataWithDefaults");
@@ -333,7 +333,7 @@ class FeedbackController
         foreach ($submitted as $key => $value) {
             // If value is an array and exists in defaults as an array, recurse
             if (is_array($value) && isset($defaults[$key]) && is_array($defaults[$key])) {
-                $merged[$key] = $this->mergeFormDataWithDefaults($defaults[$key], $value);
+                $merged[$key] = $this->mergeNewDataWithDefaults($defaults[$key], $value);
             } else {
                 // Otherwise, use the submitted value, overriding defaults
                 $merged[$key] = $value;
