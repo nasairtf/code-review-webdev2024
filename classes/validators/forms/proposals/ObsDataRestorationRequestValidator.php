@@ -6,8 +6,8 @@ namespace App\validators\forms\proposals;
 
 use Exception;
 use App\exceptions\ValidationException;
-use App\core\common\AbstractDebug          as Debug;
-use App\validators\forms\BaseFormValidator as BaseValidator;
+use App\core\common\AbstractDebug as Debug;
+use App\validators\BaseValidator;
 
 /**
  * Validator for handling the Observer Data Restoration Request logic.
@@ -36,114 +36,101 @@ class ObsDataRestorationRequestValidator extends BaseValidator
         $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
     }
 
-    /**
-     * Validates form data submitted for schedule upload.
-     *
-     * This method validates all fields in the form data and ensures compliance
-     * with the required formats, constraints, and allowed values.
-     *
-     * @param array $form The form input data to validate.
-     *
-     * @return array An associative array containing validated data.
-     * @throws ValidationException If validation errors occur.
-     */
-    public function validateFormData(
-        array $form
-    ): array {
+    protected function getValidationPlan(array $data, array $context = []): array
+    {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Validator", "validateFormData");
+        $debugHeading = $this->debug->debugHeading("Validator", "getValidationPlan");
         $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($form, "{$debugHeading} -- form");
+        $this->debug->debugVariable($data, "{$debugHeading} -- data");
+        $this->debug->debugVariable($context, "{$debugHeading} -- context");
 
-        // Validate the form data and return the validated data array
-        $validData = $this->validateRequestData($form);
-
-        // Return array
-        return $validData;
+        $minYear = 2016;
+        $maxYear = date('Y') + 1;
+        return [
+            // Validate `reqname` field [Requestor name]
+            [
+                'field'         => 'reqname',
+                'method'        => 'validateNameField',
+                'args'          => [50],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `reqemail` field [Requestor email]
+            [
+                'field'         => 'reqemail',
+                'method'        => 'validateEmailField',
+                'args'          => [70],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `y` field [The semester year the data were taken]
+            [
+                'field'         => 'y',
+                'method'        => 'validateYear',
+                'args'          => [$minYear, $maxYear],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `s` field [The semester tag the data were taken]
+            [
+                'field'         => 's',
+                'method'        => 'validateSemesterTagField',
+                'args'          => [],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `srcprogram` field [Program the data were taken under]
+            [
+                'field'         => 'srcprogram',
+                'method'        => 'validateProgramNumberField',
+                'args'          => [$minYear, $maxYear],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `piprogram` field [PI of the program]
+            [
+                'field'         => 'piprogram',
+                'method'        => 'validateNameField',
+                'args'          => [50],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `obsinstr` field [Instruments used to take the data]
+            [
+                'field'         => 'obsinstr',
+                'method'        => 'validateNameField',
+                'args'          => [50],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `reldetails` field [Any other details that might be relevant or helpful
+            [
+                'field'         => 'reldetails',
+                'method'        => 'validateLongTextField',
+                'args'          => [500],
+                'required'      => false,
+                'required_msg'  => '',
+            ],
+        ];
     }
 
-    private function validateRequestData(
-        array $form
-    ): array {
+    protected function formatValidData(array $normalizedPlan): array
+    {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Validator", "validateRequestData");
+        $debugHeading = $this->debug->debugHeading("Validator", "formatValidData");
         $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($form, "{$debugHeading} -- form");
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        // Build the validated data array
-        $valid = [];
+        return $this->formatStdValidData($normalizedPlan);
+    }
 
-        // Validate `reqname` field [Requestor name]
-        $valid['reqname'] = $this->validateName(
-            $form['reqname'] ?? '',
-            'reqname',
-            true,
-            50,
-            'Requestor name'
-        );
+    protected function formatErrors(array $normalizedPlan): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "formatErrors");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        // Validate `reqemail` field [Requestor email]
-        $valid['reqemail'] = $this->validateEmail(
-            $form['reqemail'] ?? '',
-            'reqemail',
-            true
-        );
-
-        // Validate `y` field [The semester year the data were taken]
-        $valid['y'] = $this->validateYear(
-            $form['y'] ?? '',
-            'y',
-            true,
-            2016,
-            intval(date('Y')) + 1
-        );
-
-        // Validate `s` field [The semester tag the data were taken]
-        $valid['s'] = $this->validateSemester(
-            $form['s'] ?? '',
-            's',
-            true
-        );
-
-        // Validate `srcprogram` field [Program the data were taken under]
-        $valid['srcprogram'] = $this->validateProgramNumber(
-            $form['srcprogram'] ?? '',
-            'srcprogram',
-            true
-        );
-
-        // Validate `piprogram` field [PI of the program]
-        $valid['piprogram'] = $this->validateName(
-            $form['piprogram'] ?? '',
-            'piprogram',
-            true,
-            50,
-            'Program PI'
-        );
-
-        // Validate `obsinstr` field [Instruments used to take the data]
-        $valid['obsinstr'] = $this->validateName(
-            $form['obsinstr'] ?? '',
-            'obsinstr',
-            true,
-            50,
-            'Instruments'
-        );
-
-        // Validate `reldetails` field [Any other details that might be relevant or helpful
-        $valid['reldetails'] = $this->validateLongTextField(
-            $form['reldetails'] ?? '',
-            500,
-            'reldetails',
-            false
-        );
-
-        // Check for validation errors and throw an exception if any are found
-        if (!empty($this->errors)) {
-            throw new ValidationException("Validation errors occurred.", $this->errors);
-        }
-
-        // Return the validated data
-        return $valid;
+        return $this->formatStdErrors($normalizedPlan);
     }
 }

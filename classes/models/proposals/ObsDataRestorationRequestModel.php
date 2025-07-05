@@ -6,7 +6,7 @@ namespace App\models\proposals;
 
 use Exception;
 use App\core\common\AbstractDebug as Debug;
-use App\models\BaseModel          as BaseModel;
+use App\models\BaseModel;
 
 /**
  * Model for handling the Observer Data Restoration Request logic.
