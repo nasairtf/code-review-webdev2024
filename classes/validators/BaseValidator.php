@@ -334,4 +334,60 @@ abstract class BaseValidator extends AbstractValidator
         }
         return implode('; ', $messages);
     }
+
+    /**
+     * Default formatter: extracts validated values from result object.
+     *
+     * @param array $plan The normalized validation plan.
+     *
+     * @return array Associative array of field => validated value.
+     */
+    protected function formatStdValidData(
+        array $plan
+    ): array {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseValidator", "formatStdValidData");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($plan, "{$debugHeading} -- plan");
+
+        $formatted = [];
+        foreach ($plan as $step) {
+            // Extract the field's name
+            $field = $step['field'];
+            // Retrieve the field's value(s) stored in the result object
+            $formatted[$field] = $this->result->getFieldValue($field);
+            $this->debug->debugVariable($formatted[$field], "{$debugHeading} -- formatted[$field]");
+        }
+        return $formatted;
+    }
+
+    /**
+     * Default formatter: extracts first validation error per field.
+     *
+     * @param array $plan The normalized validation plan.
+     *
+     * @return array Associative array of field => error message.
+     */
+    protected function formatStdErrors(
+        array $plan
+    ): array {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("BaseValidator", "formatStdErrors");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($plan, "{$debugHeading} -- plan");
+
+        $formatted = [];
+        foreach ($plan as $step) {
+            // Extract the field's name
+            $field = $step['field'];
+            // Retrieve the field's error(s) stored in the result object
+            $errors = $this->result->getFieldErrors($field);
+            // Only add the field if there are real errors for it
+            if (!empty($errors) && isset($errors[0])) {
+                $formatted[$field] = $errors[0];
+                $this->debug->debugVariable($formatted[$field], "{$debugHeading} -- formatted[$field]");
+            }
+        }
+        return $formatted;
+    }
 }
