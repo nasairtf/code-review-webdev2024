@@ -506,7 +506,7 @@ class LoginController
 
         // Logic to generate the first page form
         $formAction = $this->validateFormAction();
-        $formData = $formData ?: $this->model->initializeDefaultFormData();
+        $formData = $formData ?: $this->model->initializeDefaultData();
         $formData['instructions'] = $this->instructions;
 
         // Call the view to render the form

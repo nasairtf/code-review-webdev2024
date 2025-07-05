@@ -100,19 +100,7 @@ class LoginValidator extends BaseValidator
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        $formatted = [];
-        foreach ($normalizedPlan as $step) {
-            // Extract the field's name
-            $field = $step['field'];
-            // Retrieve the field's value(s) stored in the result object
-            $value = $this->result->getFieldValue($field);
-            // ***** do some magic formatting shit here *****
-            $formattedValid = $value;
-            // Store the formatted and validated field data
-            $formatted[$field] = $formattedValid;
-            $this->debug->debugVariable($formatted[$field], "{$debugHeading} -- formatted[$field]");
-        }
-        return $formatted;
+        return $this->formatStdValidData($normalizedPlan);
     }
 
     /**
@@ -131,18 +119,6 @@ class LoginValidator extends BaseValidator
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        $formatted = [];
-        foreach ($normalizedPlan as $step) {
-            // Extract the field's name
-            $field = $step['field'];
-            // Retrieve the field's error(s) stored in the result object
-            $error = $this->result->getFieldErrors($field);
-            // ***** do some magic formatting shit here *****
-            $formattedError = $error[0];
-            // Store the formatted and validated field data
-            $formatted[$field] = $formattedError;
-            $this->debug->debugVariable($formatted[$field], "{$debugHeading} -- formatted[$field]");
-        }
-        return $formatted;
+        return $this->formatStdErrors($normalizedPlan);
     }
 }
