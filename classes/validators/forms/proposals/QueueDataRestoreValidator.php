@@ -6,8 +6,8 @@ namespace App\validators\forms\proposals;
 
 use Exception;
 use App\exceptions\ValidationException;
-use App\core\common\AbstractDebug          as Debug;
-use App\validators\forms\BaseFormValidator as BaseValidator;
+use App\core\common\AbstractDebug as Debug;
+use App\validators\BaseValidator;
 
 /**
  * Validator for handling the Queue Observer Data Restoration logic.
@@ -38,93 +38,85 @@ class QueueDataRestoreValidator extends BaseValidator
         $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
     }
 
-    /**
-     * Validates form data submitted for schedule upload.
-     *
-     * This method validates all fields in the form data and ensures compliance
-     * with the required formats, constraints, and allowed values.
-     *
-     * @param array $form The form input data to validate.
-     *
-     * @return array An associative array containing validated data.
-     * @throws ValidationException If validation errors occur.
-     */
-    public function validateFormData(
-        array $form
-    ): array {
+    protected function getValidationPlan(array $data, array $context = []): array
+    {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Validator", "validateFormData");
+        $debugHeading = $this->debug->debugHeading("Validator", "getValidationPlan");
         $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($form, "{$debugHeading} -- form");
+        $this->debug->debugVariable($data, "{$debugHeading} -- data");
+        $this->debug->debugVariable($context, "{$debugHeading} -- context");
 
-        // Validate the form data and return the validated data array
-        $validData = $this->validateRestoreData($form);
-
-        // Return array
-        return $validData;
+        $minYear = 2000;
+        $maxYear = date('Y') + 1;
+        return [
+            // Validate `usersrc` field [Source Program Username]
+            [
+                'field'         => 'usersrc',
+                'method'        => 'validateProgramNumberField',
+                'args'          => [$minYear, $maxYear],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `userdst` field [Destination Program Username]
+            [
+                'field'         => 'userdst',
+                'method'        => 'validateProgramNumberField',
+                'args'          => [$minYear, $maxYear],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `codesrc` field [Source Program Code]
+            [
+                'field'         => 'codesrc',
+                'method'        => 'validateSessionCodeField',
+                'args'          => [],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `codedst` field [Destination Program Code]
+            [
+                'field'         => 'codedst',
+                'method'        => 'validateSessionCodeField',
+                'args'          => [],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `test` field [Restore data in test mode]
+            [
+                'field'         => 'test',
+                'method'        => 'validateOnOffRadio',
+                'args'          => [],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            // Validate `delete` field [Restore data in delete mode]
+            [
+                'field'         => 'delete',
+                'method'        => 'validateOnOffRadio',
+                'args'          => [],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+        ];
     }
 
-    private function validateRestoreData(
-        array $form
-    ): array {
+    protected function formatValidData(array $normalizedPlan): array
+    {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Validator", "validateRestoreData");
+        $debugHeading = $this->debug->debugHeading("Validator", "formatValidData");
         $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($form, "{$debugHeading} -- form");
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        // Build the validated data array for database
-        $valid = [];
+        return $this->formatStdValidData($normalizedPlan);
+    }
 
-        // Validate `usersrc` field [Source Program Username]
-        $valid['usersrc'] = $this->validateProgramNumber(
-            $form['usersrc'] ?? '',
-            'usersrc',
-            true
-        );
+    protected function formatErrors(array $normalizedPlan): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "formatErrors");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        // Validate `userdst` field [Destination Program Username]
-        $valid['userdst'] = $this->validateProgramNumber(
-            $form['userdst'] ?? '',
-            'userdst',
-            true
-        );
-
-        // Validate `codesrc` field [Source Program Code]
-        $valid['codesrc'] = $this->validateProgramSession(
-            $form['codesrc'] ?? '',
-            'codesrc',
-            true
-        );
-        //$valid['codesrc'] = $form['codesrc'] ?? '';
-
-        // Validate `codedst` field [Destination Program Code]
-        $valid['codedst'] = $this->validateProgramSession(
-            $form['codedst'] ?? '',
-            'codedst',
-            true
-        );
-        //$valid['codedst'] = $form['codedst'] ?? '';
-
-        // Validate `test` field [Restore data in test mode]
-        $valid['test'] = $this->validateOnOffRadio(
-            (int) $form['test'],
-            'test',
-            true
-        );
-
-        // Validate `delete` field [Restore data in delete mode]
-        $valid['delete'] = $this->validateOnOffRadio(
-            (int) $form['delete'],
-            'delete',
-            true
-        );
-
-        // Check for validation errors and throw an exception if any are found
-        if (!empty($this->errors)) {
-            throw new ValidationException("Validation errors occurred.", $this->errors);
-        }
-
-        // Return the validated data
-        return $valid;
+        return $this->formatStdErrors($normalizedPlan);
     }
 }

@@ -108,7 +108,7 @@ class QueueDataRestoreController
             }
 
             // Validate the form data
-            $validData = $this->valid->validateFormData($mergedData);
+            $validData = $this->valid->validateData($mergedData);
             $this->debug->debugVariable($validData, "{$debugHeading} -- validData");
 
             // If validation passes, proceed to processing the data
