@@ -42,6 +42,8 @@ class LoginValidator extends BaseValidator
         $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
     }
 
+    // Abstract methods: getValidationPlan(), formatValidData(), formatErrors()
+
     /**
      * Defines the validation plan for the login form.
      *

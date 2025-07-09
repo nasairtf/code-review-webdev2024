@@ -60,7 +60,7 @@ abstract class BasePageView extends BaseView
         $this->debug->debug("{$debugHeading} -- Parent View initialisation complete.");
     }
 
-    // Abstract methods: getPageContents()
+    // Abstract method: getPageContents()
 
     /**
      * Abstract method to generate the main page content for a form.

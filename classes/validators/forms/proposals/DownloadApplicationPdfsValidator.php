@@ -7,8 +7,8 @@ namespace App\validators\forms\proposals;
 use Exception;
 use App\exceptions\ValidationException;
 use App\core\irtf\IrtfUtilities;
-use App\core\common\AbstractDebug          as Debug;
-use App\validators\forms\BaseFormValidator as BaseValidator;
+use App\core\common\AbstractDebug as Debug;
+use App\validators\BaseValidator;
 
 /**
  * Validator for handling the Download Application Pdfs logic.
@@ -38,6 +38,8 @@ class DownloadApplicationPdfsValidator extends BaseValidator
         // Class initialisation complete
         $this->debug->debug("{$debugHeading} -- Validator initialisation complete.");
     }
+
+    // Abstract methods: getValidationPlan(), formatValidData(), formatErrors()
 
     public function validateFormData(
         array $form

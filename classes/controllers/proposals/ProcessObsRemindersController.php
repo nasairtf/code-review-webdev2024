@@ -104,7 +104,7 @@ class ProcessObsRemindersController
         $this->debug->debugVariable($formData, "{$debugHeading} -- _POST");
 
         // Merge the file data into the form data array
-        $initData = $this->model->initializeDefaultFormData();
+        $initData = $this->model->initializeDefaultData();
         $this->debug->debugVariable($initData, "{$debugHeading} -- initData");
 
         try {
@@ -168,7 +168,7 @@ class ProcessObsRemindersController
         $dbData = [];
 
         // data for the form
-        $formData = $this->model->initializeDefaultFormData();
+        $formData = $this->model->initializeDefaultData();
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
 
         // Call the view to render the initial form

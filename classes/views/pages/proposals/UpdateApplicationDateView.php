@@ -48,7 +48,7 @@ class UpdateApplicationDateView extends BaseView
         $this->debug->debug("{$debugHeading} -- View initialisation complete.");
     }
 
-    // Abstract methods: getPageContents()
+    // Abstract method: getPageContents()
 
     /**
      * Generates the main page content for the update form.

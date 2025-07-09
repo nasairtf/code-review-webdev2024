@@ -36,6 +36,8 @@ class FeedbackValidator extends BaseValidator
         $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
     }
 
+    // Abstract methods: getValidationPlan(), formatValidData(), formatErrors()
+
     /**
      * Returns the validation plan defining each field’s validation strategy.
      *

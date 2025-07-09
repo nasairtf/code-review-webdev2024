@@ -61,6 +61,8 @@ abstract class BaseValidator extends AbstractValidator
         $this->debug->debug("{$debugHeading} -- Parent Validator initialisation complete.");
     }
 
+    // Abstract method: validateData()
+
     /**
      * Main execution method: validates input data against a field plan.
      *
@@ -125,6 +127,8 @@ abstract class BaseValidator extends AbstractValidator
         // Return formatted validated data array
         return $this->formatValidData($normalizedPlan);
     }
+
+    // Helper methods
 
     /**
      * Validates and normalizes the raw validation plan structure.

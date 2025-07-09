@@ -21,6 +21,8 @@ namespace App\validators\common;
  */
 abstract class AbstractValidator
 {
+    // Abstract methods: validateData(), getValidationPlan(), formatValidData(), formatErrors()
+
     /**
      * Entry point for validation execution.
      *

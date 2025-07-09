@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\models\proposals;
 
-use App\core\common\DebugFactory;
 use App\core\common\AbstractDebug as Debug;
+use App\models\BaseModel;
 
 /**
  * Model for updating the application date.
@@ -16,9 +16,8 @@ use App\core\common\AbstractDebug as Debug;
  * @version  1.0.0
  */
 
-class ProcessObsRemindersModel
+class ProcessObsRemindersModel extends BaseModel
 {
-    private $debug;
     private $dbRead;
     private $dbWrite;
 
@@ -27,10 +26,11 @@ class ProcessObsRemindersModel
         ?DbRead $dbRead = null,
         ?DbWrite $dbWrite = null
     ) {
-        // Debug output
-        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
+        // Use parent class' constructor
+        parent::__construct($debug);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
 
         // Initialise the additional classes needed by this model
         //$this->dbRead = $dbRead ?? new DbRead($this->debug->isDebugMode());
@@ -41,10 +41,12 @@ class ProcessObsRemindersModel
         $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
     }
 
-    public function initializeDefaultFormData(): array
+    // Abstract method: initializeDefaultData()
+
+    public function initializeDefaultData(?array $data = null): array
     {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Model", "initializeDefaultFormData");
+        $debugHeading = $this->debug->debugHeading("Model", "initializeDefaultData");
         $this->debug->debug($debugHeading);
         // Calcualte necessary fields
         // Return the data

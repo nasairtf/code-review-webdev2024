@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\models\proposals;
 
-use App\core\common\DebugFactory;
 use App\core\common\AbstractDebug                        as Debug;
+use App\models\BaseModel;
 use App\services\database\troublelog\read\ObsAppService  as DbRead;
 use App\services\database\troublelog\write\ObsAppService as DbWrite;
 
@@ -18,9 +18,8 @@ use App\services\database\troublelog\write\ObsAppService as DbWrite;
  * @version  1.0.0
  */
 
-class UpdateApplicationDateModel
+class UpdateApplicationDateModel extends BaseModel
 {
-    private $debug;
     private $dbRead;
     private $dbWrite;
 
@@ -29,10 +28,11 @@ class UpdateApplicationDateModel
         ?DbRead $dbRead = null,
         ?DbWrite $dbWrite = null
     ) {
-        // Debug output
-        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
+        // Use parent class' constructor
+        parent::__construct($debug);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
 
         // Initialise the additional classes needed by this model
         $this->dbRead = $dbRead ?? new DbRead($this->debug->isDebugMode());
@@ -41,6 +41,14 @@ class UpdateApplicationDateModel
 
         // Class initialisation complete
         $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
+    }
+
+    // Abstract method: initializeDefaultData()
+
+    public function initializeDefaultData(?array $data = null): array
+    {
+        // stub
+        return [];
     }
 
     /**

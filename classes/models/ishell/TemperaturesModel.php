@@ -51,6 +51,8 @@ class TemperaturesModel extends BaseModel
         $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
     }
 
+    // Abstract method: initializeDefaultData()
+
     public function initializeDefaultData(?array $data = null): array
     {
         // stub

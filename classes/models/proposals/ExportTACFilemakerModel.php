@@ -4,20 +4,10 @@ declare(strict_types=1);
 
 namespace App\models\proposals;
 
-use Exception;
 use App\core\common\AbstractDebug as Debug;
 use App\models\BaseModel;
 
-/**
- * Model for handling the Observer Data Restoration Request logic.
- *
- * @category Models
- * @package  IRTF
- * @author   Miranda Hawarden-Ogata
- * @version  1.0.0
- */
-
-class ObsDataRestorationRequestModel extends BaseModel
+class ExportTACFilemakerModel extends BaseModel
 {
     public function __construct(
         ?Debug $debug = null
@@ -42,15 +32,6 @@ class ObsDataRestorationRequestModel extends BaseModel
         $this->debug->debugVariable($data, "{$debugHeading} -- data");
 
         // Return the data
-        return [
-            'reqname'    => '',
-            'reqemail'   => '',
-            'y'          => date('Y'),
-            's'          => '',
-            'srcprogram' => '',
-            'piprogram'  => '',
-            'obsinstr'   => '',
-            'reldetails' => '',
-        ];
+        return [];
     }
 }

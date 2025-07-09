@@ -94,6 +94,8 @@ abstract class BaseFormView extends BaseView
         int $pad = 0
     ): string;
 
+    // Public methods: renderFormPage(), renderFormWithErrors()
+
     /**
      * Renders the main form page.
      *
@@ -210,6 +212,8 @@ abstract class BaseFormView extends BaseView
             )
         );
     }
+
+    // Helper methods: getErrorsBlock(), getContentsForm()
 
     /**
      * Generates the HTML block for displaying validation error messages.

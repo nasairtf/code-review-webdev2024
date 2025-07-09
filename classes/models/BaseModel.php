@@ -40,7 +40,7 @@ abstract class BaseModel
         $this->debug->debug("{$debugHeading} -- Parent Model initialisation complete.");
     }
 
-    // Abstract methods: initializeDefaultData()
+    // Abstract method: initializeDefaultData()
 
     abstract public function initializeDefaultData(?array $data = null): array;
 

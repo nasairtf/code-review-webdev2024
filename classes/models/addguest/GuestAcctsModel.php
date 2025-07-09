@@ -7,7 +7,7 @@ namespace App\models\addguest;
 use Exception;
 use App\exceptions\ExecutionException;
 use App\core\common\AbstractDebug as Debug;
-use App\models\BaseModel          as BaseModel;
+use App\models\BaseModel;
 use App\legacy\traits\LegacyAddguestTrait;
 
 /**
@@ -44,6 +44,8 @@ class GuestAcctsModel extends BaseModel
         // Class initialisation complete
         $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
     }
+
+    // Abstract method: initializeDefaultData()
 
     public function initializeDefaultData(?array $data = null): array
     {

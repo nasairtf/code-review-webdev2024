@@ -63,6 +63,8 @@ class LoginModel extends BaseModel
         $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
     }
 
+    // Abstract method: initializeDefaultData()
+
     /**
      * Initializes default values for login form fields.
      *
