@@ -11,14 +11,17 @@ review_comment_severity:
   critical: true
   high: true
   medium: true
-  low: false
+  low: true
 
 code_review:
   disable: false
-  comment_severity_threshold: MEDIUM
+  comment_severity_threshold: LOW
   max_review_comments: -1
 
 pull_request_opened:
   summary: true
   code_review: true
-  help: false
+  help: true
+
+metadata:
+  styleguide_path: ../styleguide.md
