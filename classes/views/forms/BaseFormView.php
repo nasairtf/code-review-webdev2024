@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\views\forms;
 
 use App\exceptions\HtmlBuilderException;
-use App\core\common\CustomDebug           as Debug;
+use App\core\common\AbstractDebug         as Debug;
 use App\views\BaseView                    as BaseView;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
@@ -93,6 +93,8 @@ abstract class BaseFormView extends BaseView
         array $formData = [],
         int $pad = 0
     ): string;
+
+    // Public methods: renderFormPage(), renderFormWithErrors()
 
     /**
      * Renders the main form page.
@@ -210,6 +212,8 @@ abstract class BaseFormView extends BaseView
             )
         );
     }
+
+    // Helper methods: getErrorsBlock(), getContentsForm()
 
     /**
      * Generates the HTML block for displaying validation error messages.

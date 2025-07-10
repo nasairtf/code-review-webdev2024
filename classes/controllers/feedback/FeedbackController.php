@@ -8,11 +8,13 @@ use Exception;
 use App\exceptions\ValidationException;
 use App\core\traits\LoginHelperTrait;
 use App\core\common\Config;
-use App\core\common\CustomDebug                     as Debug;
-use App\services\email\feedback\FeedbackService     as Email;
-use App\models\feedback\FeedbackModel               as Model;
-use App\views\forms\feedback\FeedbackView           as View;
-use App\validators\forms\feedback\FeedbackValidator as Validator;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                       as Debug;
+use App\services\email\feedback\FeedbackService         as Email;
+use App\models\feedback\FeedbackModel                   as Model;
+use App\transformers\forms\feedback\FeedbackTransformer as Transformer;
+use App\validators\forms\feedback\FeedbackValidator     as Validator;
+use App\views\forms\feedback\FeedbackView               as View;
 
 /**
  * Controller for handling the Feedback form logic.
@@ -32,6 +34,7 @@ class FeedbackController
     private $model;
     private $view;
     private $valid;
+    private $transform;
     private $email;
     private $redirect;
 
@@ -51,13 +54,14 @@ class FeedbackController
         ?Model $model = null,
         ?View $view = null,
         ?Validator $valid = null,
+        ?Transformer $transform = null,
         ?Email $email = null
     ) {
         // Start the session for the login form
         $this->sessionSetup();
 
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
 
@@ -75,7 +79,8 @@ class FeedbackController
         $this->model = $model ?? new Model($this->debug);
         $this->view = $view ?? new View($this->formatHtml, $this->debug);
         $this->valid = $valid ?? new Validator($this->debug);
-        $this->debug->debug("{$debugHeading} -- Model, View, Validator classes successfully initialised.");
+        $this->transform = $transform ?? new Transformer($this->debug);
+        $this->debug->debug("{$debugHeading} -- Model, View, Validator, Transformer classes successfully initialised.");
 
         // Initialise the additional classes needed by this controller
         $this->email = $email ?? new Email($this->debug->isDebugMode());
@@ -118,11 +123,11 @@ class FeedbackController
         $this->debug->debugVariable($formData, "{$debugHeading} -- _POST");
 
         // Initialize with default structure
-        $cleanData = $this->model->initializeDefaultFormData();
+        $cleanData = $this->model->initializeDefaultData();
         $this->debug->debugVariable($cleanData, "{$debugHeading} -- cleanData");
 
         // Merge the form data into the cleanData array
-        $mergedData = $this->mergeFormDataWithDefaults($cleanData, $formData);
+        $mergedData = $this->mergeNewDataWithDefaults($cleanData, $formData);
         $this->debug->debugVariable($mergedData, "{$debugHeading} -- mergedData");
 
         try {
@@ -130,13 +135,32 @@ class FeedbackController
             $dbData = $this->model->fetchFormLists($cleanData['program']);
             $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
 
+            // Integrity-check the hidden form fields against login-derived values
+            $this->valid->validateProgramIntegrity($mergedData, $dbData['program']);
+
+            // Prepare the instrument data for validation
+            $instruments = $this->transform->transformInstruments(
+                $mergedData['facility_instruments'],
+                $mergedData['visitor_instruments'],
+                $dbData['facility'],
+                $dbData['visitor']
+            );
+            $mergedData['instruments'] = $instruments['values'] ?? [];
+            $dbData['instruments'] = $instruments['allowed'] ?? [];
+
             // Validate the form data
-            $validData = $this->valid->validateFormData($mergedData, $dbData);
+            $validData = $this->valid->validateData($mergedData, $dbData);
             $this->debug->debugVariable($validData, "{$debugHeading} -- validData");
 
-            // If validation passes, proceed to processing the feedback data
+            // If validation passes, proceed to processing the data
             $this->debug->debug("{$debugHeading} -- Validation checks completed.");
-            $this->processFormSubmit($validData);
+
+            // Transform the validated data
+            $transformedData = $this->transform->transformData($validData, $dbData);
+            $this->debug->debugVariable($transformedData, "{$debugHeading} -- transformedData");
+
+            // If validation passes, proceed to processing the feedback data
+            $this->processFormSubmit($transformedData);
         } catch (ValidationException $e) {
             // Debug output
             $this->debug->debugVariable($e->getMessages(), "Validation Errors");
@@ -222,7 +246,7 @@ class FeedbackController
         $formAction = $_SERVER['PHP_SELF'];
 
         // data for the form
-        $formData = $this->model->initializeDefaultFormData();
+        $formData = $this->model->initializeDefaultData();
         $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
 
         // retrieve data lists
@@ -297,7 +321,7 @@ class FeedbackController
      * @param array $submitted The user-submitted data array (e.g., $_POST).
      * @return array The merged array with defaults filled where missing.
      */
-    private function mergeFormDataWithDefaults(array $defaults, array $submitted): array
+    private function mergeNewDataWithDefaults(array $defaults, array $submitted): array
     {
         // Debug output
         $debugHeading = $this->debug->debugHeading("Controller", "mergeFormDataWithDefaults");
@@ -309,7 +333,7 @@ class FeedbackController
         foreach ($submitted as $key => $value) {
             // If value is an array and exists in defaults as an array, recurse
             if (is_array($value) && isset($defaults[$key]) && is_array($defaults[$key])) {
-                $merged[$key] = $this->mergeFormDataWithDefaults($defaults[$key], $value);
+                $merged[$key] = $this->mergeNewDataWithDefaults($defaults[$key], $value);
             } else {
                 // Otherwise, use the submitted value, overriding defaults
                 $merged[$key] = $value;

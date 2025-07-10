@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\models\proposals;
 
 use Exception;
-use App\core\common\CustomDebug as Debug;
-use App\models\BaseModel        as BaseModel;
+use App\core\common\AbstractDebug as Debug;
+use App\models\BaseModel;
 
 /**
  * Model for handling the Observer Data Restoration Request logic.
@@ -31,6 +31,8 @@ class ObsDataRestorationRequestModel extends BaseModel
         // Class initialisation complete
         $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
     }
+
+    // Abstract method: initializeDefaultData()
 
     public function initializeDefaultData(?array $data = null): array
     {

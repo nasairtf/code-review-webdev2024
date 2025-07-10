@@ -12,7 +12,6 @@ use Exception as Base;
  * Allows passing and retrieving detailed error messages
  * when execution checks fail.
  */
-
 class ExecutionException extends Base
 {
     /**

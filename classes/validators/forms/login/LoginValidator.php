@@ -6,41 +6,32 @@ namespace App\validators\forms\login;
 
 use Exception;
 use App\exceptions\ValidationException;
-use App\core\irtf\IrtfUtilities;
-use App\core\common\CustomDebug            as Debug;
-use App\validators\forms\BaseFormValidator as BaseValidator;
+use App\core\common\AbstractDebug as Debug;
+use App\validators\BaseValidator;
 
 /**
- * Validator for login form input.
+ * Validator for login form input (refactored to use ValidationCore architecture).
  *
- * This class handles the validation of login form fields, including program numbers
- * and session codes. It ensures that the input conforms to the expected format and
- * constraints. Any invalid input results in a `ValidationException`, and the debug utility
- * logs detailed messages for troubleshooting.
+ * This class handles validation for login form fields using a declarative
+ * validation plan executed by BaseValidator and ValidationCore. It validates
+ * program numbers and session codes, returning controller-safe output or
+ * throwing a structured ValidationException when needed.
  *
  * Responsibilities:
- * - Validate program numbers and session codes for syntax and logical correctness.
- * - Generate arrays suitable for database interactions or further processing.
- * - Manage and throw detailed exceptions for validation errors.
+ * - Define validation steps via a normalized plan.
+ * - Delegate execution to the core validation framework.
+ * - Format output and errors for controller use.
  *
  * @category Validators
  * @package  IRTF
- * @author   Miranda Hawarden-Ogata
- * @version  1.0.0
- *
- * @property Debug $debug Debugging utility for logging validation processes.
+ * @version  2.0.0
  */
-
 class LoginValidator extends BaseValidator
 {
     /**
-     * Constructor to initialize the LoginValidator.
+     * Constructor for LoginValidator.
      *
-     * Creates a new instance of the validator, initializing the debug utility
-     * to log the validation process. The debug utility is either provided as
-     * a parameter or defaults to a new instance.
-     *
-     * @param Debug|null $debug Optional debugging utility instance for logging.
+     * @param Debug|null $debug Optional debugging utility instance.
      */
     public function __construct(?Debug $debug = null)
     {
@@ -51,78 +42,85 @@ class LoginValidator extends BaseValidator
         $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
     }
 
-    /**
-     * Validates and transforms form data for database verification.
-     *
-     * This method ensures that the provided form data meets all required criteria.
-     * It validates each field, returning a structured array with validated data ready
-     * for database processing or further use in the application.
-     *
-     * @param array $form The form input data to validate.
-     *
-     * @return array An associative array containing validated form data:
-     *               - 'program': The validated program number.
-     *               - 'session': The validated session code.
-     *
-     * @throws ValidationException If validation errors occur.
-     */
-    public function validateFormData(
-        array $form
-    ): array {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Validator", "validateFormData");
-        $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($form, "form");
+    // Abstract methods: getValidationPlan(), formatValidData(), formatErrors()
 
-        // Validate the form data and return the array for database verification
-        return $this->validateDataForDatabase($form);
+    /**
+     * Defines the validation plan for the login form.
+     *
+     * Validates:
+     * - 'program': program number string (e.g., 2025B001) with min/max year checks
+     * - 'session': session code string (10-character guest or ENG session format)
+     *
+     * @param array $data    Input data to validate.
+     * @param array $context Contextual info (currently unused).
+     *
+     * @return array Normalized validation plan for BaseValidator.
+     */
+    protected function getValidationPlan(array $data, array $context = []): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "getValidationPlan");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($data, "{$debugHeading} -- data");
+        $this->debug->debugVariable($context, "{$debugHeading} -- context");
+
+        $minYear = 2000;
+        $maxYear = date('Y') + 1;
+        return [
+            [
+                'field'         => 'program',
+                'method'        => 'validateProgramNumberField',
+                'args'          => [$minYear, $maxYear],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'session',
+                'method'        => 'validateSessionCodeField',
+                'args'          => [],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+        ];
     }
 
     /**
-     * Validates form data for database verification.
+     * Formats validated data for controller use.
      *
-     * Performs field-specific validation for the login form, ensuring that
-     * the provided program number and session code are in the correct format.
-     * Validated data is returned as an associative array.
+     * Uses the normalized plan to extract and return clean values for:
+     * - 'program'
+     * - 'session'
      *
-     * @param array $form The form input data to validate.
+     * @param array $normalizedPlan The plan used for this validation run.
      *
-     * @return array An array containing validated form data:
-     *               - 'program': The validated program number.
-     *               - 'session': The validated session code.
-     *
-     * @throws ValidationException If any validation errors are detected.
+     * @return array Cleaned validated values ready for controller or model use.
      */
-    private function validateDataForDatabase(
-        array $form
-    ): array {
+    protected function formatValidData(array $normalizedPlan): array
+    {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Validator", "validateDataForDatabase");
+        $debugHeading = $this->debug->debugHeading("Validator", "formatValidData");
         $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        // Build the validated data array for database
-        $valid = [];
+        return $this->formatStdValidData($normalizedPlan);
+    }
 
-        // Validate program number
-        $valid['program'] = $this->validateProgramNumber(
-            $form['program'] ?? '',
-            'program',
-            true
-        );
+    /**
+     * Formats validation errors for controller use.
+     *
+     * Reduces multi-error arrays to a single user-facing message per field.
+     *
+     * @param array $normalizedPlan The plan used for this validation run.
+     *
+     * @return array Associative array of field => message.
+     */
+    protected function formatErrors(array $normalizedPlan): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "formatErrors");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        // Validate session code
-        $valid['session'] = $this->validateProgramSession(
-            $form['session'] ?? '',
-            'session',
-            true
-        );
-
-        // After validating, check if errors exist and throw if necessary
-        if (!empty($this->errors)) {
-            throw new ValidationException("Validation errors occurred.", $this->errors);
-        }
-
-        // Return the valid data for database verification
-        return $valid;
+        return $this->formatStdErrors($normalizedPlan);
     }
 }

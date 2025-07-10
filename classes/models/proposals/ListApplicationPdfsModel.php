@@ -6,7 +6,8 @@ namespace App\models\proposals;
 
 use Exception;
 use App\core\common\Config;
-use App\core\common\CustomDebug as Debug;
+use App\core\common\AbstractDebug                       as Debug;
+use App\models\BaseModel;
 use App\services\database\troublelog\read\ObsAppService as DbRead;
 
 /**
@@ -18,19 +19,19 @@ use App\services\database\troublelog\read\ObsAppService as DbRead;
  * @version  1.0.0
  */
 
-class ListApplicationPdfsModel
+class ListApplicationPdfsModel extends BaseModel
 {
-    private $debug;
     private $dbRead;
 
     public function __construct(
         ?Debug $debug = null,
         ?DbRead $dbRead = null
     ) {
-        // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        // Use parent class' constructor
+        parent::__construct($debug);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
 
         // Initialise the additional classes needed by this model
         $this->dbRead = $dbRead ?? new DbRead($this->debug->isDebugMode());
@@ -38,6 +39,14 @@ class ListApplicationPdfsModel
 
         // Class initialisation complete
         $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
+    }
+
+    // Abstract method: initializeDefaultData()
+
+    public function initializeDefaultData(?array $data = null): array
+    {
+        // stub
+        return [];
     }
 
     /**

@@ -7,7 +7,8 @@ namespace App\controllers\proposals;
 use Exception;
 use App\exceptions\ExecutionException;
 use App\exceptions\ValidationException;
-use App\core\common\CustomDebug                              as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                            as Debug;
 use App\models\proposals\QueueDataRestoreModel               as Model;
 use App\views\forms\proposals\QueueDataRestoreView           as View;
 use App\validators\forms\proposals\QueueDataRestoreValidator as Validator;
@@ -37,7 +38,7 @@ class QueueDataRestoreController
         ?Validator $valid = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
 
@@ -107,7 +108,7 @@ class QueueDataRestoreController
             }
 
             // Validate the form data
-            $validData = $this->valid->validateFormData($mergedData);
+            $validData = $this->valid->validateData($mergedData);
             $this->debug->debugVariable($validData, "{$debugHeading} -- validData");
 
             // If validation passes, proceed to processing the data

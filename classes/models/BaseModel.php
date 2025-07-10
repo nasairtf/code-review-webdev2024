@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\models;
 
-use App\core\common\CustomDebug as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 
 /**
  * Model for handling common model logic.
@@ -31,7 +32,7 @@ abstract class BaseModel
         ?Debug $debug = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("BaseModel", "__construct");
         $this->debug->debug($debugHeading);
 
@@ -39,7 +40,7 @@ abstract class BaseModel
         $this->debug->debug("{$debugHeading} -- Parent Model initialisation complete.");
     }
 
-    // Abstract methods: initializeDefaultData()
+    // Abstract method: initializeDefaultData()
 
     abstract public function initializeDefaultData(?array $data = null): array;
 
@@ -54,7 +55,7 @@ abstract class BaseModel
     public function mergeNewDataWithDefaults(array $defaults, array $submitted): array
     {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Model", "mergeNewDataWithDefaults");
+        $debugHeading = $this->debug->debugHeading("BaseModel", "mergeNewDataWithDefaults");
         $this->debug->debug($debugHeading);
         $this->debug->debugVariable($defaults, "{$debugHeading} -- defaults");
         $this->debug->debugVariable($submitted, "{$debugHeading} -- submitted");

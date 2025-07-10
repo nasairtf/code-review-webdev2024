@@ -935,7 +935,7 @@ class TableLayoutBuilder
             );
         }
         $labeledPulldown = $this->htmlBuilder->getLabeledPulldown(
-            $names['visitor'],
+            $names['visitor'] . '[]',
             $selectedOptions['visitor'],
             $options['visitor'],
             'Visitor Instrument',

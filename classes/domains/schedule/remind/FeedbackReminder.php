@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\domains\schedule\remind;
 
 use Exception;
-use App\core\common\CustomDebug as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 use App\legacy\traits\LegacyProcessFeedRemindersTrait;
 
 /**
@@ -32,7 +33,7 @@ class FeedbackReminder
         ?Debug $debug = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('schedule', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('schedule', false, 0);
         $debugHeading = $this->debug->debugHeading("Reminder", "__construct");
         $this->debug->debug($debugHeading);
 

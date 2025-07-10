@@ -1,0 +1,75 @@
+review:
+  enable: true
+
+  scope:
+    # Review all files in PR, not just the latest commit
+    diff_mode: full
+    include_deleted: false
+    include_renamed: true
+
+  comments:
+    max_comments: 1000         # Increase default cap
+    min_severity: info         # Comment on info+ severity issues (info, warning, error)
+    comment_unified: false     # Comment inline per file instead of aggregating
+
+  rules:
+    structure:
+      enforce_method_order: true
+      require_docblocks: true
+      max_method_length: 50
+      max_file_length: 1000
+      enforce_section_headers: true
+
+    style:
+      enforce_psr12: true
+      indent_style: space
+      indent_size: 4
+      max_line_length: 120
+      require_strict_types: true
+
+    naming:
+      variable_case: snake_case
+      class_case: PascalCase
+      method_case: camelCase
+      constant_case: UPPER_CASE
+
+    duplication:
+      check_duplicate_code: true
+      similarity_threshold: 85
+
+    tests:
+      require_tests_for_new_code: true
+      require_test_annotations: true
+      max_test_class_size: 300
+      enforce_test_naming: true
+
+    security:
+      scan_secrets: true
+      scan_for_sql_injection: true
+      scan_for_eval: true
+      scan_for_file_injection: true
+      scan_for_hardcoded_creds: true
+
+    best_practices:
+      flag_todo_comments: true
+      check_deprecated_apis: true
+      check_unreachable_code: true
+      suggest_nullsafe_ops: true
+      suggest_final_classes: true
+
+    performance:
+      flag_expensive_loops: true
+      flag_nested_loops: true
+      check_memory_usage: true
+
+  exclusions:
+    paths:
+      - "vendor/**"
+      - "node_modules/**"
+      - "tests/fixtures/**"
+    file_extensions:
+      - ".lock"
+      - ".min.js"
+
+metadata:
+  styleguide_path: ../styleguide.md

@@ -6,7 +6,8 @@ namespace App\controllers\proposals;
 
 use Exception;
 use App\exceptions\ValidationException;
-use App\core\common\CustomDebug                                as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                              as Debug;
 use App\domains\tac\TACManager                                 as Manager;
 use App\views\forms\proposals\UploadTACFilemakerView           as View;
 use App\validators\forms\proposals\UploadTACFilemakerValidator as Validator;
@@ -36,7 +37,7 @@ class UploadTACFilemakerController
         ?Validator $valid = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
 

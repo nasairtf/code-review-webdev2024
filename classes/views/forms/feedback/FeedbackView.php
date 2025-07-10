@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\views\forms\feedback;
 
 use App\exceptions\HtmlBuilderException;
-use App\core\common\CustomDebug           as Debug;
+use App\core\common\AbstractDebug         as Debug;
 use App\views\forms\BaseFormView          as BaseView;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
@@ -76,22 +76,23 @@ class FeedbackView extends BaseView
 
         // Map internal field names to user-friendly labels
         return [
-            'respondent'         => 'Your Name',
-            'email'              => 'E-mail Address',
-            'dates'              => 'Observing Dates',
-            'support_staff'      => 'Support Astronomer(s)',
-            'operator_staff'     => 'Telescope Operator(s)',
-            'instruments'        => 'Facility Instrument(s)',
-            'visitor_instrument' => 'Visitor Instrument',
-            'location'           => 'Observing Location',
-            'experience'         => 'Overall Experience',
-            'technical'          => 'Technical Commentary',
-            'scientificstaff'    => 'Support Staff',
-            'operators'          => 'Telescope Operators',
-            'daycrew'            => 'Daycrew',
-            'personnel'          => 'Personnel Support',
-            'scientific'         => 'Scientific Results',
-            'comments'           => 'Comments and Suggestions',
+            'respondent'           => 'Your Name',
+            'email'                => 'E-mail Address',
+            'dates'                => 'Observing Dates',
+            'support_staff'        => 'Support Astronomer(s)',
+            'operator_staff'       => 'Telescope Operator(s)',
+            'instruments'          => 'Instrument(s)',
+            'facility_instruments' => 'Facility Instrument(s)',
+            'visitor_instruments'  => 'Visitor Instrument(s)',
+            'location'             => 'Observing Location',
+            'experience'           => 'Overall Experience',
+            'technical'            => 'Technical Commentary',
+            'scientificstaff'      => 'Support Staff',
+            'operators'            => 'Telescope Operators',
+            'daycrew'              => 'Daycrew',
+            'personnel'            => 'Personnel Support',
+            'scientific'           => 'Scientific Results',
+            'comments'             => 'Comments and Suggestions',
         ];
     }
 
@@ -287,8 +288,8 @@ class FeedbackView extends BaseView
         // Debug output
         $debugHeading = $this->debug->debugHeading("View", "getProgramInfo");
         $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($dbData, "dbData");
-        $this->debug->debugVariable($formData, "formData");
+        $this->debug->debugVariable($dbData, "{$debugHeading} -- dbData");
+        $this->debug->debugVariable($formData, "{$debugHeading} -- formData");
 
         $tablePad = $pad;
         $tableRowPad = $pad + 2;
@@ -402,9 +403,9 @@ class FeedbackView extends BaseView
             [
                 'label' => 'Please select the instrument(s) you used during this run:',
                 'element' => $this->compBuilder->buildInstrumentCheckboxPulldownTable(
-                    ['facility' => 'instruments', 'visitor' => 'visitor_instrument'],
+                    ['facility' => 'facility_instruments', 'visitor' => 'visitor_instruments'],
                     ['facility' => $dbData['facility'], 'visitor' => $dbData['visitor']],
-                    ['facility' => $formData['instruments'], 'visitor' => $formData['visitor_instrument']],
+                    ['facility' => $formData['facility_instruments'], 'visitor' => $formData['visitor_instruments'][0]],
                     $colors[0],
                     $elementPad
                 ),

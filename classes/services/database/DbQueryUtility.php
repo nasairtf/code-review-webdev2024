@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\services\database;
 
-use App\core\common\CustomDebug as Debug;
+use App\core\common\AbstractDebug as Debug;
 
 /**
  * Utility class for executing and managing database queries.

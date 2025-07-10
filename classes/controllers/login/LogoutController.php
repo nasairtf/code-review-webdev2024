@@ -7,7 +7,8 @@ namespace App\controllers\login;
 use Exception;
 use App\core\traits\LoginHelperTrait;
 use App\core\common\Config;
-use App\core\common\CustomDebug as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 
 /**
  * Manages logout functionality for IRTF forms, handling session cleanup and redirection.
@@ -50,7 +51,7 @@ class LogoutController
         // Start the session if it hasn't been started
         $this->sessionSetup();
         // internal login-form specific properties
-        $this->debug = $debug ?? new Debug('login', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('login', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
     }

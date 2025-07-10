@@ -8,7 +8,8 @@ use Exception;
 use App\exceptions\ValidationException;
 use App\core\traits\LoginHelperTrait;
 use App\core\common\Config;
-use App\core\common\CustomDebug               as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug             as Debug;
 use App\models\login\LoginModel               as Model;
 use App\views\forms\login\LoginView           as View;
 use App\validators\forms\login\LoginValidator as Validator;
@@ -119,7 +120,7 @@ class LoginController
         $this->sessionSetup();
 
         // Debug output
-        $this->debug = $debug ?? new Debug('login', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('login', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
 
@@ -399,7 +400,7 @@ class LoginController
         $this->debug->debug($debugHeading);
 
         // Validate form inputs
-        $validData = $this->valid->validateFormData($formData);
+        $validData = $this->valid->validateData($formData);
         $this->debug->debugVariable($validData, "{$debugHeading} -- validData");
 
         // Check credentials with model
@@ -505,7 +506,7 @@ class LoginController
 
         // Logic to generate the first page form
         $formAction = $this->validateFormAction();
-        $formData = $formData ?: $this->model->initializeDefaultFormData();
+        $formData = $formData ?: $this->model->initializeDefaultData();
         $formData['instructions'] = $this->instructions;
 
         // Call the view to render the form

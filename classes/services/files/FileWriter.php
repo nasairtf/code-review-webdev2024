@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\services\files;
 
 use Exception;
-use App\core\common\Debug;
+use App\core\common\DebugFactory;
 
 /**
  * FileWriter Service
@@ -59,7 +59,7 @@ class FileWriter
         ?bool $debugMode = null
     ) {
         // Debug output
-        $this->debug = new Debug('file', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
+        $this->debug = DebugFactory::create('file', $debugMode ?? false, $debugMode ? 1 : 0); // base-level service class
         $debugHeading = $this->debug->debugHeading("Service", "__construct");
         $this->debug->debug($debugHeading);
 

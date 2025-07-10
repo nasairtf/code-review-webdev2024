@@ -7,7 +7,8 @@ namespace App\controllers\ishell;
 use Exception;
 use App\exceptions\ValidationException;
 use App\core\common\Config;
-use App\core\common\CustomDebug                 as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug               as Debug;
 use App\services\graphs\GraphService            as Graph;
 use App\models\ishell\TemperaturesModel         as Model;
 use App\views\ishell\TemperaturesView           as View;
@@ -43,7 +44,7 @@ class TemperaturesController
         ?Debug $debug = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', true, 1);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
 

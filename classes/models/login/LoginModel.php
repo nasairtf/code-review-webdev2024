@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\models\login;
 
-use App\core\common\CustomDebug                             as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                           as Debug;
+use App\models\BaseModel;
 use App\services\database\troublelog\read\GuestAcctsService as DbRead;
 
 /**
@@ -25,13 +27,8 @@ use App\services\database\troublelog\read\GuestAcctsService as DbRead;
  * @see Debug
  * @see DbRead
  */
-class LoginModel
+class LoginModel extends BaseModel
 {
-    /**
-     * @var Debug Debugging utility for logging and error handling.
-     */
-    private $debug;
-
     /**
      * @var GuestAcctsService Service instance for reading data related to guest accounts.
      */
@@ -52,10 +49,11 @@ class LoginModel
         ?Debug $debug = null,
         ?DbRead $dbRead = null
     ) {
-        // Debug output
-        $this->debug = $debug ?? new Debug('login', false, 0);
+        // Use parent class' constructor
+        parent::__construct($debug);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
 
         // Initialise the additional classes needed by this model
         $this->dbRead = $dbRead ?? new DbRead($this->debug->isDebugMode());
@@ -63,6 +61,30 @@ class LoginModel
 
         // Class initialisation complete
         $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
+    }
+
+    // Abstract method: initializeDefaultData()
+
+    /**
+     * Initializes default values for login form fields.
+     *
+     * This method provides default values for the login form fields, ensuring a consistent structure
+     * for the form input. These defaults are used when rendering a blank or reset form.
+     *
+     * @return array Default values for the login form fields.
+     */
+    public function initializeDefaultData(?array $data = null): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Model", "initializeDefaultData");
+        $this->debug->debug($debugHeading);
+
+        // Return default field values
+        return [
+            'program' => '', // Default empty program number
+            'session' => '', // Default empty session code
+            'error'   => '', // Placeholder for validation error messages
+        ];
     }
 
     /**
@@ -90,27 +112,5 @@ class LoginModel
 
         // Return true if at least one valid match is found
         return ($result[0]['count'] > 0);
-    }
-
-    /**
-     * Initializes default values for login form fields.
-     *
-     * This method provides default values for the login form fields, ensuring a consistent structure
-     * for the form input. These defaults are used when rendering a blank or reset form.
-     *
-     * @return array Default values for the login form fields.
-     */
-    public function initializeDefaultFormData(): array
-    {
-        // Debug output
-        $debugHeading = $this->debug->debugHeading("Model", "initializeDefaultFormData");
-        $this->debug->debug($debugHeading);
-
-        // Return default field values
-        return [
-            'program' => '', // Default empty program number
-            'session' => '', // Default empty session code
-            'error'   => '', // Placeholder for validation error messages
-        ];
     }
 }

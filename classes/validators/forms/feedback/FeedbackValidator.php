@@ -6,29 +6,26 @@ namespace App\validators\forms\feedback;
 
 use Exception;
 use App\exceptions\ValidationException;
-use App\core\irtf\IrtfUtilities;
-use App\core\common\CustomDebug            as Debug;
-use App\validators\forms\BaseFormValidator as BaseValidator;
+use App\core\common\AbstractDebug as Debug;
+use App\validators\BaseValidator;
 
 /**
- * Validator for handling the Feedback form logic.
+ * FeedbackValidator handles validation for the user feedback submission form.
  *
- * This class handles validation for feedback form fields, including respondent
- * information, date validation, ratings, and specific selection fields for
- * instruments and location. It provides two sets of validated data: one for
- * database storage and one for email formatting.
+ * It defines the validation plan, interprets validated results, and formats
+ * validation errors for frontend consumption. It supports both scalar and composite
+ * inputs (e.g., dates, instrument selections) and integrates program integrity checks.
  *
  * @category Validators
  * @package  IRTF
  * @version  1.0.0
  */
-
 class FeedbackValidator extends BaseValidator
 {
     /**
-     * Constructor to initialize the FeedbackValidator with a Debug instance.
+     * Constructor for FeedbackValidator.
      *
-     * @param Debug|null $debug Optional. An instance of Debug for logging; defaults to null.
+     * @param Debug|null $debug Optional debugging utility instance.
      */
     public function __construct(?Debug $debug = null)
     {
@@ -39,258 +36,281 @@ class FeedbackValidator extends BaseValidator
         $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
     }
 
+    // Abstract methods: getValidationPlan(), formatValidData(), formatErrors()
+
     /**
-     * Validates and transforms form data for database storage and email output.
+     * Returns the validation plan defining each field’s validation strategy.
      *
-     * This method validates the form input data against database reference data,
-     * generates a structured array for storing in the database, and prepares
-     * a transformed version of the data for email output.
+     * Each plan step defines the field name, associated input keys, validation method,
+     * optional arguments, and requirement policy. Composite fields are explicitly
+     * identified using the `fields` array.
      *
-     * @param array $form The form input data to validate.
-     * @param array $db   The database reference data for validation.
+     * @param array $data    Submitted input data.
+     * @param array $context Supplemental context such as allowed selections.
      *
-     * @return array An associative array with 'db' and 'email' keys, each containing validated data.
+     * @return array Structured validation plan.
      */
-    public function validateFormData(
-        array $form,
-        array $db
-    ): array {
+    protected function getValidationPlan(array $data, array $context = []): array
+    {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Validator", "validateFormData");
+        $debugHeading = $this->debug->debugHeading("Validator", "getValidationPlan");
         $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($form, "form");
-        $this->debug->debugVariable($db, "db");
-        // Validate the form data and return the array for database input
-        $validData = $this->validateDataForDatabase($form, $db);
-        // Transform the validated data and return the array for email output
-        $emailData = $this->transformDataForEmail($validData, $form, $db);
-        // Return both arrays
-        return ['db' => $validData, 'email' => $emailData];
+        $this->debug->debugVariable($data, "{$debugHeading} -- data");
+        $this->debug->debugVariable($context, "{$debugHeading} -- context");
+
+        return [
+            [
+                'field'         => 'respondent',
+                'fields'        => ['respondent'],
+                'method'        => 'validateNameField',
+                'args'          => [70],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'email',
+                'fields'        => ['email'],
+                'method'        => 'validateEmailField',
+                'args'          => [70],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'dates',
+                'fields'        => [
+                    'startyear',
+                    'startmonth',
+                    'startday',
+                    'endyear',
+                    'endmonth',
+                    'endday',
+                ],
+                'method'        => 'validateDateRange',
+                'args'          => [],
+                'required'      => true,
+                'required_msg'  => 'These fields are required',
+            ],
+            [
+                'field'         => 'support_staff',
+                'fields'        => ['support_staff'],
+                'method'        => 'validateSelection',
+                'args'          => [$context['support']],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'operator_staff',
+                'fields'        => ['operator_staff'],
+                'method'        => 'validateSelection',
+                'args'          => [$context['operator']],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'instruments',
+                'fields'        => ['instruments'],
+                'method'        => 'validateSelection',
+                'args'          => [$context['instruments']],
+                'required'      => true,
+                'required_msg'  => 'At least one instrument must be selected',
+            ],
+            [
+                'field'         => 'location',
+                'fields'        => ['location'],
+                'method'        => 'validateLocation',
+                'args'          => [],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'experience',
+                'fields'        => ['experience'],
+                'method'        => 'validateRating',
+                'args'          => [false],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'technical',
+                'fields'        => ['technical'],
+                'method'        => 'validateLongTextField',
+                'args'          => [500],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'scientificstaff',
+                'fields'        => ['scientificstaff'],
+                'method'        => 'validateRating',
+                'args'          => [true],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'operators',
+                'fields'        => ['operators'],
+                'method'        => 'validateRating',
+                'args'          => [true],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'daycrew',
+                'fields'        => ['daycrew'],
+                'method'        => 'validateRating',
+                'args'          => [true],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'personnel',
+                'fields'        => ['personnel'],
+                'method'        => 'validateLongTextField',
+                'args'          => [500],
+                'required'      => false,
+                'required_msg'  => '',
+            ],
+            [
+                'field'         => 'scientific',
+                'fields'        => ['scientific'],
+                'method'        => 'validateLongTextField',
+                'args'          => [500],
+                'required'      => false,
+                'required_msg'  => '',
+            ],
+            [
+                'field'         => 'comments',
+                'fields'        => ['comments'],
+                'method'        => 'validateLongTextField',
+                'args'          => [500],
+                'required'      => false,
+                'required_msg'  => '',
+            ],
+        ];
     }
 
     /**
-     * Validates form data for database storage.
+     * Converts validated values into the canonical format expected by the controller.
      *
-     * This method checks all relevant fields of the feedback form, ensuring that
-     * data adheres to expected formats and constraints, and structures it for
-     * insertion into the database.
+     * Handles renaming of composite fields (e.g., dates → start_date, end_date) and
+     * passes scalar fields through untouched. Used after all validation has passed.
      *
-     * @param array $form Form input data to validate.
-     * @param array $db   Reference data from the database.
+     * @param array $normalizedPlan Normalized validation plan steps.
      *
-     * @return array Validated data for database storage.
-     * @throws ValidationException If validation errors occur.
+     * @return array Formatted validated data.
      */
-    private function validateDataForDatabase(
-        array $form,
-        array $db
-    ): array {
+    protected function formatValidData(array $normalizedPlan): array
+    {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Validator", "validateDataForDatabase");
+        $debugHeading = $this->debug->debugHeading("Validator", "formatValidData");
         $this->debug->debug($debugHeading);
-        // Build the validated data array for database
-        $valid = [];
-        $fb = 'feedback';
-        $in = 'instruments';
-        $op = 'operators';
-        $sp = 'support';
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
 
-        // Basic info
-        $valid[$fb]['name'] = $this->validateName(
-            $form['respondent'] ?? '',
-            'respondent',
-            true
-        );
-        $valid[$fb]['email'] = $this->validateEmail(
-            $form['email'] ?? '',
-            'email',
-            true
-        );
-        // Program Information
-        $valid[$fb]['programID'] = $db['program']['p'];
-        $valid[$fb]['a'] = $db['program']['a'];
-        //$valid[$fb]['i'] = $db['program']['i'];
-        //$valid[$fb]['n'] = $db['program']['n'];
-        $valid[$fb]['semesterID'] = $db['program']['s'];
-        //$valid[$email]['semesterID'] = $db['program']['s'];
-        // Observing Dates
-        $this->validateDates(
-            (int) $form['startmonth'],
-            (int) $form['startday'],
-            (int) $form['startyear'],
-            (int) $form['endmonth'],
-            (int) $form['endday'],
-            (int) $form['endyear'],
-            $form['s'],
-            'dates',
-            true
-        );
-        $valid[$fb]['start_date'] = IrtfUtilities::returnUnixDate(
-            (int) $form['startmonth'],
-            (int) $form['startday'],
-            (int) $form['startyear']
-        );
-        $valid[$fb]['end_date'] = IrtfUtilities::returnUnixDate(
-            (int) $form['endmonth'],
-            (int) $form['endday'],
-            (int) $form['endyear']
-        );
-        // Support Staff
-        $valid[$sp] = $this->validateSelection(
-            $form['support_staff'] ?? [],
-            $db['support'],
-            'support_staff',
-            true,
-            'Invalid support astronomer selection.'
-        );
-        // Telescope Operators
-        $valid[$op] = $this->validateSelection(
-            $form['operator_staff'] ?? [],
-            $db['operator'],
-            'operator_staff',
-            true,
-            'Invalid telescope operator selection.'
-        );
-        // Instruments [nested filter removes 'none' from visitor arrays]
-        $instruments = $this->transformInstruments(
-            $form['instruments'],
-            $form['visitor_instrument'],
-            $db['facility'],
-            $db['visitor']
-        );
-        $valid[$in] = $this->validateSelection(
-            $instruments['form'],
-            $instruments['db'],
-            'instruments',
-            true,
-            'Invalid instrument selection.'
-        );
-        // Technical Feedback
-        $valid[$fb]['location'] = $this->validateLocation(
-            (int) $form['location'],
-            'location',
-            true
-        );
-        $valid[$fb]['technical_rating'] = $this->validateRating(
-            (int) $form['experience'],
-            false,
-            'experience',
-            true
-        );
-        $valid[$fb]['technical_comments'] = $this->validateLongTextField(
-            $form['technical'] ?? '',
-            500,
-            'technical',
-            true
-        );
-        // Personnel Feedback
-        $valid[$fb]['scientific_staff_rating'] = $this->validateRating(
-            (int) $form['scientificstaff'],
-            true,
-            'scientificstaff',
-            true
-        );
-        $valid[$fb]['TO_rating'] = $this->validateRating(
-            (int) $form['operators'],
-            true,
-            'operators',
-            true
-        );
-        $valid[$fb]['daycrew_rating'] = $this->validateRating(
-            (int) $form['daycrew'],
-            true,
-            'daycrew',
-            true
-        );
-        $valid[$fb]['personnel_comment'] = $this->validateLongTextField(
-            $form['personnel'] ?? '',
-            500,
-            'personnel',
-            false
-        );
-        // Scientific Results
-        $valid[$fb]['scientific_results'] = $this->validateLongTextField(
-            $form['scientific'] ?? '',
-            500,
-            'scientific',
-            false
-        );
-        // Suggestions
-        $valid[$fb]['suggestions'] = $this->validateLongTextField(
-            $form['comments'] ?? '',
-            500,
-            'comments',
-            false
-        );
-        // After validating, check if errors exist and throw if necessary
-        if (!empty($this->errors)) {
-            throw new ValidationException("Validation errors occurred.", $this->errors);
+        $formatted = [];
+        foreach ($normalizedPlan as $step) {
+            // Extract the field's name
+            $field = $step['field'];
+            // Store the formatted and validated field data
+            switch ($field) {
+                case 'dates':
+                    // The dates branch data is stored with element names different from inputs AND fields
+                    $formatted['start_date'] = $this->result->getFieldValue('dates_start_timestamp');
+                    $formatted['end_date'] = $this->result->getFieldValue('dates_end_timestamp');
+                    $this->debug->debugVariable($formatted['start_date'], "{$debugHeading} -- formatted[start_date]");
+                    $this->debug->debugVariable($formatted['end_date'], "{$debugHeading} -- formatted[end_date]");
+                    break;
+                case 'instruments':
+                    // This branch might be able to fold into the default branch....
+                    $formatted['instruments'] = $this->result->getFieldValue('instruments');
+                    $this->debug->debugVariable($formatted['instruments'], "{$debugHeading} -- formatted[instruments]");
+                    break;
+                default:
+                    // Retrieve the field's value(s) stored in the result object
+                    $formatted[$field] = $this->result->getFieldValue($field);
+                    $this->debug->debugVariable($formatted[$field], "{$debugHeading} -- formatted[$field]");
+            }
         }
-        return $valid;
+        return $formatted;
     }
 
     /**
-     * Transforms validated data for email output format.
+     * Converts internal error structure into controller-facing error array.
      *
-     * This method converts database-friendly data into a format suitable for email output,
-     * including formatting dates and converting selection keys into human-readable text.
+     * Returns errors keyed by the input name(s), including composite field aggregations
+     * when needed (e.g., dates). Only the first error per input is returned.
      *
-     * @param array $valid The validated data array for database.
-     * @param array $form  The original form input data.
-     * @param array $db    The database reference data.
+     * @param array $normalizedPlan Normalized validation plan steps.
      *
-     * @return array Transformed data formatted for email output.
+     * @return array Formatted validation errors keyed by input.
      */
-    private function transformDataForEmail(
-        array $valid,
-        array $form,
-        array $db
-    ): array {
+    protected function formatErrors(array $normalizedPlan): array
+    {
         // Debug output
-        $debugHeading = $this->debug->debugHeading("Validator", "transformDataForEmail");
+        $debugHeading = $this->debug->debugHeading("Validator", "formatErrors");
         $this->debug->debug($debugHeading);
-        // Build the transformed data array for email
-        $email = [];
-        $fb = 'feedback';
-        $in = 'instruments';
-        $op = 'operators';
-        $sp = 'support';
-        // Basic info
-        $email['name'] = $valid[$fb]['name'];
-        $email['email'] = $valid[$fb]['email'];
-        // Program Information
-        $email['program'] = $db['program']['a'];
-        // Observing Dates
-        $email['start_date'] = IrtfUtilities::returnTextDate($valid[$fb]['start_date'], 'M d, Y');
-        $email['end_date'] = IrtfUtilities::returnTextDate($valid[$fb]['end_date'], 'M d, Y');
-        // Support Staff
-        $email[$sp] = $this->returnSelectionText($form['support_staff'] ?? [], $db['support']);
-        // Telescope Operators
-        $email[$op] = $this->returnSelectionText($form['operator_staff'] ?? [], $db['operator']);
-        // Instruments
-        $instruments = $this->transformInstruments(
-            $form['instruments'],
-            $form['visitor_instrument'],
-            $db['facility'],
-            $db['visitor']
-        );
-        $email[$in] = $this->returnSelectionText(
-            $instruments['form'],
-            $instruments['db']
-        );
-        // Technical Feedback
-        $email['location'] = $this->returnLocationText($valid[$fb]['location']);
-        $email['technical_rating'] = $this->returnRatingText($valid[$fb]['technical_rating']);
-        $email['technical_comments'] = $valid[$fb]['technical_comments'];
-        // Personnel Feedback
-        $email['scientific_staff_rating'] = $this->returnRatingText($valid[$fb]['scientific_staff_rating']);
-        $email['TO_rating'] = $this->returnRatingText($valid[$fb]['TO_rating']);
-        $email['daycrew_rating'] = $this->returnRatingText($valid[$fb]['daycrew_rating']);
-        $email['personnel_comment'] = $valid[$fb]['personnel_comment'];
-        // Scientific Results
-        $email['scientific_results'] = $valid[$fb]['scientific_results'];
-        // Suggestions
-        $email['suggestions'] = $valid[$fb]['suggestions'];
-        return $email;
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
+
+        // Process each step's inputs for errors; where fields different from inputs additional checks are below
+        $formatted = [];
+        foreach ($normalizedPlan as $step) {
+            // Extract the input name(s)
+            $fields = $step['fields'];
+            // Retrieve the input errors and store them to be returned to the controller
+            foreach ($fields as $input) {
+                // Retrieve the input's error(s) stored in the result object
+                $error = $this->result->getFieldErrors($input);
+                // Only add the input field if there are real errors for it
+                if (is_array($error) && isset($error[0])) {
+                    // Store the formatted input field error(s)
+                    $formatted[$input] = $error[0];
+                    $this->debug->debugVariable($formatted[$input], "{$debugHeading} -- formatted[$input]");
+                }
+            }
+
+            // Grab the overarching field errors
+            if (count($fields) !== 1) {
+                // Extract the field name
+                $field = $step['field'];
+                // Retrieve the umbrella field's error(s) stored in the result object
+                $fieldErrors = $this->collectCompositeFieldErrors($field);
+                // Only add the field if there are real errors for it
+                if ($fieldErrors !== '') {
+                    // Store the formatted field error(s)
+                    $formatted[$field] = $fieldErrors;
+                    $this->debug->debugVariable($formatted[$field], "{$debugHeading} -- formatted[$field]");
+                }
+            }
+        }
+        return $formatted;
+    }
+
+    /**
+     * Confirms that submitted program metadata matches trusted server values.
+     *
+     * Validates that critical form keys ('a', 'i', 'n', 's') were not tampered with
+     * between initial render and submission. Throws debug failure if mismatch is detected.
+     *
+     * @param array $submitted Client-submitted program data (e.g., $_POST).
+     * @param array $trusted   Server-side trusted values for comparison.
+     *
+     * @throws Exception If integrity check fails.
+     */
+    public function validateProgramIntegrity(array $submitted, array $trusted): void
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "validateProgramIntegrity");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($submitted, "{$debugHeading} -- submitted");
+        $this->debug->debugVariable($trusted, "{$debugHeading} -- trusted");
+
+        $message = "Program data mismatch: "
+            . "feedback form has been altered or corrupted. "
+            . "Please refresh the page and try again.";
+        foreach (['a', 'i', 'n', 's'] as $key) {
+            if ((string) ($submitted[$key] ?? '') !== (string) ($trusted[$key] ?? '')) {
+                $this->debug->fail($message);
+            }
+        }
+        $this->debug->debug("{$debugHeading} -- SUCCESS! Integrity check passed!");
     }
 }

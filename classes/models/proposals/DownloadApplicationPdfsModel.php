@@ -6,6 +6,7 @@ namespace App\models\proposals;
 
 use Exception;
 use App\core\common\CustomDebug as Debug;
+use App\models\BaseModel;
 
 /**
  * Model for handling the List Application Pdfs logic.
@@ -16,26 +17,34 @@ use App\core\common\CustomDebug as Debug;
  * @version  1.0.0
  */
 
-class DownloadApplicationPdfsModel
+class DownloadApplicationPdfsModel extends BaseModel
 {
-    private $debug;
     private $pdfpath;
 
     public function __construct(
         string $pdfpath,
         ?Debug $debug = null
     ) {
-        // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        // Use parent class' constructor
+        parent::__construct($debug);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
-        $this->debug->debugVariable($pdfpath, "{$debugHeading} -- pdfpath");
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
 
         // Store the file path
+        $this->debug->debugVariable($pdfpath, "{$debugHeading} -- pdfpath");
         $this->pdfpath = $pdfpath ?? '';
 
         // Class initialisation complete
         $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
+    }
+
+    // Abstract method: initializeDefaultData()
+
+    public function initializeDefaultData(?array $data = null): array
+    {
+        // stub
+        return [];
     }
 
     public function resolveDownloadPath(

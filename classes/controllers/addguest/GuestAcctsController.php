@@ -7,7 +7,8 @@ namespace App\controllers\addguest;
 use Exception;
 use App\exceptions\ExecutionException;
 use App\exceptions\ValidationException;
-use App\core\common\CustomDebug                       as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                     as Debug;
 use App\models\addguest\GuestAcctsModel               as Model;
 use App\views\forms\addguest\GuestAcctsView           as View;
 use App\validators\forms\addguest\GuestAcctsValidator as Validator;
@@ -36,7 +37,7 @@ class GuestAcctsController
         ?Validator $valid = null
     ) {
         // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        $this->debug = $debug ?? DebugFactory::create('default', false, 0);
         $debugHeading = $this->debug->debugHeading("Controller", "__construct");
         $this->debug->debug($debugHeading);
 

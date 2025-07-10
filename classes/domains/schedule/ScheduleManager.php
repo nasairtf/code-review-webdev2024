@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\domains\schedule;
 
 use Exception;
-use App\core\common\CustomDebug                          as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug                        as Debug;
 use App\domains\schedule\build\ScheduleBuildManager      as Builder;
 use App\domains\schedule\upload\ScheduleUploadManager    as Uploader;
 use App\domains\schedule\remind\ScheduleRemindersManager as Reminder;
@@ -32,7 +33,7 @@ class ScheduleManager
         ?bool $debugMode = null
     ) {
         // Debug output
-        $this->debug = new Debug('schedule', $debugMode ?? false, $debugMode ? 1 : 0); // base-level domain class
+        $this->debug = DebugFactory::create('schedule', $debugMode ?? false, $debugMode ? 1 : 0); // base-level domain class
         $debugHeading = $this->debug->debugHeading("Manager", "__construct");
         $this->debug->debug($debugHeading);
 

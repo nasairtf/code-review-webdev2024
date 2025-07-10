@@ -6,7 +6,8 @@ namespace App\services\database;
 
 use App\exceptions\DatabaseException;
 use App\core\common\Config;
-use App\core\common\CustomDebug as Debug;
+use App\core\common\DebugFactory;
+use App\core\common\AbstractDebug as Debug;
 use App\services\database\MySQLiWrapper;
 
 /**
@@ -27,7 +28,8 @@ use App\services\database\MySQLiWrapper;
  * @since    2024-10-29
  *
  * @uses \App\core\common\Config
- * @uses \App\core\common\Debug
+ * @uses \App\core\common\DebugFactory
+ * @uses \App\core\common\AbstractDebug
  * @uses \App\exceptions\DatabaseException
  * @uses \App\services\database\MySQLiWrapper
  */
@@ -71,7 +73,7 @@ class DBConnection
         ?Debug $debug = null
     ) {
         // Only set debug mode once during instance creation
-        $this->debug = $debug ?? new Debug('db', $debugMode ?? false, $debugMode ? 1 : 0);
+        $this->debug = $debug ?? DebugFactory::create('db', $debugMode ?? false, $debugMode ? 1 : 0);
 
         // Fetch the config for DBConnection credentials
         $config = Config::get('db_config');
@@ -124,7 +126,7 @@ class DBConnection
      * @return DBConnection Database connection instance.
      *
      * @uses \App\core\common\Config
-     * @uses \App\core\common\Debug
+     * @uses \App\core\common\AbstractDebug
      * @uses \App\services\database\MySQLiWrapper
      */
     public static function getInstance(

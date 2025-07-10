@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\views\pages;
 
 use App\exceptions\HtmlBuilderException;
-use App\core\common\CustomDebug           as Debug;
+use App\core\common\AbstractDebug         as Debug;
 use App\views\BaseView                    as BaseView;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
@@ -60,7 +60,7 @@ abstract class BasePageView extends BaseView
         $this->debug->debug("{$debugHeading} -- Parent View initialisation complete.");
     }
 
-    // Abstract methods: getPageContents()
+    // Abstract method: getPageContents()
 
     /**
      * Abstract method to generate the main page content for a form.

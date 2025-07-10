@@ -6,7 +6,7 @@ namespace App\services\database\ishell;
 
 use App\exceptions\DatabaseException;
 use App\services\database\DBConnection;
-use App\core\common\CustomDebug           as Debug;
+use App\core\common\AbstractDebug         as Debug;
 use App\services\database\DatabaseService as BaseService;
 
 /**

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\models\ishell;
 
-use App\core\common\Debug;
+use App\core\common\AbstractDebug                         as Debug;
 use App\core\irtf\IrtfUtilities;
+use App\models\BaseModel;
 use App\services\database\ishell\read\TemperaturesService as DbRead;
 
 /**
@@ -17,9 +18,8 @@ use App\services\database\ishell\read\TemperaturesService as DbRead;
  * @version  1.0.0
  */
 
-class TemperaturesModel
+class TemperaturesModel extends BaseModel
 {
-    private $debug;
     private $dbRead;
     private $config;
     private $tempConfig;
@@ -29,10 +29,11 @@ class TemperaturesModel
         ?Debug $debug = null,
         ?DbRead $dbRead = null
     ) {
-        // Debug output
-        $this->debug = $debug ?? new Debug('default', false, 0);
+        // Use parent class' constructor
+        parent::__construct($debug);
         $debugHeading = $this->debug->debugHeading("Model", "__construct");
         $this->debug->debug($debugHeading);
+        $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
 
         // Store the ishell configuration
         $this->config = $config;
@@ -45,6 +46,17 @@ class TemperaturesModel
 
         // READ services
         $this->dbRead = $dbRead ?? new DbRead($this->debug->isDebugMode());
+
+        // Class initialisation complete
+        $this->debug->debug("{$debugHeading} -- Model initialisation complete.");
+    }
+
+    // Abstract method: initializeDefaultData()
+
+    public function initializeDefaultData(?array $data = null): array
+    {
+        // stub
+        return [];
     }
 
     public function fetchTemperatureData(): array

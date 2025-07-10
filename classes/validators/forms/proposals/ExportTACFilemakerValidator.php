@@ -7,8 +7,8 @@ namespace App\validators\forms\proposals;
 use Exception;
 use App\exceptions\ValidationException;
 use App\core\irtf\IrtfUtilities;
-use App\core\common\CustomDebug            as Debug;
-use App\validators\forms\BaseFormValidator as BaseValidator;
+use App\core\common\AbstractDebug as Debug;
+use App\validators\BaseValidator;
 
 /**
  * Validator for handling the TAC scores upload logic.
@@ -41,6 +41,56 @@ class ExportTACFilemakerValidator extends BaseValidator
         $debugHeading = $this->debug->debugHeading("Validator", "__construct");
         $this->debug->debug($debugHeading);
         $this->debug->debug("{$debugHeading} -- Parent class is successfully constructed.");
+    }
+
+    // Abstract methods: getValidationPlan(), formatValidData(), formatErrors()
+
+    protected function getValidationPlan(array $data, array $context = []): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "getValidationPlan");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($data, "{$debugHeading} -- data");
+        $this->debug->debugVariable($context, "{$debugHeading} -- context");
+
+        $minYear = 2000;
+        $maxYear = date('Y') + 1;
+        return [
+            [
+                'field'         => 'program',
+                'method'        => 'validateProgramNumberField',
+                'args'          => [$minYear, $maxYear],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+            [
+                'field'         => 'session',
+                'method'        => 'validateSessionCodeField',
+                'args'          => [],
+                'required'      => true,
+                'required_msg'  => 'This field is required',
+            ],
+        ];
+    }
+
+    protected function formatValidData(array $normalizedPlan): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "formatValidData");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
+
+        return $this->formatStdValidData($normalizedPlan);
+    }
+
+    protected function formatErrors(array $normalizedPlan): array
+    {
+        // Debug output
+        $debugHeading = $this->debug->debugHeading("Validator", "formatErrors");
+        $this->debug->debug($debugHeading);
+        $this->debug->debugVariable($normalizedPlan, "{$debugHeading} -- normalizedPlan");
+
+        return $this->formatStdErrors($normalizedPlan);
     }
 
     /**

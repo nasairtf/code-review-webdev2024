@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\views\pages\proposals;
 
 use App\exceptions\HtmlBuilderException;
-use App\core\common\CustomDebug           as Debug;
+use App\core\common\AbstractDebug         as Debug;
 use App\views\pages\BasePageView          as BaseView;
 use App\core\htmlbuilder\HtmlBuilder      as HtmlBuilder;
 use App\core\htmlbuilder\CompositeBuilder as CompBuilder;
@@ -48,7 +48,7 @@ class ListApplicationPdfsView extends BaseView
         $this->debug->debug("{$debugHeading} -- View initialisation complete.");
     }
 
-    // Abstract methods: getPageContents()
+    // Abstract method: getPageContents()
 
     /**
      * Generates the main page content for the update form.
